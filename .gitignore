@@ -1,0 +1,17 @@
+# Sensitive files - never push
+*.json
+*.key
+*.token
+*.secret
+.env
+
+# OpenClaw internal
+openclaw.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Keep markdown and code
+!TASKBOARD.md
+!*.md
