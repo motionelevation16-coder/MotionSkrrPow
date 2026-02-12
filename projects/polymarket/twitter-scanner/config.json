@@ -1,0 +1,50 @@
+{
+  "accounts": {
+    "news": [
+      "unusual_whales",
+      "WatcherGuru",
+      "WSJ",
+      "Reuters",
+      "AP",
+      "TheBlock__",
+      "CoinDesk"
+    ],
+    "polymarket_gurus": [
+      "Polymarket",
+      "DustinMoskovitz",
+      "StarSauceETH",
+      "ShayneCCoplan",
+      "MikePodhorzer",
+      "NateSilver538",
+      "EricBalchunas"
+    ],
+    "crypto_traders": [
+      "CryptoKaleo",
+      "inversebrah",
+      "TraderSZ",
+      "lookonchain"
+    ]
+  },
+  "hashtags": [
+    "polymarket",
+    "predictionmarkets",
+    "predictions",
+    "bettingmarkets",
+    "politicalbetting",
+    "electionbets"
+  ],
+  "keywords": [
+    "polymarket",
+    "prediction market",
+    "betting odds",
+    "odds shifted",
+    "whales betting"
+  ],
+  "viral_threshold": {
+    "min_likes": 100,
+    "min_retweets": 25,
+    "min_replies": 10
+  },
+  "scan_hours": 24,
+  "output_dir": "output"
+}

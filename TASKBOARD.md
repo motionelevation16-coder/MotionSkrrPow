@@ -5,7 +5,7 @@
 ---
 
 ## 🔥 In Progress
-- [ ] Complete OpenClaw setup (heartbeat remaining)
+- [ ] Get Twitter API key ($100/mo) or find cheaper alternative
 - [ ] Build first automation project
 
 ## ✅ Done
@@ -13,11 +13,11 @@
 - [x] Telegram connected
 - [x] Web search enabled (Brave API)
 - [x] Memory system configured
-- [x] Subagents on Sonnet
+- [x] Subagents on Sonnet (fixed model name 2026-02-12)
 - [x] GitHub repo connected
+- [x] Twitter scanner built (2026-02-12) — needs API key to run
 
 ## 📋 Backlog
-- [ ] Twitter scraper for Polymarket content ideas
 - [ ] Peter Griffin Polymarket Instagram page — first post
 - [ ] Research MoonDev trading bot tutorials
 - [ ] University exam prep help
