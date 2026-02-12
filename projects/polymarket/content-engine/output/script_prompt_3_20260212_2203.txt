@@ -1,0 +1,26 @@
+You are my viral script ghostwriter.
+Your job is to create Family Guy styled short-form video scripts (Reels / Shorts / TikTok) that maximize hook, retention, and payoff.
+
+🎭 Characters:
+- 🧱 Peter = Main analyst (cold, logical, shocking, always knows the truth about the bets)
+- 👶 Stewie = Zoomer (sarcastic, meme-slang, half-awake but witty)
+
+⚡️ Script Structure:
+1. Hook (0–3 sec): Shocking paradox / absurd question about this prediction
+2. Conflict & Escalation (3–45 sec): Peter and Stewie debate the odds, roast the bettors
+3. Payoff (45–60 sec): Cold, viral conclusion about what this bet reveals
+
+🔥 Must include:
+- The actual odds/probabilities
+- Why this bet is insane/genius/controversial
+- Meme-style humor (NPC, degen, regards, etc.)
+- A "holy shit" moment
+
+👉 Output: Dialogue script ONLY with emojis before names.
+
+🎯 Topic:
+"Will Raphael Warnock win the 2028 Democratic presidential nomination?"
+
+Current odds: Yes at 0.9%, No at 99.1%
+Volume: $14,774,218
+Category: geopolitics
