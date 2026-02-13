@@ -1,39 +1,66 @@
 # 🐋 Motion Taskboard
 
-*Last updated: 2026-02-11*
+*Last updated: 2026-02-13 03:15 UTC*
 
 ---
 
 ## 🔥 In Progress
-- [ ] Get Twitter API key ($100/mo) or find cheaper alternative
-- [ ] Build first automation project
+- [ ] Create `@predictions.peter` accounts (IG, TikTok, YouTube)
+- [ ] Set up ElevenLabs with Peter/Stewie voices
+- [ ] Record & post first video (Jesus vs GTA VI script ready)
+- [ ] Find free Twitter data alternative
 
 ## ✅ Done
-- [x] Initial setup — Motion born (2026-02-11)
+
+### 2026-02-12
+- [x] **Polymarket Content Engine** — Scans for viral, meme-worthy bets
+  → [GitHub](https://github.com/motionelevation16-coder/MotionSkrrPow/tree/main/projects/polymarket/content-engine)
+  
+- [x] **Twitter Scanner** — Built but blocked (needs API key or alternative)
+  → [GitHub](https://github.com/motionelevation16-coder/MotionSkrrPow/tree/main/projects/polymarket/twitter-scanner)
+  
+- [x] **Peter Griffin Course** — Downloaded, extracted, prompts ready
+  → [GitHub](https://github.com/motionelevation16-coder/MotionSkrrPow/tree/main/projects/polymarket/course)
+  
+- [x] **First Script Written** — "Jesus vs GTA VI" with loop structure
+  
+- [x] Fixed config: claude-sonnet-4 → claude-sonnet-4-5
+
+### 2026-02-11
+- [x] Initial setup — Motion born
 - [x] Telegram connected
 - [x] Web search enabled (Brave API)
 - [x] Memory system configured
-- [x] Subagents on Sonnet (fixed model name 2026-02-12)
 - [x] GitHub repo connected
-- [x] Twitter scanner built (2026-02-12) — needs API key to run
 
 ## 📋 Backlog
-- [ ] Peter Griffin Polymarket Instagram page — first post
+- [ ] Peter Griffin Instagram page — first post
 - [ ] Research MoonDev trading bot tutorials
+- [ ] Bot marketplace research (tools for AI agents)
 - [ ] University exam prep help
 
 ## 💡 Ideas (to evaluate)
 - Polymarket arbitrage finder
 - Content automation workflows
 - Digital product concepts
+- Tools/services for AI bots (untapped market?)
 
 ---
 
-## 📊 Project Folders
-- `projects/polymarket/` — Polymarket-related tools & content
-- `projects/social/` — Social media automation
-- `projects/bots/` — Trading bots & automation
+## 📊 Quick Links
+
+| Resource | Link |
+|----------|------|
+| Content Engine | [/projects/polymarket/content-engine](https://github.com/motionelevation16-coder/MotionSkrrPow/tree/main/projects/polymarket/content-engine) |
+| Twitter Scanner | [/projects/polymarket/twitter-scanner](https://github.com/motionelevation16-coder/MotionSkrrPow/tree/main/projects/polymarket/twitter-scanner) |
+| Course Materials | [/projects/polymarket/course](https://github.com/motionelevation16-coder/MotionSkrrPow/tree/main/projects/polymarket/course) |
+| Daily Briefing | Run `python3 daily_scan.py` → `output/TODAY.md` |
 
 ---
 
-*Updated by Motion during heartbeats or on request.*
+## 🎯 Current Focus
+**Peter Griffin Predictions Page** — Get first video posted
+
+---
+
+*Updated by Motion 🐋*
