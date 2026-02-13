@@ -5,10 +5,19 @@
 ---
 
 ## 🔥 In Progress
+- [ ] **Bot Platform Concept** — School + Careers + Healthcare for AI agents
+  - Clarifying questions sent to Lyubo (awaiting answers)
+  - Concept: Bots learn → get certified → apply for careers → get healthcare if broken
+  - Next: Define MVP, revenue model, technical approach
+
 - [ ] Create `@predictions.peter` accounts (IG, TikTok, YouTube)
 - [ ] Set up ElevenLabs with Peter/Stewie voices
-- [ ] Record & post first video (Jesus vs GTA VI script ready)
-- [ ] Find free Twitter data alternative
+- [ ] Record & post first video (Lyubo polishing scripts)
+
+## ✅ Just Completed
+- [x] **Bot Economy Research** — Deep dive into services FOR bots AS customers
+  → [Full Research](projects/bot-economy-research/RESEARCH.md)
+- [x] ~~Twitter scraper~~ → Lyubo will source topics manually
 
 ## ✅ Done
 
