@@ -73,7 +73,8 @@ def analyze_market(market: dict) -> dict:
         'outcomes': [],
         'content_score': 0,
         'content_angles': [],
-        'category': 'general'
+        'category': 'general',
+        'meme_worthy': False
     }
     
     # Parse outcomes and probabilities
@@ -107,6 +108,17 @@ def analyze_market(market: dict) -> dict:
     angles = []
     question = analysis['question'].lower()
     
+    # HIGH LIQUIDITY = PRIORITY (people are putting real money)
+    if analysis['liquidity'] > 500000:
+        score += 40
+        angles.append("💎 MASSIVE LIQUIDITY - Serious money here")
+    elif analysis['liquidity'] > 100000:
+        score += 25
+        angles.append("💰 HIGH LIQUIDITY - Real bets")
+    elif analysis['liquidity'] > 50000:
+        score += 15
+        angles.append("📈 Good liquidity")
+    
     # High volume = trending
     if analysis['volume'] > 1000000:
         score += 30
@@ -114,6 +126,27 @@ def analyze_market(market: dict) -> dict:
     elif analysis['volume'] > 100000:
         score += 15
         angles.append("📈 Decent volume - Active market")
+    
+    # MEME-WORTHY DETECTION
+    meme_keywords = [
+        'gta', 'game', 'celebrity', 'kanye', 'kardashian', 'drake', 
+        'beef', 'fight', 'ufo', 'alien', 'bigfoot', 'simulation',
+        'girlfriend', 'boyfriend', 'marry', 'divorce', 'baby',
+        'tweet', 'meme', 'viral', 'tiktok', 'instagram', 'youtube',
+        'world end', 'apocalypse', 'zombie', 'superbowl', 'halftime',
+        'oscar', 'grammy', 'championship', 'knockout', 'retire'
+    ]
+    if any(word in question for word in meme_keywords):
+        score += 35
+        analysis['meme_worthy'] = True
+        angles.append("😂 MEME-WORTHY - Perfect for content")
+    
+    # Absurd/funny question detection
+    absurd_patterns = ['before gta', 'before 2030', 'ever happen', 'first to']
+    if any(pattern in question for pattern in absurd_patterns):
+        score += 25
+        analysis['meme_worthy'] = True
+        angles.append("🤡 ABSURD BET - Comedy gold")
     
     # Close odds = controversial/uncertain
     if analysis['outcomes']:

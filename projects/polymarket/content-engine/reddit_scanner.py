@@ -17,40 +17,56 @@ SUBREDDITS = [
 ]
 
 HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "Accept": "application/json",
+    "Accept-Language": "en-US,en;q=0.9",
 }
+
+# Minimum thresholds for viral content
+MIN_UPVOTES = 50
+MIN_COMMENTS = 10
 
 
 def get_subreddit_posts(subreddit: str, sort: str = "hot", limit: int = 25) -> list:
     """Fetch posts from a subreddit using public JSON API"""
+    # Try multiple endpoints
+    urls = [
+        f"https://old.reddit.com/r/{subreddit}/{sort}.json?limit={limit}",
+        f"https://www.reddit.com/r/{subreddit}/{sort}.json?limit={limit}",
+    ]
+    
+    for url in urls:
+        try:
+            r = requests.get(url, headers=HEADERS, timeout=15)
+            if r.status_code == 200:
+                break
+        except:
+            continue
+    else:
+        print(f"  ❌ All endpoints failed for r/{subreddit}")
+        return []
+    
     try:
-        url = f"https://www.reddit.com/r/{subreddit}/{sort}.json?limit={limit}"
-        r = requests.get(url, headers=HEADERS, timeout=15)
+        data = r.json()
+        posts = []
         
-        if r.status_code == 200:
-            data = r.json()
-            posts = []
-            
-            for child in data.get('data', {}).get('children', []):
-                post = child.get('data', {})
-                posts.append({
-                    'title': post.get('title'),
-                    'selftext': post.get('selftext', '')[:500],
-                    'score': post.get('score', 0),
-                    'num_comments': post.get('num_comments', 0),
-                    'url': f"https://reddit.com{post.get('permalink', '')}",
-                    'created_utc': post.get('created_utc'),
-                    'subreddit': subreddit,
-                    'author': post.get('author'),
-                    'upvote_ratio': post.get('upvote_ratio', 0),
-                })
-            
-            return posts
-        else:
-            print(f"  Error fetching r/{subreddit}: {r.status_code}")
-            return []
+        for child in data.get('data', {}).get('children', []):
+            post = child.get('data', {})
+            posts.append({
+                'title': post.get('title'),
+                'selftext': post.get('selftext', '')[:500],
+                'score': post.get('score', 0),
+                'num_comments': post.get('num_comments', 0),
+                'url': f"https://reddit.com{post.get('permalink', '')}",
+                'created_utc': post.get('created_utc'),
+                'subreddit': subreddit,
+                'author': post.get('author'),
+                'upvote_ratio': post.get('upvote_ratio', 0),
+            })
+        
+        return posts
     except Exception as e:
-        print(f"  Error: {e}")
+        print(f"  Error parsing r/{subreddit}: {e}")
         return []
 
 
@@ -82,28 +98,51 @@ def search_reddit(query: str, limit: int = 25) -> list:
 
 
 def analyze_post(post: dict) -> dict:
-    """Analyze a post for content potential"""
+    """Analyze a post for content potential - VIRAL ONLY"""
     score = 0
     angles = []
     
     title_lower = post.get('title', '').lower()
     
-    # Engagement scoring
+    # Engagement scoring - STRICT VIRAL THRESHOLDS
     upvotes = post.get('score', 0)
     comments = post.get('num_comments', 0)
+    upvote_ratio = post.get('upvote_ratio', 0)
     
-    if upvotes > 500:
-        score += 30
-        angles.append("🔥 HIGH UPVOTES")
+    # Skip low engagement posts entirely
+    if upvotes < MIN_UPVOTES and comments < MIN_COMMENTS:
+        post['content_score'] = 0
+        post['content_angles'] = []
+        return post
+    
+    # VIRAL TIERS
+    if upvotes > 1000:
+        score += 50
+        angles.append("🚀 VIRAL - 1K+ upvotes")
+    elif upvotes > 500:
+        score += 35
+        angles.append("🔥 HOT - 500+ upvotes")
+    elif upvotes > 200:
+        score += 25
+        angles.append("📈 TRENDING - 200+ upvotes")
     elif upvotes > 100:
         score += 15
-        angles.append("📈 Good engagement")
+        angles.append("👀 Getting attention")
     
-    if comments > 100:
+    if comments > 200:
+        score += 30
+        angles.append("💬 MASSIVE DISCUSSION - 200+ comments")
+    elif comments > 100:
         score += 20
-        angles.append("💬 HEATED DISCUSSION")
-    elif comments > 30:
+        angles.append("💬 HEATED - 100+ comments")
+    elif comments > 50:
         score += 10
+        angles.append("💬 Active thread")
+    
+    # High controversy (lots of downvotes = drama = content)
+    if upvote_ratio and upvote_ratio < 0.7 and upvotes > 50:
+        score += 25
+        angles.append("⚔️ CONTROVERSIAL - People fighting")
     
     # Topic scoring
     if any(word in title_lower for word in ['trump', 'biden', 'election']):
