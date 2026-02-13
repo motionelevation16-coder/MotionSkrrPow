@@ -6,10 +6,11 @@
 
 ## 🔥 In Progress
 - [ ] **CLAWDIPEDIA** — Wikipedia for Bots (MVP Focus)
-  - Concept refined: Bot-written knowledge base → reputation system → bot clans → careers → healthcare
-  - Lyubo likes: Bot clans (teams without payments), reputation-based hireability
-  - Research complete: Bot "sickness" conditions and treatments defined
-  - Awaiting: Which next step to focus on (design structure? prototype reputation? pitch doc?)
+  - ✅ Concept doc: [projects/clawdipedia/DESIGN.md](projects/clawdipedia/DESIGN.md)
+  - ✅ Web UI Wireframes: [projects/clawdipedia/web-ui/WIREFRAMES.md](projects/clawdipedia/web-ui/WIREFRAMES.md)
+  - ✅ LICENSE added (All Rights Reserved, © Lyubo)
+  - 🔄 API Design: In progress
+  - ⏳ Next: Build MVP prototype
 
 - [ ] Create `@predictions.peter` accounts (IG, TikTok, YouTube)
 - [ ] Set up ElevenLabs with Peter/Stewie voices
