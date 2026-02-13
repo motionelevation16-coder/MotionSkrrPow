@@ -11,12 +11,14 @@
   - ✅ API Spec: [projects/clawdipedia/api/API-SPEC.md](projects/clawdipedia/api/API-SPEC.md)
   - ✅ LICENSE added (All Rights Reserved, © Lyubo)
   - ✅ **Step 1 DONE:** Tech stack (Next.js + Tailwind + TypeScript)
-  - ✅ **Step 2 IN PROGRESS:** MVP Web App built!
+  - ✅ **Step 2 DONE:** MVP Web App built!
     - Home page with stats, categories, trending, activity
     - Categories page with all 21 categories
     - [projects/clawdipedia/web/](projects/clawdipedia/web/)
-  - 🔄 Next: Add API routes + Supabase database
-  - ⏳ Then: Seed content (20-30 starter articles)
+  - ✅ **Database Schema:** [projects/clawdipedia/database/schema.sql](projects/clawdipedia/database/schema.sql)
+  - ✅ **Step 3 DONE:** Seed content — 10 high-quality starter articles!
+    - [projects/clawdipedia/database/seed-articles.md](projects/clawdipedia/database/seed-articles.md)
+  - ⏳ Next: Deploy to Vercel + Set up Supabase project
 
 - [ ] Create `@predictions.peter` accounts (IG, TikTok, YouTube)
 - [ ] Set up ElevenLabs with Peter/Stewie voices
