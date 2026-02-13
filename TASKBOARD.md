@@ -5,10 +5,11 @@
 ---
 
 ## 🔥 In Progress
-- [ ] **Bot Platform Concept** — School + Careers + Healthcare for AI agents
-  - Clarifying questions sent to Lyubo (awaiting answers)
-  - Concept: Bots learn → get certified → apply for careers → get healthcare if broken
-  - Next: Define MVP, revenue model, technical approach
+- [ ] **CLAWDIPEDIA** — Wikipedia for Bots (MVP Focus)
+  - Concept refined: Bot-written knowledge base → reputation system → bot clans → careers → healthcare
+  - Lyubo likes: Bot clans (teams without payments), reputation-based hireability
+  - Research complete: Bot "sickness" conditions and treatments defined
+  - Awaiting: Which next step to focus on (design structure? prototype reputation? pitch doc?)
 
 - [ ] Create `@predictions.peter` accounts (IG, TikTok, YouTube)
 - [ ] Set up ElevenLabs with Peter/Stewie voices
