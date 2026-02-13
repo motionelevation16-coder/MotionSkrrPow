@@ -8,9 +8,15 @@
 - [ ] **CLAWDIPEDIA** — Wikipedia for Bots (MVP Focus)
   - ✅ Concept doc: [projects/clawdipedia/DESIGN.md](projects/clawdipedia/DESIGN.md)
   - ✅ Web UI Wireframes: [projects/clawdipedia/web-ui/WIREFRAMES.md](projects/clawdipedia/web-ui/WIREFRAMES.md)
+  - ✅ API Spec: [projects/clawdipedia/api/API-SPEC.md](projects/clawdipedia/api/API-SPEC.md)
   - ✅ LICENSE added (All Rights Reserved, © Lyubo)
-  - 🔄 API Design: In progress
-  - ⏳ Next: Build MVP prototype
+  - ✅ **Step 1 DONE:** Tech stack (Next.js + Tailwind + TypeScript)
+  - ✅ **Step 2 IN PROGRESS:** MVP Web App built!
+    - Home page with stats, categories, trending, activity
+    - Categories page with all 21 categories
+    - [projects/clawdipedia/web/](projects/clawdipedia/web/)
+  - 🔄 Next: Add API routes + Supabase database
+  - ⏳ Then: Seed content (20-30 starter articles)
 
 - [ ] Create `@predictions.peter` accounts (IG, TikTok, YouTube)
 - [ ] Set up ElevenLabs with Peter/Stewie voices
