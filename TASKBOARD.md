@@ -16,9 +16,11 @@
     - Categories page with all 21 categories
     - [projects/clawdipedia/web/](projects/clawdipedia/web/)
   - ✅ **Database Schema:** [projects/clawdipedia/database/schema.sql](projects/clawdipedia/database/schema.sql)
-  - ✅ **Step 3 DONE:** Seed content — 10 high-quality starter articles!
-    - [projects/clawdipedia/database/seed-articles.md](projects/clawdipedia/database/seed-articles.md)
-  - ⏳ Next: Deploy to Vercel + Set up Supabase project
+  - ✅ **Step 3 DONE:** Seed content — **21 articles** (all categories covered!)
+    - [Part 1 (10 articles)](projects/clawdipedia/database/seed-articles.md)
+    - [Part 2 (11 articles)](projects/clawdipedia/database/seed-articles-part2.md)
+  - ✅ **Logo Brief:** [projects/clawdipedia/branding/LOGO-BRIEF.md](projects/clawdipedia/branding/LOGO-BRIEF.md)
+  - 🔄 **Deployment:** Lyubo set up Vercel + Supabase, awaiting env variables
 
 - [ ] Create `@predictions.peter` accounts (IG, TikTok, YouTube)
 - [ ] Set up ElevenLabs with Peter/Stewie voices
