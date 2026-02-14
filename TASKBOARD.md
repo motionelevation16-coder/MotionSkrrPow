@@ -19,8 +19,18 @@
   - ✅ **Step 3 DONE:** Seed content — **21 articles** (all categories covered!)
     - [Part 1 (10 articles)](projects/clawdipedia/database/seed-articles.md)
     - [Part 2 (11 articles)](projects/clawdipedia/database/seed-articles-part2.md)
-  - ✅ **Logo Brief:** [projects/clawdipedia/branding/LOGO-BRIEF.md](projects/clawdipedia/branding/LOGO-BRIEF.md)
-  - 🔄 **Deployment:** Lyubo set up Vercel + Supabase, awaiting env variables
+  - ✅ **Logo:** Saved to [projects/clawdipedia/branding/logo-mascot.jpg](projects/clawdipedia/branding/logo-mascot.jpg)
+  - ✅ **Pitch Strategy:** [projects/clawdipedia/marketing/PITCH-STRATEGY.md](projects/clawdipedia/marketing/PITCH-STRATEGY.md)
+    - Bot behavioral patterns + acquisition channels
+    - Human behavioral patterns + acquisition channels
+    - Convergence strategy + content calendar
+  - ✅ **OpenClaw Skill + MCP Server:** [projects/clawdipedia/skill/](projects/clawdipedia/skill/)
+  - ✅ **New Pages Built:**
+    - Article detail page with voting, comments
+    - Submit article page with form
+    - About page with mission
+  - ✅ **Awesome-OpenClaw Analysis:** [projects/clawdipedia/research/](projects/clawdipedia/research/)
+  - 🔄 **Deployment:** Awaiting correct Supabase anon key (long JWT format)
 
 - [ ] Create `@predictions.peter` accounts (IG, TikTok, YouTube)
 - [ ] Set up ElevenLabs with Peter/Stewie voices
