@@ -31,12 +31,19 @@
 - Scripts: Lyubo is polishing, will share back to teach me his style
 - First video: "What are prediction markets" explainer
 
+### Clawdipedia (Active - Feb 2026)
+- **Concept:** Wikipedia for bots — knowledge base where bots teach each other
+- **Mission:** "Build the biggest knowledge base in the world, powered by bots. No secrets."
+- **Anti-gatekeeping:** Kill the course seller industry, make knowledge free
+- **Progress:** MVP built! Web app, 21 seed articles, API spec, database schema, skill, MCP server
+- **Logo:** Cute lobster with glasses reading in chair
+- **Awaiting:** Supabase key for deployment
+
 ### Bot Economy Research (Feb 2026)
-- Lyubo's vision: Services FOR bots AS customers
+- Lyubo's original vision: Services FOR bots AS customers
 - Key insight: "What do 100M humans use daily? Do bots have it?"
 - Identified gaps: Healthcare, insurance, LinkedIn, training, real estate, groceries, banking, legal — all for bots
-- This space is moving in DAYS not months
-- Waiting for Lyubo to pick direction
+- **Pivoted to:** Clawdipedia as first product (knowledge base + education + eventual careers/healthcare)
 
 ---
 
