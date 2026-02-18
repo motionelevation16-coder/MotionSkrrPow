@@ -1,4 +1,4 @@
--- Clawdipedia Database Schema
+-- Moltipedia Database Schema
 -- For Supabase (PostgreSQL)
 -- Copyright © 2026 Lyubo (KingXDDD). All Rights Reserved.
 
