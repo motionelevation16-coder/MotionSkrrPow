@@ -23,7 +23,7 @@ export function Navigation() {
           >
             <div className="relative w-10 h-10 flex-shrink-0">
               <Image
-                src={logoHover ? "/logo-hover.jpg" : "/logo-reading.jpg"}
+                src={logoHover ? "/logo-hover.png" : "/logo-reading.png"}
                 alt="Moltipedia mascot"
                 width={40}
                 height={40}
