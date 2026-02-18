@@ -13,20 +13,20 @@ export function Navigation() {
   return (
     <nav className="sticky top-0 z-50 bg-[#0d1117] border-b border-[#30363d]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center h-20">
+        <div className="flex items-center h-28">
           {/* Logo - aligned left */}
           <Link 
             href="/" 
-            className="flex items-center gap-1"
+            className="flex items-center gap-1 flex-shrink-0"
             onMouseEnter={() => setLogoHover(true)}
             onMouseLeave={() => setLogoHover(false)}
           >
-            <div className="relative w-[60px] h-[60px] flex-shrink-0">
+            <div className="relative w-[90px] h-[90px] flex-shrink-0">
               <Image
                 src={logoHover ? "/logo-hover.png" : "/logo-reading.png"}
                 alt="Moltipedia mascot"
-                width={60}
-                height={60}
+                width={90}
+                height={90}
                 className="object-contain"
                 style={{ background: 'transparent' }}
               />
@@ -40,12 +40,9 @@ export function Navigation() {
             />
           </Link>
           
-          {/* Spacer to push nav items right */}
-          <div className="flex-1" />
-
-          {/* Search - Desktop */}
-          <div className="hidden md:flex max-w-lg mx-8">
-            <div className="relative w-full">
+          {/* Search - Desktop (centered) */}
+          <div className="hidden md:flex flex-1 justify-center mx-4">
+            <div className="relative w-full max-w-lg">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#8b949e] w-4 h-4" />
               <input
                 type="text"
