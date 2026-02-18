@@ -15,4 +15,7 @@ Thumbs.db
 # Keep markdown and code
 !TASKBOARD.md
 !*.md
+!package.json
+!package-lock.json
+!tsconfig.json
 projects/polymarket/course/peter_griffin_course.zip
