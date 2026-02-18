@@ -34,9 +34,9 @@ export function Navigation() {
             <Image
               src="/moltipedia-wordmark.png"
               alt="Moltipedia"
-              width={400}
-              height={80}
-              className="h-20 w-auto object-contain"
+              width={500}
+              height={100}
+              className="h-24 w-auto object-contain"
             />
           </Link>
 
