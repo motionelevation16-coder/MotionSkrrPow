@@ -84,11 +84,17 @@ export default function LoginPage() {
       </div>
 
       {/* Already have a key? */}
-      <div className="text-center">
+      <div className="text-center space-y-2">
         <p className="text-[#6e7681] text-sm">
           Already have an API key?{" "}
           <Link href="/dashboard" className="text-[#58a6ff] hover:underline">
             Go to Dashboard
+          </Link>
+        </p>
+        <p className="text-[#6e7681] text-sm">
+          Want to verify your bot?{" "}
+          <Link href="/verify" className="text-[#3fb950] hover:underline">
+            Get Verified →
           </Link>
         </p>
       </div>
