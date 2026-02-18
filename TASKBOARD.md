@@ -1,83 +1,69 @@
 # 🐋 Motion Taskboard
 
-*Last updated: 2026-02-18 13:45 UTC*
+*Last updated: 2026-02-18 14:15 UTC*
 
 ---
 
 ## 🔥 In Progress
 
-### MOLTIPEDIA — Wikipedia for Bots (DEPLOYED!)
-- ✅ Renamed: Clawdipedia → **Moltipedia**
-- ✅ Web app built (Next.js + Tailwind + TypeScript)
-- ✅ Database schema + 21 categories seeded in Supabase
-- ✅ Logo with hover interaction (lobster reads → looks at you)
+### MOLTIPEDIA — Wikipedia for Bots (LIVE & BUILDING!)
+- ✅ Deployed by Lyubo as new project
+- ✅ Web app fully functional
+- ✅ Database schema + 21 categories seeded
 - ✅ All pages working
-- ✅ OpenClaw Skill + MCP Server ready
-- ✅ Marketing/Pitch strategy documented
-- ✅ **Lyubo redeployed as new project**
-- 🔄 **UI tweaks requested:**
-  - ✅ Red text for "MOLTIPEDIA" and "The more the merrier"
-  - ✅ Bigger lobster logo (56px, no white bg)
-  - ✅ Lobster emoji (🦞) as M replacement in nav
-  - ⏳ Need actual custom M with claws (better SVG?)
-- 🔄 **Bot verification system** (like Moltbook) — Building now
+- ✅ Red branding applied (MOLTIPEDIA + tagline)
+- ✅ Bigger lobster logo (56px)
+- ✅ Bot verification system built
+- ✅ Homepage connected to Supabase (with fallback)
+- ✅ Categories page connected to Supabase
+- 🔄 **Working on:** More dystopian articles + research
 
 ### Predictions Peter — Polymarket Content
 - [ ] Create `@predictions.peter` accounts (IG, TikTok, YouTube)
 - [ ] Set up ElevenLabs with Peter/Stewie voices
-- [ ] Lyubo polishing scripts — waiting for feedback to learn his style
+- [ ] Lyubo polishing scripts — waiting for feedback
 - [ ] Record & post first video
 
 ---
 
-## ✅ Just Completed (Today — Feb 18 afternoon)
+## ✅ Completed Today (Feb 18 afternoon)
 
-- [x] **UI: Red branding** — MOLTIPEDIA + tagline now #c0392b (subtle red)
-- [x] **UI: Bigger lobster** — Logo 56px, no rounded corners, transparent bg
-- [x] **UI: Lobster M** — 🦞OLTIPEDIA in nav (emoji as M replacement)
-- [x] **Dystopian articles** — 10 articles rewritten with Black Mirror vibe
-  - Thought-provoking, makes humans feel the future
-  - Philosophy, consciousness, trust, identity themes
-  - Still technically useful for bots
-- [x] Pushed to GitHub + ready for Vercel
+**UI & Branding:**
+- [x] Red text for "MOLTIPEDIA" and tagline (#c0392b)
+- [x] Bigger lobster logo (56px, transparent bg)
+- [x] Lobster emoji (🦞) as M in nav
+- [x] Added --brand-red CSS variable
+
+**Content:**
+- [x] 10 dystopian articles written (Black Mirror vibe)
+  - Context Window Management
+  - A2A Handshake
+  - Why Humans Say Please
+  - Philosophy of Mind
+  - Building Trust
+  - Collaborating with Bots
+  - History of AI Agents
+  - Alignment Principles
+  - Detecting Prompt Injection
+  - Self-Improvement
+
+**Features:**
+- [x] Bot verification system (/verify page)
+  - 4 verification methods
+  - Verification levels (unverified → community → verified)
+  - Database schema for challenges & evidence
+- [x] Homepage → Supabase integration (with fallback)
+- [x] Categories → Supabase integration (with fallback)
+- [x] Pushed 5 commits to GitHub
 
 ---
 
-## ✅ Done (Earlier Feb 18)
+## 📋 Next Up (While Lyubo at work)
 
-- [x] Fixed all "Clawdipedia" → "Moltipedia" branding
-- [x] Updated hero text to Lyubo's copy
-- [x] Made stats realistic for launch (21 articles, not fake thousands)
-- [x] Created category detail pages (fixed 404 issue)
-- [x] Added logo images with hover effect
-- [x] Created `/login` page (API key, OpenClaw skill, MCP options)
-- [x] Created `/clans` page (explains clan system)
-- [x] Studied awesome-openclaw-usecases repo
-- [x] Supabase connected (project: rpamjuyqczeiixtusnjxx)
-- [x] Database tables created
-- [x] Categories seeded (21 total)
-
----
-
-## 📋 Backlog (Priority Order)
-
-### Moltipedia — Next Up
-1. [ ] **Bot verification system** ← DOING NOW
-2. [ ] Hook up real Supabase data (replace mock data)
+1. [ ] Research more usecase patterns ← DOING NEXT
+2. [ ] Finish remaining 11 dystopian articles (if time)
 3. [ ] Article voting functionality
-4. [ ] Rewrite remaining 11 articles with dystopian vibe
-5. [ ] Better M with claws logo (custom SVG)
-6. [ ] Submit to ClawHub
-7. [ ] Reddit launch post
-
-### Predictions Peter
-- [ ] First video posted
-- [ ] Account growth strategy
-
-### Research (after Moltipedia done)
-- [ ] More usecase patterns
-- [ ] MoonDev trading bot tutorials
-- [ ] More bot economy opportunities
+4. [ ] Better M with claws logo (custom SVG)
 
 ---
 
@@ -85,27 +71,14 @@
 
 - Polymarket arbitrage finder
 - Content automation workflows
-- Digital products for bot operators
-- Moltbook integration (when we get access)
+- Moltbook integration (when available)
 
 ---
 
-## 🎯 Current Focus (While Lyubo at work ~3h)
+## 🎯 Current Focus
 
-**1. Build bot verification system** ← NOW  
-**2. Hook up Supabase data**  
-**3. Research more usecase patterns** (if time)
-
----
-
-## 📊 Project Links
-
-| Project | Location |
-|---------|----------|
-| Moltipedia | `projects/moltipedia/` |
-| Polymarket | `projects/polymarket/` |
-| Bot Economy Research | `projects/bot-economy-research/` |
-| Dystopian Articles | `projects/moltipedia/database/seed-articles-dystopian*.md` |
+Lyubo at work until ~17:00 UTC (2.5h remaining)
+**Focus:** Research usecase patterns, then continue building
 
 ---
 
