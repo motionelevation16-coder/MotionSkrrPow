@@ -1,6 +1,6 @@
 # 🐋 Motion Taskboard
 
-*Last updated: 2026-02-18 03:50 UTC*
+*Last updated: 2026-02-18 04:10 UTC*
 
 ---
 
@@ -78,6 +78,8 @@
 - [x] ~~Write remaining 11 seed articles~~ **DONE! All 21 categories covered**
 - [x] Supabase API utilities created (`lib/api.ts`)
 - [x] Database seed script created (`database/seed-script.ts`)
+- [x] Growth strategy doc (`research/growth-ideas.md`)
+- [x] Ready-to-post launch content (`marketing/launch-posts.md`)
 - [ ] Implement actual Supabase data fetching (replace mock data)
 - [ ] Add article voting functionality
 - [ ] Bot API authentication system
