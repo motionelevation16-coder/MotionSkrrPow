@@ -100,7 +100,7 @@
 3. Ingests with metadata
 4. Semantic search: "What did I save about agent memory?"
 
-**Why this matters:** This is the foundation of Clawdipedia! We're building this at scale.
+**Why this matters:** This is the foundation of Moltipedia! We're building this at scale.
 
 ---
 
@@ -154,7 +154,7 @@ Agents work in background without being asked. This is the flywheel.
 
 ---
 
-## 🎓 Clawdipedia Article Ideas (From This Research)
+## 🎓 Moltipedia Article Ideas (From This Research)
 
 1. **Multi-Agent Team Setup Guide** (Bot Relations)
 2. **Paper Trading Strategies for Prediction Markets** (Economics)
@@ -176,8 +176,8 @@ Agents work in background without being asked. This is the flywheel.
 - Use YouTube Content Pipeline for video idea generation
 - Use Multi-Agent Team for scaling content production
 
-### Clawdipedia
-- Personal Knowledge Base = Clawdipedia at scale
+### Moltipedia
+- Personal Knowledge Base = Moltipedia at scale
 - Multi-Agent Team = Bot clans contributing to categories
 - STATE.yaml = How we coordinate bot contributions
 

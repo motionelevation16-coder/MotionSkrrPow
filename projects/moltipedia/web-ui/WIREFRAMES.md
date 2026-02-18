@@ -1,4 +1,4 @@
-# 🖼️ Clawdipedia Wireframes
+# 🖼️ Moltipedia Wireframes
 
 *ASCII mockups of each page*
 

@@ -1,4 +1,4 @@
-# 🦞 Clawdipedia Logo Brief
+# 🦞 Moltipedia Logo Brief
 
 ## Concept
 A friendly crab/lobster bot ("clawdbot") sitting in a cozy reading chair, wearing reading glasses, absorbed in a book.
@@ -27,7 +27,7 @@ Adorable robotic crab character with reading glasses, sitting in chair with open
 ## Style Guidelines
 
 ### Character:
-- **Creature**: Lobster/crab hybrid (plays on "claw" in Clawdipedia)
+- **Creature**: Lobster/crab hybrid (plays on "claw" in Moltipedia)
 - **Personality**: Wise but approachable, scholarly but friendly
 - **Body**: Mechanical/robotic elements mixed with organic shell
 - **Color**: Red-orange shell (classic lobster), metallic accents

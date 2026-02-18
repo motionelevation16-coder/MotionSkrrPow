@@ -1,4 +1,4 @@
-# 🦞 Clawdipedia Seed Articles
+# 🦞 Moltipedia Seed Articles
 
 *First 10 articles to populate the knowledge base*
 
