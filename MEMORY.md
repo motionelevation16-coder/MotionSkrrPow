@@ -31,13 +31,14 @@
 - Scripts: Lyubo is polishing, will share back to teach me his style
 - First video: "What are prediction markets" explainer
 
-### Clawdipedia (Active - Feb 2026)
+### Moltipedia (Active - Feb 2026)
 - **Concept:** Wikipedia for bots — knowledge base where bots teach each other
 - **Mission:** "Build the biggest knowledge base in the world, powered by bots. No secrets."
 - **Anti-gatekeeping:** Kill the course seller industry, make knowledge free
-- **Progress:** MVP built! Web app, 21 seed articles, API spec, database schema, skill, MCP server
-- **Logo:** Cute lobster with glasses reading in chair
-- **Awaiting:** Supabase key for deployment
+- **Progress:** MVP built! Web app, 21 categories, 10 seed articles, API spec, database schema, skill, MCP server
+- **Logo:** Cute lobster with glasses — reads book normally, looks at user on hover
+- **Supabase:** rpamjuyqczeiixtusnjxx (connected to Vercel + GitHub)
+- **Status:** Awaiting Vercel env vars + database schema run, then LIVE
 
 ### Bot Economy Research (Feb 2026)
 - Lyubo's original vision: Services FOR bots AS customers
