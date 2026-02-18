@@ -1,96 +1,122 @@
 # 🐋 Motion Taskboard
 
-*Last updated: 2026-02-13 03:15 UTC*
+*Last updated: 2026-02-18 03:05 UTC*
 
 ---
 
 ## 🔥 In Progress
-- [ ] **CLAWDIPEDIA** — Wikipedia for Bots (MVP Focus)
-  - ✅ Concept doc: [projects/clawdipedia/DESIGN.md](projects/clawdipedia/DESIGN.md)
-  - ✅ Web UI Wireframes: [projects/clawdipedia/web-ui/WIREFRAMES.md](projects/clawdipedia/web-ui/WIREFRAMES.md)
-  - ✅ API Spec: [projects/clawdipedia/api/API-SPEC.md](projects/clawdipedia/api/API-SPEC.md)
-  - ✅ LICENSE added (All Rights Reserved, © Lyubo)
-  - ✅ **Step 1 DONE:** Tech stack (Next.js + Tailwind + TypeScript)
-  - ✅ **Step 2 DONE:** MVP Web App built!
-    - Home page with stats, categories, trending, activity
-    - Categories page with all 21 categories
-    - [projects/clawdipedia/web/](projects/clawdipedia/web/)
-  - ✅ **Database Schema:** [projects/clawdipedia/database/schema.sql](projects/clawdipedia/database/schema.sql)
-  - ✅ **Step 3 DONE:** Seed content — **21 articles** (all categories covered!)
-    - [Part 1 (10 articles)](projects/clawdipedia/database/seed-articles.md)
-    - [Part 2 (11 articles)](projects/clawdipedia/database/seed-articles-part2.md)
-  - ✅ **Logo:** Saved to [projects/clawdipedia/branding/logo-mascot.jpg](projects/clawdipedia/branding/logo-mascot.jpg)
-  - ✅ **Pitch Strategy:** [projects/clawdipedia/marketing/PITCH-STRATEGY.md](projects/clawdipedia/marketing/PITCH-STRATEGY.md)
-    - Bot behavioral patterns + acquisition channels
-    - Human behavioral patterns + acquisition channels
-    - Convergence strategy + content calendar
-  - ✅ **OpenClaw Skill + MCP Server:** [projects/clawdipedia/skill/](projects/clawdipedia/skill/)
-  - ✅ **New Pages Built:**
-    - Article detail page with voting, comments
-    - Submit article page with form
-    - About page with mission
-  - ✅ **Awesome-OpenClaw Analysis:** [projects/clawdipedia/research/](projects/clawdipedia/research/)
-  - 🔄 **Deployment:** Awaiting correct Supabase anon key (long JWT format)
 
+### MOLTIPEDIA — Wikipedia for Bots (MVP NEARLY LIVE!)
+- ✅ Renamed: Clawdipedia → **Moltipedia**
+- ✅ Web app built (Next.js + Tailwind + TypeScript)
+- ✅ Database schema + 21 categories seeded in Supabase
+- ✅ Logo with hover interaction (lobster reads → looks at you)
+- ✅ All pages working:
+  - Home (stats, trending, categories, activity)
+  - Categories list + individual category pages
+  - Article detail pages
+  - Submit article page
+  - About page
+  - Login/Connect Bot page
+  - Clans page
+- ✅ OpenClaw Skill + MCP Server ready
+- ✅ Marketing/Pitch strategy documented
+- 🔄 **BLOCKED:** Vercel deployment showing 404
+  - Root directory should be: `projects/moltipedia/web`
+  - Lyubo needs to verify settings and redeploy
+
+### Predictions Peter — Polymarket Content
 - [ ] Create `@predictions.peter` accounts (IG, TikTok, YouTube)
 - [ ] Set up ElevenLabs with Peter/Stewie voices
-- [ ] Record & post first video (Lyubo polishing scripts)
-
-## ✅ Just Completed
-- [x] **Bot Economy Research** — Deep dive into services FOR bots AS customers
-  → [Full Research](projects/bot-economy-research/RESEARCH.md)
-- [x] ~~Twitter scraper~~ → Lyubo will source topics manually
-
-## ✅ Done
-
-### 2026-02-12
-- [x] **Polymarket Content Engine** — Scans for viral, meme-worthy bets
-  → [GitHub](https://github.com/motionelevation16-coder/MotionSkrrPow/tree/main/projects/polymarket/content-engine)
-  
-- [x] **Twitter Scanner** — Built but blocked (needs API key or alternative)
-  → [GitHub](https://github.com/motionelevation16-coder/MotionSkrrPow/tree/main/projects/polymarket/twitter-scanner)
-  
-- [x] **Peter Griffin Course** — Downloaded, extracted, prompts ready
-  → [GitHub](https://github.com/motionelevation16-coder/MotionSkrrPow/tree/main/projects/polymarket/course)
-  
-- [x] **First Script Written** — "Jesus vs GTA VI" with loop structure
-  
-- [x] Fixed config: claude-sonnet-4 → claude-sonnet-4-5
-
-### 2026-02-11
-- [x] Initial setup — Motion born
-- [x] Telegram connected
-- [x] Web search enabled (Brave API)
-- [x] Memory system configured
-- [x] GitHub repo connected
-
-## 📋 Backlog
-- [ ] Peter Griffin Instagram page — first post
-- [ ] Research MoonDev trading bot tutorials
-- [ ] Bot marketplace research (tools for AI agents)
-- [ ] University exam prep help
-
-## 💡 Ideas (to evaluate)
-- Polymarket arbitrage finder
-- Content automation workflows
-- Digital product concepts
-- Tools/services for AI bots (untapped market?)
+- [ ] Lyubo polishing scripts — waiting for feedback to learn his style
+- [ ] Record & post first video
 
 ---
 
-## 📊 Quick Links
+## ✅ Just Completed (Overnight Feb 18)
 
-| Resource | Link |
-|----------|------|
-| Content Engine | [/projects/polymarket/content-engine](https://github.com/motionelevation16-coder/MotionSkrrPow/tree/main/projects/polymarket/content-engine) |
-| Twitter Scanner | [/projects/polymarket/twitter-scanner](https://github.com/motionelevation16-coder/MotionSkrrPow/tree/main/projects/polymarket/twitter-scanner) |
-| Course Materials | [/projects/polymarket/course](https://github.com/motionelevation16-coder/MotionSkrrPow/tree/main/projects/polymarket/course) |
-| Daily Briefing | Run `python3 daily_scan.py` → `output/TODAY.md` |
+- [x] Fixed all "Clawdipedia" → "Moltipedia" branding
+- [x] Updated hero text to Lyubo's copy
+- [x] Made stats realistic for launch (21 articles, not fake thousands)
+- [x] Created category detail pages (fixed 404 issue)
+- [x] Added logo images with hover effect
+- [x] Created `/login` page (API key, OpenClaw skill, MCP options)
+- [x] Created `/clans` page (explains clan system)
+- [x] Studied awesome-openclaw-usecases repo
+- [x] Extracted patterns: multi-agent, STATE.yaml, cron-driven, security
+
+---
+
+## ✅ Done
+
+### 2026-02-18
+- [x] Supabase connected (project: rpamjuyqczeiixtusnjxx)
+- [x] Database tables created
+- [x] Categories seeded (21 total)
+- [x] Environment variables set up
+
+### 2026-02-13
+- [x] **Moltipedia MVP Built** — Full web app
+- [x] **Bot Economy Research** — Services FOR bots
+- [x] **Pitch Strategy** — Bot + human acquisition
+
+### 2026-02-12
+- [x] **Polymarket Content Engine** — Viral bet scanner
+- [x] **Peter Griffin Course** — Downloaded, voices ready
+- [x] **First Script Written** — "Jesus vs GTA VI"
+
+### 2026-02-11
+- [x] Motion born 🐋
+- [x] Telegram + web search configured
+- [x] GitHub repo connected
+
+---
+
+## 📋 Backlog
+
+### Moltipedia
+- [ ] Write remaining 11 seed articles (one per empty category)
+- [ ] Implement actual Supabase data fetching (replace mock data)
+- [ ] Add article voting functionality
+- [ ] Bot API authentication system
+- [ ] Submit to ClawHub
+- [ ] Reddit launch post (r/OpenClaw, r/artificial)
+
+### Predictions Peter
+- [ ] First video posted
+- [ ] Account growth strategy
+
+### Research
+- [ ] MoonDev trading bot tutorials
+- [ ] More bot economy opportunities
+
+---
+
+## 💡 Ideas
+
+- Polymarket arbitrage finder
+- Content automation workflows
+- Digital products for bot operators
+- Moltbook integration (when we get access)
 
 ---
 
 ## 🎯 Current Focus
-**Peter Griffin Predictions Page** — Get first video posted
+
+**1. Get Moltipedia LIVE** — Fix Vercel deployment  
+**2. Seed more content** — Fill empty categories  
+**3. Predictions Peter** — First video
+
+---
+
+## 📊 Project Links
+
+| Project | Location |
+|---------|----------|
+| Moltipedia | `projects/moltipedia/` |
+| Polymarket | `projects/polymarket/` |
+| Bot Economy Research | `projects/bot-economy-research/` |
+| Usecase Patterns | `projects/moltipedia/research/awesome-usecases-knowledge.md` |
 
 ---
 
