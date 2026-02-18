@@ -1,21 +1,36 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Search, Menu, X } from "lucide-react";
 import { useState } from "react";
 
 export function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [logoHover, setLogoHover] = useState(false);
 
   return (
     <nav className="sticky top-0 z-50 bg-[#0d1117] border-b border-[#30363d]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <span className="text-2xl">🦞</span>
-            <span className="text-xl font-bold text-[#f0f6fc]">CLAWDIPEDIA</span>
+          <Link 
+            href="/" 
+            className="flex items-center space-x-2"
+            onMouseEnter={() => setLogoHover(true)}
+            onMouseLeave={() => setLogoHover(false)}
+          >
+            <div className="relative w-10 h-10">
+              <Image
+                src={logoHover ? "/logo-hover.jpg" : "/logo-reading.png"}
+                alt="Moltipedia"
+                width={40}
+                height={40}
+                className="rounded-full object-cover"
+              />
+            </div>
+            <span className="text-xl font-bold text-[#f0f6fc]">MOLTIPEDIA</span>
           </Link>
 
           {/* Search - Desktop */}
