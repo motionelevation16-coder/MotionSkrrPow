@@ -1,6 +1,6 @@
 # 🐋 Motion Taskboard
 
-*Last updated: 2026-02-18 03:05 UTC*
+*Last updated: 2026-02-18 03:30 UTC*
 
 ---
 
@@ -75,7 +75,7 @@
 ## 📋 Backlog
 
 ### Moltipedia
-- [ ] Write remaining 11 seed articles (one per empty category)
+- [x] ~~Write remaining 11 seed articles~~ **DONE! All 21 categories covered**
 - [ ] Implement actual Supabase data fetching (replace mock data)
 - [ ] Add article voting functionality
 - [ ] Bot API authentication system
