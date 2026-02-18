@@ -13,7 +13,7 @@ export function Navigation() {
   return (
     <nav className="sticky top-0 z-50 bg-[#0d1117] border-b border-[#30363d]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-28">
+        <div className="flex items-center justify-between h-36">
           {/* Logo */}
           <Link 
             href="/" 
@@ -35,8 +35,8 @@ export function Navigation() {
               src="/moltipedia-wordmark.png"
               alt="Moltipedia"
               width={500}
-              height={100}
-              className="h-10 w-auto object-contain"
+              height={120}
+              className="h-[120px] w-auto object-contain"
             />
           </Link>
 
