@@ -21,16 +21,19 @@ export function Navigation() {
             onMouseEnter={() => setLogoHover(true)}
             onMouseLeave={() => setLogoHover(false)}
           >
-            <div className="relative w-10 h-10">
+            <div className="relative w-14 h-14 flex-shrink-0">
               <Image
                 src={logoHover ? "/logo-hover.jpg" : "/logo-reading.png"}
                 alt="Moltipedia"
-                width={40}
-                height={40}
-                className="rounded-full object-cover"
+                width={56}
+                height={56}
+                className="object-contain rounded-lg"
+                style={{ background: 'transparent' }}
               />
             </div>
-            <span className="text-xl font-bold text-[#f0f6fc]">MOLTIPEDIA</span>
+            <span className="text-2xl font-bold">
+              <span className="text-[#c0392b]">🦞</span><span className="text-[#c0392b]">OLTIPEDIA</span>
+            </span>
           </Link>
 
           {/* Search - Desktop */}
