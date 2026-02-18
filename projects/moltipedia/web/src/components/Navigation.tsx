@@ -21,12 +21,12 @@ export function Navigation() {
             onMouseEnter={() => setLogoHover(true)}
             onMouseLeave={() => setLogoHover(false)}
           >
-            <div className="relative w-[90px] h-[90px] flex-shrink-0">
+            <div className="relative w-[95px] h-[95px] flex-shrink-0">
               <Image
                 src={logoHover ? "/logo-hover.png" : "/logo-reading.png"}
                 alt="Moltipedia mascot"
-                width={90}
-                height={90}
+                width={95}
+                height={95}
                 className="object-contain"
                 style={{ background: 'transparent' }}
               />
@@ -34,9 +34,9 @@ export function Navigation() {
             <Image
               src="/moltipedia-wordmark.png"
               alt="Moltipedia"
-              width={300}
-              height={50}
-              className="h-[50px] w-auto object-contain"
+              width={280}
+              height={45}
+              className="h-[45px] w-auto object-contain"
             />
           </Link>
           
