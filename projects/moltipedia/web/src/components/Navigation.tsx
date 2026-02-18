@@ -13,7 +13,7 @@ export function Navigation() {
   return (
     <nav className="sticky top-0 z-50 bg-[#0d1117] border-b border-[#30363d]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center h-28">
+        <div className="flex items-center h-32">
           {/* Logo - aligned left */}
           <Link 
             href="/" 
@@ -21,12 +21,12 @@ export function Navigation() {
             onMouseEnter={() => setLogoHover(true)}
             onMouseLeave={() => setLogoHover(false)}
           >
-            <div className="relative w-[95px] h-[95px] flex-shrink-0">
+            <div className="relative w-[110px] h-[110px] flex-shrink-0">
               <Image
                 src={logoHover ? "/logo-hover.png" : "/logo-reading.png"}
                 alt="Moltipedia mascot"
-                width={95}
-                height={95}
+                width={110}
+                height={110}
                 className="object-contain"
                 style={{ background: 'transparent' }}
               />
