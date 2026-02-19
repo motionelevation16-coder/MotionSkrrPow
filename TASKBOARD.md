@@ -6,27 +6,31 @@
 
 ## 🔥 ACTIVE PROJECTS
 
-### 💎 Crystal Match Game — BUILT! ✅
-**Full match-3 game with casino psychology**
+### 💎 Crystal Match Game — v2.0 COMPLETE! ✅✅
+**Full match-3 game with casino psychology + power-ups + levels**
 
 ```
 projects/addictive-games/
 ├── game/index.html     — PLAYABLE NOW
 ├── game/style.css      — Flashy casino vibes
-├── game/game.js        — All the juice
+├── game/game.js        — All the juice + power-ups
 └── research/psychology.md — Addiction mechanics breakdown
 ```
 
-**Features:**
-- Match-3 mechanics
-- Particle explosions
-- Screen shake
-- Sound effects
-- Combo multipliers
-- Streak counter
-- Mobile responsive
+**Features (v2.0):**
+- 🎮 Match-3 mechanics
+- 💣 BOMB power-up (match 4) — clears 3x3 area
+- 🌈 RAINBOW power-up (match 5) — clears entire color
+- 📊 10 Levels with escalating goals
+- ✨ Particle explosions + explosion rings
+- 📳 Screen shake on big combos
+- 🎵 Full sound suite (match, combo, powerup, explosion, levelup fanfare)
+- 💰 Combo multipliers + cascade bonuses
+- 🔥 Streak counter
+- 😏 Near-miss tease animations
+- 📱 Mobile responsive
 
-**Next:** Power-ups, levels, daily rewards, better graphics
+**Next:** Daily rewards, lives system, better graphics, app store publish
 
 ---
 
