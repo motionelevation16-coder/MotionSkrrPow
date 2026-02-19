@@ -87,24 +87,53 @@
 
 ---
 
-## AI-Powered Apps (Coming Next)
+## No-Code Game Builders
 
-To research:
-- AI writing tools
-- AI image generators
-- AI productivity apps
-- AI chatbot apps
-- What's printing money in the AI app space?
+### Platforms
+
+**1. GDevelop (Free/Open Source)**
+- Visual scripting, no coding needed
+- Built-in monetization via gd.games hosting
+- **Earn automatically:** Host on gd.games → paid per session
+- Companies making >$50K/year must use Pro plan (proof people make money)
+- Best for: Arcade-style, 2D games, open-source flexibility
+
+**2. Buildbox (Paid)**
+- Drag-and-drop, zero code
+- "Multiple revenue-generating games launched every month"
+- Built-in ads, IAP, store solutions
+- Huge asset library (characters, sounds, backgrounds)
+- Best for: Hyper-casual mobile games, rapid releases
+
+**3. Construct 3**
+- Browser-based, visual scripting
+- Cross-platform exports
+- Monetization integrations
+- Best for: Hobbyists and indie devs
+
+---
+
+## The No-Code Game Play
+
+**Strategy:** Rapid-release studios use Buildbox to pump out hyper-casual games monthly without programmers.
+
+**Economics:**
+- Build time: 1-4 weeks per game (no coding)
+- Cost: Buildbox subscription (~$20-100/mo) + art assets
+- Revenue: Ads + IAP (see hyper-casual numbers above)
+- Volume game: Launch 5-10 games, 1-2 hit = profit
+
+**Risk:** Saturated market, need marketing/ASO skills. But faster to test than coding from scratch.
 
 ---
 
 ## Action Items
 
-1. [ ] Research AI apps revenue (next search)
-2. [ ] Find solo dev success stories
-3. [ ] Identify lowest-effort, highest-ROI game types
-4. [ ] Look at no-code/low-code game builders
-5. [ ] Estimate dev time vs revenue potential
+1. [✅] Research AI apps revenue
+2. [✅] Find solo dev success stories
+3. [✅] Identify lowest-effort, highest-ROI game types
+4. [✅] Look at no-code/low-code game builders
+5. [ ] Pick top 3 money machines to build
 
 ---
 

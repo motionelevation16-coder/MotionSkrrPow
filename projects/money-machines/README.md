@@ -20,11 +20,12 @@ See: `research/ai-apps.md`
 - AI writing tools, chatbots, productivity apps
 - Revenue models (subscriptions, freemium, credits)
 
-### 3. Apps & Games 🔄 IN PROGRESS
+### 3. Apps & Games ✅ DONE
 See: `research/apps-games.md`
-- Mobile games (hyper-casual, idle, etc.)
-- Utility apps
+- Mobile games (hyper-casual, idle, hybrid-casual)
+- No-code builders (GDevelop, Buildbox, Construct 3)
 - Revenue models (ads, IAP, subscriptions)
+- Real numbers: $35K-$300K/month for indie games
 
 ### 4. Automation Plays 📋 TODO
 See: `research/automations.md`
@@ -69,8 +70,9 @@ A money machine must:
 
 ## Progress Log
 
-- 2026-02-19: Hub created, AI agency research complete, AI apps research complete
-- Next: Continue apps/games research, no-code game builders
+- 2026-02-19: AI agencies research complete, AI apps research complete, apps/games research complete
+- **3 of 6 research areas DONE** 
+- Next: Automation plays, data plays, marketing funnels
 
 ---
 
