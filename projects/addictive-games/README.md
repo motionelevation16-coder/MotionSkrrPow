@@ -41,12 +41,12 @@ See `research/psychology.md` for:
 
 ## Roadmap
 
-### Phase 1: Prototype ✅
+### Phase 1: Prototype ✅ DONE
 - [x] Research addiction mechanics
-- [ ] Build basic match-3 grid
-- [ ] Add juice (particles, shake)
-- [ ] Add sounds
-- [ ] Casino elements
+- [x] Build basic match-3 grid
+- [x] Add juice (particles, shake, glow, score popups)
+- [x] Add sounds (Web Audio API synthesized)
+- [x] Casino elements (combos, streaks, multipliers)
 
 ### Phase 2: Polish
 - [ ] Power-ups

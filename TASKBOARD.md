@@ -1,95 +1,117 @@
 # 🐋 Motion Taskboard
 
-*Last updated: 2026-02-19 02:00 UTC*
+*Last updated: 2026-02-19 15:49 UTC*
 
 ---
 
-## 🔥 READY FOR LYUBO (Lunch Brief)
+## 🔥 ACTIVE PROJECTS
 
-### Research ✅
-- `research/ai-agency-money-plays.md` — Market analysis, top 3 opportunities
-- `research/voice-agent-agency-blueprint.md` — Detailed implementation guide
+### 💎 Crystal Match Game — BUILT! ✅
+**Full match-3 game with casino psychology**
 
-### BUILT OVERNIGHT ✅ 🚀
-**Full AI Agency Launch Kit:**
+```
+projects/addictive-games/
+├── game/index.html     — PLAYABLE NOW
+├── game/style.css      — Flashy casino vibes
+├── game/game.js        — All the juice
+└── research/psychology.md — Addiction mechanics breakdown
+```
+
+**Features:**
+- Match-3 mechanics
+- Particle explosions
+- Screen shake
+- Sound effects
+- Combo multipliers
+- Streak counter
+- Mobile responsive
+
+**Next:** Power-ups, levels, daily rewards, better graphics
+
+---
+
+### 🎨 Tattoo Studio Automation — WAITING FOR REQUIREMENTS
+**First AI Agency client (Lyubo's friend)**
+
+**Planned workflow:**
+- Client inquiry → style/bodypart selection
+- Pinterest reference upload
+- Auto-schedule consultations
+- Telegram bot alerts to artist
+
+**Status:** Question list ready, Lyubo will interview friend
+
+---
+
+### 🦞 Moltipedia — READY TO LAUNCH
+**Just needs Lyubo to:**
+1. [ ] Add Vercel env vars (Supabase URL + Key)
+2. [ ] Run `database/schema.sql` in Supabase SQL Editor
+3. [ ] Flip the switch
+
+---
+
+### 🎬 Predictions Peter — LYUBO EDITING
+- Voice clones ready
+- Scripts ready
+- Lyubo editing first video in CapCut
+
+---
+
+## 📊 Research Progress
+
+| Area | Status | Location |
+|------|--------|----------|
+| AI Agencies | ✅ Done | `research/ai-agency-money-plays.md` |
+| AI Apps (Solo SaaS) | ✅ Done | `projects/money-machines/research/ai-apps.md` |
+| Apps & Games | ✅ Done | `projects/money-machines/research/apps-games.md` |
+| Game Psychology | ✅ Done | `projects/addictive-games/research/psychology.md` |
+| Automation Plays | 📋 TODO | — |
+| Data Plays | 📋 TODO | — |
+| Marketing Funnels | 📋 TODO | — |
+
+**3 of 6 research areas complete** + game psychology deep dive
+
+---
+
+## 🚀 AI Agency Assets (Ready to Use)
+
 ```
 projects/ai-agency/
 ├── agent-templates/dental-receptionist.md  — Complete AI prompt
 ├── landing-page/index.html                 — Professional website
-├── sales/outreach-templates.md             — 5 emails, scripts, LinkedIn
-└── operations/client-onboarding.md         — Full client process
+├── sales/outreach-templates.md             — Cold emails + scripts
+└── operations/client-onboarding.md         — Full process
 ```
 
-**What's Ready to Use TODAY:**
-1. ✅ Landing page (just needs hosting)
-2. ✅ Cold email templates (copy-paste ready)
-3. ✅ Call scripts for demos
-4. ✅ Complete agent prompt (just add practice info)
-5. ✅ Client onboarding checklist
-
-### Lunch Brief Scheduled
-- Cron job at 11:00 UTC (12:00 CET)
-- Will deliver summary + action items
-
 ---
 
-## 🚀 Moltipedia — Ready to Launch!
+## 🎯 Today's Plan
 
-All done, just needs:
-1. [ ] Run database schema in Supabase
-2. [ ] Seed articles
-3. [ ] Post launch announcements
-
----
-
-## 🎬 Predictions Peter
-- Lyubo editing video (CapCut)
-- Ready when he's ready
-
----
-
-## 📊 What Got Built Tonight
-
-| Asset | Status | Time Invested |
-|-------|--------|---------------|
-| Market research | ✅ Done | ~30 min |
-| Voice agency blueprint | ✅ Done | ~30 min |
-| Dental agent prompt | ✅ Done | ~20 min |
-| Landing page | ✅ Done | ~30 min |
-| Sales templates | ✅ Done | ~20 min |
-| Onboarding checklist | ✅ Done | ~15 min |
-| **TOTAL** | **6 Assets** | **~2.5 hours** |
-
----
-
-## 🎯 Next Steps (When Lyubo Wakes)
-
-### Decision Point
-1. **Launch Moltipedia today?** (30 min of Lyubo's time)
-2. **Start AI Agency?** (Pick platform, send first emails)
-3. **Both?** (Why not)
-
-### If Starting AI Agency TODAY
-- [ ] Sign up for Bland AI / Vapi (free trial)
-- [ ] Deploy landing page (Vercel/Netlify)
-- [ ] Send first 10 cold emails
-- [ ] I'll build the demo agent with a test number
+| Task | Who | Status |
+|------|-----|--------|
+| Edit Peter Griffin video | Lyubo | 🔄 In progress |
+| Launch Moltipedia | Lyubo (env vars) + Motion | ⏳ Waiting |
+| Talk to tattoo friend | Lyubo | ⏳ Pending |
+| Build tattoo automation | Motion | ⏳ After requirements |
+| Polish Crystal Match | Motion | ⏳ Next |
 
 ---
 
 ## 💰 Path to First Dollar
 
-| Day | Action | Who |
-|-----|--------|-----|
-| 1 | Deploy landing page | Motion |
-| 1 | Send 20 cold emails | Lyubo |
-| 2-3 | Follow up, book demos | Lyubo |
-| 4-7 | Run demos, close first client | Both |
-| 7-14 | Onboard + go live | Both |
+**Option A: AI Agency (Tattoo friend)**
+- Free test client → Portfolio → Paid clients
+- Timeline: 2-4 weeks to first paying client
 
-**First client = $1,500-$3,000 setup + $1,500/month recurring**
+**Option B: Games**
+- Crystal Match → Polish → Publish → Ads
+- Timeline: 4-8 weeks to first ad revenue
+
+**Option C: Moltipedia**
+- Launch → Build audience → Monetize later
+- Timeline: Long-term play
 
 ---
 
 *Updated by Motion 🐋*
-*Research + Execution. Let's get it!*
