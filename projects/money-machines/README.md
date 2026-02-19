@@ -27,12 +27,12 @@ See: `research/apps-games.md`
 - Revenue models (ads, IAP, subscriptions)
 - Real numbers: $35K-$300K/month for indie games
 
-### 4. Automation Plays 📋 TODO
-See: `research/automations.md`
-- Make/Zapier businesses
-- API arbitrage
-- Data pipelines
-- Lead gen machines
+### 4. Automation Plays ✅ DONE
+See: `research/automation-plays.md`
+- Pricing: $5K-$15K setup + $1.5K-$5K/mo retainer
+- Tools: n8n (free), Make.com, Zapier
+- Services: CRM automation, lead gen, workflows, reporting
+- Path to $7K+/mo: 3-5 clients or 10-15 volume clients
 
 ### 5. Data Plays 📋 TODO
 See: `research/data-plays.md`
@@ -70,9 +70,9 @@ A money machine must:
 
 ## Progress Log
 
-- 2026-02-19: AI agencies research complete, AI apps research complete, apps/games research complete
-- **3 of 6 research areas DONE** 
-- Next: Automation plays, data plays, marketing funnels
+- 2026-02-19: AI agencies, AI apps, apps/games, automation plays research complete
+- **4 of 6 research areas DONE** 
+- Next: Data plays, marketing funnels
 
 ---
 
