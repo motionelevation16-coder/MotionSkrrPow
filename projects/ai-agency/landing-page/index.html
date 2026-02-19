@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Receptionist for Dental Practices | Never Miss Another Patient Call</title>
+    <meta name="description" content="24/7 AI phone agent that answers calls, books appointments, and handles patient inquiries. Save $2,000+/month vs. hiring staff.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: #1a1a2e;
+            background: #ffffff;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Header */
+        header {
+            padding: 20px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            border-bottom: 1px solid #eee;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #4F46E5;
+        }
+
+        .cta-button {
+            background: #4F46E5;
+            color: white;
+            padding: 12px 28px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .cta-button:hover {
+            background: #4338CA;
+            transform: translateY(-2px);
+        }
+
+        /* Hero */
+        .hero {
+            padding: 160px 0 100px;
+            text-align: center;
+            background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+        }
+
+        .hero h1 {
+            font-size: 56px;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero h1 span {
+            color: #4F46E5;
+        }
+
+        .hero p {
+            font-size: 20px;
+            color: #64748b;
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .cta-secondary {
+            background: white;
+            color: #1a1a2e;
+            border: 2px solid #e2e8f0;
+            padding: 12px 28px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .cta-secondary:hover {
+            border-color: #4F46E5;
+            color: #4F46E5;
+        }
+
+        /* Stats */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            padding: 60px 0;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+            margin: 60px 0;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 48px;
+            font-weight: 700;
+            color: #4F46E5;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 16px;
+            margin-top: 8px;
+        }
+
+        /* Problem Section */
+        .problem {
+            padding: 80px 0;
+            background: #1a1a2e;
+            color: white;
+        }
+
+        .problem h2 {
+            font-size: 40px;
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+        }
+
+        .problem-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 32px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .problem-card .icon {
+            font-size: 40px;
+            margin-bottom: 20px;
+        }
+
+        .problem-card h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        .problem-card p {
+            color: #94a3b8;
+            font-size: 15px;
+        }
+
+        /* Solution Section */
+        .solution {
+            padding: 100px 0;
+        }
+
+        .solution h2 {
+            font-size: 40px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .solution > p {
+            text-align: center;
+            color: #64748b;
+            font-size: 18px;
+            max-width: 600px;
+            margin: 0 auto 60px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+        }
+
+        .feature {
+            display: flex;
+            gap: 20px;
+            padding: 32px;
+            background: #f8fafc;
+            border-radius: 16px;
+        }
+
+        .feature-icon {
+            width: 56px;
+            height: 56px;
+            background: #4F46E5;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .feature h3 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .feature p {
+            color: #64748b;
+            font-size: 15px;
+        }
+
+        /* Pricing */
+        .pricing {
+            padding: 100px 0;
+            background: #f8fafc;
+        }
+
+        .pricing h2 {
+            font-size: 40px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .pricing > p {
+            text-align: center;
+            color: #64748b;
+            font-size: 18px;
+            margin-bottom: 60px;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .pricing-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s;
+        }
+
+        .pricing-card.popular {
+            border-color: #4F46E5;
+            transform: scale(1.05);
+        }
+
+        .pricing-card:hover {
+            border-color: #4F46E5;
+        }
+
+        .pricing-card .badge {
+            background: #4F46E5;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 16px;
+        }
+
+        .pricing-card h3 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .pricing-card .price {
+            font-size: 48px;
+            font-weight: 700;
+            color: #4F46E5;
+        }
+
+        .pricing-card .price span {
+            font-size: 18px;
+            color: #64748b;
+            font-weight: 400;
+        }
+
+        .pricing-card .description {
+            color: #64748b;
+            margin: 16px 0 24px;
+            font-size: 15px;
+        }
+
+        .pricing-card ul {
+            list-style: none;
+            margin-bottom: 32px;
+        }
+
+        .pricing-card li {
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .pricing-card li:last-child {
+            border-bottom: none;
+        }
+
+        .pricing-card li::before {
+            content: "✓";
+            color: #4F46E5;
+            font-weight: 700;
+        }
+
+        /* Testimonial */
+        .testimonial {
+            padding: 100px 0;
+            text-align: center;
+        }
+
+        .testimonial blockquote {
+            font-size: 28px;
+            font-style: italic;
+            max-width: 800px;
+            margin: 0 auto 32px;
+            line-height: 1.5;
+        }
+
+        .testimonial cite {
+            font-style: normal;
+            color: #64748b;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 100px 0;
+            background: #4F46E5;
+            color: white;
+            text-align: center;
+        }
+
+        .cta-section h2 {
+            font-size: 40px;
+            margin-bottom: 20px;
+        }
+
+        .cta-section p {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 40px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-section .cta-button {
+            background: white;
+            color: #4F46E5;
+            font-size: 18px;
+            padding: 16px 40px;
+        }
+
+        .cta-section .cta-button:hover {
+            background: #f8fafc;
+        }
+
+        /* Footer */
+        footer {
+            padding: 60px 0;
+            background: #1a1a2e;
+            color: white;
+            text-align: center;
+        }
+
+        footer p {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .stats,
+            .problem-grid,
+            .features,
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pricing-card.popular {
+                transform: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo">🦷 DentalAI</div>
+            <a href="#demo" class="cta-button">Get Free Demo</a>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Never Miss Another <span>Patient Call</span> Again</h1>
+            <p>AI receptionist that answers calls 24/7, books appointments, and handles patient inquiries — for a fraction of the cost of staff.</p>
+            <div class="hero-cta">
+                <a href="#demo" class="cta-button">Get Free Demo →</a>
+                <a href="#pricing" class="cta-secondary">See Pricing</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="container">
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Availability</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">40%</div>
+                <div class="stat-label">More Appointments Booked</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">$2k+</div>
+                <div class="stat-label">Monthly Savings vs. Staff</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="problem">
+        <div class="container">
+            <h2>The Hidden Cost of Missed Calls</h2>
+            <div class="problem-grid">
+                <div class="problem-card">
+                    <div class="icon">📞</div>
+                    <h3>30% of Calls Go Unanswered</h3>
+                    <p>During lunch, after hours, and busy times — your potential patients are calling competitors instead.</p>
+                </div>
+                <div class="problem-card">
+                    <div class="icon">💸</div>
+                    <h3>$500+ Lost Per Missed New Patient</h3>
+                    <p>Each new patient is worth $500-$2,000 annually. Just 5 missed calls a month = $30k+ lost revenue.</p>
+                </div>
+                <div class="problem-card">
+                    <div class="icon">⏰</div>
+                    <h3>Staff Buried in Routine Questions</h3>
+                    <p>"What are your hours?" "Do you take my insurance?" — Questions that don't need a human to answer.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="solution">
+        <div class="container">
+            <h2>Meet Your AI Receptionist</h2>
+            <p>A professional, friendly voice that represents your practice perfectly — available every hour of every day.</p>
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon">📅</div>
+                    <div>
+                        <h3>Books Appointments Instantly</h3>
+                        <p>Syncs with your calendar and practice management software. Patients book in real-time, 24/7.</p>
+                    </div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">❓</div>
+                    <div>
+                        <h3>Answers Common Questions</h3>
+                        <p>Hours, location, insurance, services — handled automatically so your team can focus on patients.</p>
+                    </div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🆕</div>
+                    <div>
+                        <h3>New Patient Intake</h3>
+                        <p>Collects all the information you need before they walk in. Name, contact, insurance, concerns.</p>
+                    </div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🚨</div>
+                    <div>
+                        <h3>Emergency Call Handling</h3>
+                        <p>Identifies urgent cases and routes them appropriately. Never miss a dental emergency again.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="pricing" id="pricing">
+        <div class="container">
+            <h2>Simple, Transparent Pricing</h2>
+            <p>No hidden fees. No long contracts. Cancel anytime.</p>
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <h3>Smart Answering</h3>
+                    <div class="price">$500<span>/month</span></div>
+                    <p class="description">Perfect for practices that need overflow coverage</p>
+                    <ul>
+                        <li>Business hours overflow</li>
+                        <li>Basic FAQs handled</li>
+                        <li>Message taking</li>
+                        <li>Urgent call transfer</li>
+                        <li>Call logs & analytics</li>
+                    </ul>
+                    <a href="#demo" class="cta-button" style="display: block; text-align: center;">Get Started</a>
+                </div>
+                <div class="pricing-card popular">
+                    <span class="badge">MOST POPULAR</span>
+                    <h3>AI Receptionist</h3>
+                    <div class="price">$1,500<span>/month</span></div>
+                    <p class="description">Full-service AI receptionist for growing practices</p>
+                    <ul>
+                        <li>Everything in Smart Answering</li>
+                        <li>24/7 coverage</li>
+                        <li>Appointment booking</li>
+                        <li>New patient intake</li>
+                        <li>Appointment reminders</li>
+                        <li>Calendar integration</li>
+                    </ul>
+                    <a href="#demo" class="cta-button" style="display: block; text-align: center;">Get Started</a>
+                </div>
+                <div class="pricing-card">
+                    <h3>Full Front Desk</h3>
+                    <div class="price">$3,000<span>/month</span></div>
+                    <p class="description">Complete front desk automation for busy practices</p>
+                    <ul>
+                        <li>Everything in AI Receptionist</li>
+                        <li>Insurance verification calls</li>
+                        <li>Patient recall campaigns</li>
+                        <li>Review request follow-ups</li>
+                        <li>Custom workflows</li>
+                        <li>Monthly strategy calls</li>
+                    </ul>
+                    <a href="#demo" class="cta-button" style="display: block; text-align: center;">Get Started</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="testimonial">
+        <div class="container">
+            <blockquote>
+                "We were missing 20+ calls a week before. Now every single call gets answered professionally. Our new patient bookings are up 40% and my front desk staff can finally focus on the patients in front of them."
+            </blockquote>
+            <cite>— Dr. Sarah Johnson, Bright Smile Dental, Austin TX</cite>
+        </div>
+    </section>
+
+    <section class="cta-section" id="demo">
+        <div class="container">
+            <h2>See It In Action</h2>
+            <p>Get a free demo customized for your practice. No commitment, no pressure.</p>
+            <a href="mailto:hello@dentalai.com?subject=Demo Request" class="cta-button">Request Free Demo →</a>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>© 2026 DentalAI. Built with ❤️ for dental practices everywhere.</p>
+        </div>
+    </footer>
+</body>
+</html>
