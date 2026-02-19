@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>💎 Crystal Match</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <!-- Header -->
+        <div id="header">
+            <div id="score-container">
+                <div id="score-label">SCORE</div>
+                <div id="score">0</div>
+            </div>
+            <div id="combo-container">
+                <div id="combo-label">COMBO</div>
+                <div id="combo">x1</div>
+            </div>
+            <div id="moves-container">
+                <div id="moves-label">MOVES</div>
+                <div id="moves">30</div>
+            </div>
+        </div>
+
+        <!-- Game Board -->
+        <div id="board-wrapper">
+            <div id="board"></div>
+            <!-- Particle container -->
+            <div id="particles"></div>
+        </div>
+
+        <!-- Bottom UI -->
+        <div id="bottom-ui">
+            <div id="streak-container">
+                <span id="streak-icon">🔥</span>
+                <span id="streak">0</span>
+            </div>
+            <button id="shuffle-btn">🔀 SHUFFLE</button>
+        </div>
+
+        <!-- Overlays -->
+        <div id="combo-popup" class="popup hidden">
+            <span id="combo-text"></span>
+        </div>
+
+        <div id="game-over" class="overlay hidden">
+            <div class="overlay-content">
+                <h1>🎉 AMAZING!</h1>
+                <p>Final Score</p>
+                <div id="final-score">0</div>
+                <button id="play-again">PLAY AGAIN</button>
+            </div>
+        </div>
+
+        <div id="start-screen" class="overlay">
+            <div class="overlay-content">
+                <h1>💎 CRYSTAL MATCH</h1>
+                <p>Match 3 or more gems!</p>
+                <button id="start-btn">▶️ PLAY</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
