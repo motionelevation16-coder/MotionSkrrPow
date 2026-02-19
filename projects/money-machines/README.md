@@ -14,28 +14,33 @@ See: `research/ai-agencies.md`
 - 45.8% CAGR, 70-90% margins
 - Models: Consulting, retainers, SaaS, project fees
 
-### 2. Apps & Games 🔄 IN PROGRESS
+### 2. AI Apps ✅ DONE
+See: `research/ai-apps.md`
+- Solo dev success stories ($10K-$100K/mo)
+- AI writing tools, chatbots, productivity apps
+- Revenue models (subscriptions, freemium, credits)
+
+### 3. Apps & Games 🔄 IN PROGRESS
 See: `research/apps-games.md`
 - Mobile games (hyper-casual, idle, etc.)
 - Utility apps
-- AI-powered tools
 - Revenue models (ads, IAP, subscriptions)
 
-### 3. Automation Plays 📋 TODO
+### 4. Automation Plays 📋 TODO
 See: `research/automations.md`
 - Make/Zapier businesses
 - API arbitrage
 - Data pipelines
 - Lead gen machines
 
-### 4. Data Plays 📋 TODO
+### 5. Data Plays 📋 TODO
 See: `research/data-plays.md`
 - Scraping → insights
 - Data products
 - API businesses
 - Analytics SaaS
 
-### 5. Marketing Funnels 📋 TODO
+### 6. Marketing Funnels 📋 TODO
 See: `research/marketing-funnels.md`
 - Content machines
 - Affiliate plays
@@ -64,8 +69,8 @@ A money machine must:
 
 ## Progress Log
 
-- 2026-02-19: Hub created, AI agency research complete
-- Next: Deep dive into apps/games money-printing models
+- 2026-02-19: Hub created, AI agency research complete, AI apps research complete
+- Next: Continue apps/games research, no-code game builders
 
 ---
 
