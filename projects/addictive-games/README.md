@@ -9,13 +9,18 @@
 A match-3 gem game with casino-level dopamine engineering.
 
 ### Features
-- 🎮 Match-3 mechanics (swipe/click)
-- ✨ Particle explosions on matches
+- 🎮 Match-3 mechanics (tap to swap)
+- 💣 Power-ups: Bomb (match 4) clears 3x3, Rainbow (match 5) clears color
+- 📊 10 Levels with escalating goals
+- ✨ Particle explosions + explosion rings
 - 📳 Screen shake on big combos
-- 🎵 Satisfying sound effects
-- 💰 Score multipliers & streaks
-- 🎰 Casino-style feedback loops
+- 🎵 Synthesized sound effects (match, combo, powerup, explosion, levelup)
+- 💰 Combo multipliers + cascade bonuses
+- 🔥 Streak counter
+- 😏 Near-miss tease animations
+- 🎰 Casino-style dopamine loops
 - 📱 Mobile-responsive
+- 🌈 Special gem animations
 
 ### Tech Stack
 - Pure HTML5/CSS/JavaScript
@@ -48,11 +53,20 @@ See `research/psychology.md` for:
 - [x] Add sounds (Web Audio API synthesized)
 - [x] Casino elements (combos, streaks, multipliers)
 
-### Phase 2: Polish
-- [ ] Power-ups
-- [ ] Level system
-- [ ] Daily rewards
-- [ ] Near-miss effects
+### Phase 2: Polish ✅ DONE
+- [x] Power-ups (Match 4 = 💣 Bomb, Match 5 = 🌈 Rainbow)
+- [x] Level system (10 levels, escalating goals)
+- [x] Progress bar with pulse glow
+- [x] Near-miss effects (shake tease on failed swap)
+- [x] Level complete celebration
+- [x] Enhanced sounds (powerup, explosion, levelup fanfare)
+- [x] Cascade bonus multipliers
+
+### Phase 3: Monetization
+- [ ] Daily rewards / login streaks
+- [ ] Lives system
+- [ ] Ad integration
+- [ ] IAP (extra moves, power-ups)
 
 ### Phase 3: Monetize
 - [ ] Ad integration

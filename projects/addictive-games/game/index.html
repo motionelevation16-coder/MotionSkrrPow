@@ -5,22 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>💎 Crystal Match</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💎</text></svg>">
 </head>
 <body>
     <div id="game-container">
-        <!-- Header -->
+        <!-- Level & Goal -->
+        <div id="level-bar">
+            <div id="level">Level 1</div>
+            <div id="goal-container">
+                <span>Goal: </span><span id="goal">1,000</span>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div id="progress-container">
+            <div id="progress-fill"></div>
+        </div>
+
+        <!-- Header Stats -->
         <div id="header">
             <div id="score-container">
-                <div id="score-label">SCORE</div>
+                <div class="stat-label">SCORE</div>
                 <div id="score">0</div>
             </div>
             <div id="combo-container">
-                <div id="combo-label">COMBO</div>
+                <div class="stat-label">COMBO</div>
                 <div id="combo">x1</div>
             </div>
             <div id="moves-container">
-                <div id="moves-label">MOVES</div>
-                <div id="moves">30</div>
+                <div class="stat-label">MOVES</div>
+                <div id="moves">20</div>
             </div>
         </div>
 
@@ -40,24 +54,47 @@
             <button id="shuffle-btn">🔀 SHUFFLE</button>
         </div>
 
-        <!-- Overlays -->
+        <!-- Combo Popup -->
         <div id="combo-popup" class="popup hidden">
             <span id="combo-text"></span>
         </div>
 
-        <div id="game-over" class="overlay hidden">
+        <!-- Level Complete Screen -->
+        <div id="level-complete" class="overlay hidden">
             <div class="overlay-content">
-                <h1>🎉 AMAZING!</h1>
-                <p>Final Score</p>
-                <div id="final-score">0</div>
-                <button id="play-again">PLAY AGAIN</button>
+                <div id="lc-stars">⭐⭐⭐</div>
+                <h1 id="lc-level">LEVEL 1</h1>
+                <p>Score</p>
+                <div id="lc-score">0</div>
+                <button id="next-level-btn">NEXT LEVEL ➡️</button>
             </div>
         </div>
 
-        <div id="start-screen" class="overlay">
+        <!-- Game Over Screen -->
+        <div id="game-over" class="overlay hidden">
             <div class="overlay-content">
-                <h1>💎 CRYSTAL MATCH</h1>
-                <p>Match 3 or more gems!</p>
+                <h1>💎 GAME OVER</h1>
+                <p>Final Score</p>
+                <div id="final-score">0</div>
+                <div id="final-stats"></div>
+                <button id="play-again">🔄 PLAY AGAIN</button>
+            </div>
+        </div>
+
+        <!-- Start Screen -->
+        <div id="start-screen" class="overlay">
+            <div class="overlay-content start-content">
+                <div class="title-gems">💎✨💎</div>
+                <h1>CRYSTAL MATCH</h1>
+                <p class="subtitle">Match gems. Chase cascades. Feel the rush.</p>
+                
+                <div class="how-to-play">
+                    <div class="tip">👆 Tap two gems to swap</div>
+                    <div class="tip">💥 Match 4 = BOMB</div>
+                    <div class="tip">🌈 Match 5 = RAINBOW</div>
+                    <div class="tip">⚡ Chain combos for mega points!</div>
+                </div>
+                
                 <button id="start-btn">▶️ PLAY</button>
             </div>
         </div>
