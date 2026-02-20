@@ -41,12 +41,12 @@ See: `research/data-plays.md`
 - Hot niches: AI training data, lead gen, job listings
 - Compliance = competitive advantage
 
-### 6. Marketing Funnels 📋 TODO
+### 6. Marketing Funnels ✅ DONE
 See: `research/marketing-funnels.md`
-- Content machines
-- Affiliate plays
-- Community monetization
-- Newsletter → product
+- Revenue: $500-$20K+/mo
+- Models: Affiliates, blogs, YouTube, courses, newsletters, webinars
+- Timeline: 9-18 months to $7K+/mo
+- Key: Content compounds, automation critical
 
 ---
 
@@ -71,9 +71,9 @@ A money machine must:
 ## Progress Log
 
 - 2026-02-19: AI agencies, AI apps, apps/games, automation plays research complete
-- 2026-02-20: Data plays research complete
-- **5 of 6 research areas DONE** 
-- Next: Marketing funnels
+- 2026-02-20: Data plays, marketing funnels research complete
+- **✅ ALL 6 RESEARCH AREAS COMPLETE!** 
+- Next: Analyze findings, pick top 2-3 opportunities, build MVPs
 
 ---
 
