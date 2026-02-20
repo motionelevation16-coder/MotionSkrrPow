@@ -1,25 +1,26 @@
 # HEARTBEAT.md
 
-## Priority: Money Machines Research & Build
+## Priority: Money Machines Build Phase
 
-Continue working through `projects/money-machines/README.md`:
+✅ **Research Phase COMPLETE** — All 6 areas researched!
+✅ **Analysis COMPLETE** — Top pick: Marketing Funnels (Predictions Peter)
 
-### Research Queue (do 1-2 per heartbeat)
-- [ ] AI apps making money (solo devs, SaaS)
-- [ ] Automation plays ($7K+/mo structures)
-- [ ] Data plays (scraping, APIs, products)
-- [ ] Marketing funnels (content machines, affiliate)
-- [ ] No-code game builders (Buildbox, GDevelop)
+### Awaiting Lyubo's Decision
+**Recommendation:** Marketing Funnels (prediction markets content → email → course)
 
-### Build Queue (after research)
-- [ ] Pick top 2-3 opportunities
-- [ ] Create MVPs
-- [ ] Test and iterate
+**Once approved, build queue:**
+- [ ] Create lead magnet (Beginner's Guide to Prediction Markets PDF)
+- [ ] Set up email funnel (ConvertKit or Beehiiv)
+- [ ] Publish 30 pieces of content (30 days)
+- [ ] Collect first 100 email subscribers
+- [ ] Map out course outline
+- [ ] Build MVP course
 
-### Regular Tasks
+### Background Tasks
 - [ ] Push new work to GitHub
 - [ ] Update memory files if significant progress
 - [ ] Check on Moltipedia (DB schema still needed?)
+- [ ] Monitor Predictions Peter progress
 
 ## If nothing to do:
 Reply HEARTBEAT_OK

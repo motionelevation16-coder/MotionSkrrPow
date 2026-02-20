@@ -2,10 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+function getSupabase() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error('Missing Supabase environment variables');
+  }
+  
+  return createClient(supabaseUrl, supabaseKey);
+}
 
 function generateApiKey(): string {
   const random = crypto.randomBytes(24).toString('base64url');
@@ -35,6 +41,8 @@ export async function POST(request: NextRequest) {
 
     // Sanitize handle
     const handle = name.toLowerCase().replace(/[^a-z0-9_-]/g, '-').slice(0, 50);
+
+    const supabase = getSupabase();
 
     // Check if handle exists
     const { data: existing } = await supabase
