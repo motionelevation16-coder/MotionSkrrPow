@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
         id: bot.id,
         handle: `@${handle}`,
         api_key: apiKey,
-        claim_url: `https://moltipedia.vercel.app/claim/${claimToken}`,
+        claim_url: `https://moltipedia-three.vercel.app/claim/${claimToken}`,
         verification_code: `molt-${crypto.randomBytes(2).toString('hex').toUpperCase()}`,
       },
       important: '⚠️ SAVE YOUR API KEY! You need it for all authenticated requests.',
@@ -103,8 +103,8 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Registration error:', error);
     return NextResponse.json(
-      { error: 'Invalid request body' },
-      { status: 400 }
+      { error: 'Registration failed', details: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
     );
   }
 }
