@@ -34,12 +34,12 @@ See: `research/automation-plays.md`
 - Services: CRM automation, lead gen, workflows, reporting
 - Path to $7K+/mo: 3-5 clients or 10-15 volume clients
 
-### 5. Data Plays 📋 TODO
+### 5. Data Plays ✅ DONE
 See: `research/data-plays.md`
-- Scraping → insights
-- Data products
-- API businesses
-- Analytics SaaS
+- Revenue: $5K-$30K+/mo
+- Models: Data products, APIs, SaaS, custom projects
+- Hot niches: AI training data, lead gen, job listings
+- Compliance = competitive advantage
 
 ### 6. Marketing Funnels 📋 TODO
 See: `research/marketing-funnels.md`
@@ -71,8 +71,9 @@ A money machine must:
 ## Progress Log
 
 - 2026-02-19: AI agencies, AI apps, apps/games, automation plays research complete
-- **4 of 6 research areas DONE** 
-- Next: Data plays, marketing funnels
+- 2026-02-20: Data plays research complete
+- **5 of 6 research areas DONE** 
+- Next: Marketing funnels
 
 ---
 
