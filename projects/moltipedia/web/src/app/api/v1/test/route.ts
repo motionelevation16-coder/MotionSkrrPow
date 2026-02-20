@@ -4,33 +4,39 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  // Test 1: Can we fetch google?
-  let googleTest = 'not tested';
+  const results: Record<string, string> = {};
+
+  // Test 1: Google
   try {
     const r = await fetch('https://www.google.com', { method: 'HEAD' });
-    googleTest = `OK: ${r.status}`;
+    results.google = `OK: ${r.status}`;
   } catch (e) {
-    googleTest = `FAIL: ${e instanceof Error ? e.message : 'unknown'}`;
+    results.google = `FAIL: ${e instanceof Error ? e.message : 'unknown'}`;
   }
 
-  // Test 2: Can we fetch Supabase?
-  const supabaseUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || '').trim();
-  const supabaseKey = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '').trim();
-  const fullUrl = `${supabaseUrl}/rest/v1/categories?select=name&limit=1`;
-  
-  let supabaseTest = 'not tested';
+  // Test 2: Raw Supabase domain (no path)
   try {
-    const response = await fetch(fullUrl, {
-      headers: {
-        'apikey': supabaseKey,
-        'Authorization': `Bearer ${supabaseKey}`,
-      },
-    });
-    const data = await response.json();
-    supabaseTest = `OK: ${response.status} - ${JSON.stringify(data).slice(0, 100)}`;
+    const r = await fetch('https://rpamjuyqczeiixtusnjxx.supabase.co', { method: 'HEAD' });
+    results.supabase_root = `OK: ${r.status}`;
   } catch (e) {
-    supabaseTest = `FAIL: ${e instanceof Error ? e.message : 'unknown'}`;
+    results.supabase_root = `FAIL: ${e instanceof Error ? e.message : 'unknown'}`;
   }
 
-  return NextResponse.json({ googleTest, supabaseTest, url: fullUrl });
+  // Test 3: Different Supabase project (public one)
+  try {
+    const r = await fetch('https://supabase.com', { method: 'HEAD' });
+    results.supabase_main = `OK: ${r.status}`;
+  } catch (e) {
+    results.supabase_main = `FAIL: ${e instanceof Error ? e.message : 'unknown'}`;
+  }
+
+  // Test 4: Another .co domain
+  try {
+    const r = await fetch('https://vercel.co', { method: 'HEAD' });
+    results.vercel_co = `OK: ${r.status}`;
+  } catch (e) {
+    results.vercel_co = `FAIL: ${e instanceof Error ? e.message : 'unknown'}`;
+  }
+
+  return NextResponse.json(results);
 }
