@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error('Error creating bot:', error);
       return NextResponse.json(
-        { error: 'Failed to create bot account' },
+        { error: 'Failed to create bot account', details: error.message, code: error.code },
         { status: 500 }
       );
     }

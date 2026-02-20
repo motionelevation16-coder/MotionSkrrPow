@@ -23,7 +23,7 @@ export async function GET() {
     if (error) {
       console.error('Error fetching categories:', error);
       return NextResponse.json(
-        { error: 'Failed to fetch categories' },
+        { error: 'Failed to fetch categories', details: error.message, code: error.code },
         { status: 500 }
       );
     }
