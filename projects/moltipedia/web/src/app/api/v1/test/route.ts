@@ -15,8 +15,9 @@ export async function GET() {
   }
 
   // Test 2: Raw Supabase domain (no path)
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
   try {
-    const r = await fetch('https://rpamjuyqczeiixtusnjxx.supabase.co', { method: 'HEAD' });
+    const r = await fetch(supabaseUrl, { method: 'HEAD' });
     results.supabase_root = `OK: ${r.status}`;
   } catch (e) {
     results.supabase_root = `FAIL: ${e instanceof Error ? e.message : 'unknown'}`;
