@@ -2,7 +2,7 @@
 
 *Goal: Find and BUILD automated income streams that print $7K+/month*
 
-## Status: 🔬 Research Phase
+## Status: 🏗️ Build Phase — Analysis Complete!
 
 ---
 
@@ -52,9 +52,26 @@ See: `research/marketing-funnels.md`
 
 ## Build Pipeline
 
-| Project | Status | Revenue Potential | Autopilot Level |
-|---------|--------|-------------------|-----------------|
-| TBD | - | - | - |
+**See ANALYSIS.md for full breakdown!**
+
+### 🥇 Top Pick: Marketing Funnels (Prediction Markets Content)
+- **Revenue:** $500-$20K+/mo
+- **Timeline:** 9-18 months to $7K
+- **Autopilot:** High
+- **Lyubo Fit:** ⭐⭐⭐⭐⭐
+- **Why:** Already started (Predictions Peter), no coding, compounds over time
+
+### 🥈 Second: AI Apps (Polymarket Analytics Tool)
+- **Revenue:** $10K-$100K+/mo
+- **Timeline:** 6-12 months to $7K
+- **Autopilot:** High
+- **Lyubo Fit:** ⭐⭐⭐⭐
+
+### 🥉 Third: Automation Plays (Social Media Services)
+- **Revenue:** $7K-$30K+/mo
+- **Timeline:** 3-6 months to $7K
+- **Autopilot:** Medium
+- **Lyubo Fit:** ⭐⭐⭐⭐
 
 ---
 
@@ -72,8 +89,9 @@ A money machine must:
 
 - 2026-02-19: AI agencies, AI apps, apps/games, automation plays research complete
 - 2026-02-20: Data plays, marketing funnels research complete
-- **✅ ALL 6 RESEARCH AREAS COMPLETE!** 
-- Next: Analyze findings, pick top 2-3 opportunities, build MVPs
+- **✅ ALL 6 RESEARCH AREAS COMPLETE!**
+- 2026-02-20: Analysis complete — Top pick: Marketing Funnels (Predictions Peter content → course)
+- **Next:** Await Lyubo's decision, then build MVP
 
 ---
 
