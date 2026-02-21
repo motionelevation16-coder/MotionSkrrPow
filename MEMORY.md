@@ -24,6 +24,15 @@
 
 ## Active Projects
 
+### Automation Agency (NEW - Feb 2026)
+- **Concept:** Automation-as-a-Service for all business types
+- **Model:** $297-1,497/month recurring
+- **Target:** Solopreneurs, SMBs, Agencies, Local Services
+- **Unique angle:** AI-powered, zero-cost start, 48h delivery
+- **Progress:** Full research + playbook built
+- **Location:** `/projects/job-replacement/`
+- **Status:** Ready to launch, awaiting name + landing page
+
 ### Predictions Peter (Polymarket Content)
 - Peter Griffin-style prediction market commentary
 - Platforms: Instagram, TikTok, YouTube
@@ -62,6 +71,8 @@
 2. **Ask clarifying questions** — When Lyubo gives a broad direction, narrow it down before diving in.
 3. **Speed matters** — First movers win in emerging markets.
 4. **Think global** — Bots don't have borders.
+5. **Bootstrap first** — Don't spend money on tools until there's revenue. Free tiers exist for everything.
+6. **Go wide, then narrow** — Lyubo wants to target ALL niches initially, optimize later based on traction.
 
 ---
 
