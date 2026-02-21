@@ -28,10 +28,10 @@
 - ✅ Affiliate/reseller program (AFFILIATE-PROGRAM.md) — 3 tiers ready
 
 ### Awaiting Lyubo
-- [ ] Pick business name
+- [x] Pick business name → **Motion Elevation** ✅
 - [ ] Review LAUNCH-BRIEF.md
 - [ ] Approve landing page copy
-- [ ] Start Day 1 actions
+- [ ] Start Day 1 actions (register domain, create Carrd, start outreach)
 
 ### Background Tasks
 - [x] Push all work to GitHub ✅

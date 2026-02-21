@@ -187,9 +187,9 @@ Let's fix that.
 ```
 [Logo]
 
-Questions? [hello@yourdomain.com]
+Questions? hello@motionelevation.com
 
-© 2026 [Business Name]. All rights reserved.
+© 2026 Motion Elevation. All rights reserved.
 ```
 
 ---
