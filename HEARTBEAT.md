@@ -1,26 +1,33 @@
 # HEARTBEAT.md
 
-## Priority: Money Machines Build Phase
+## Priority: Automation Agency Launch 🚀
 
-✅ **Research Phase COMPLETE** — All 6 areas researched!
-✅ **Analysis COMPLETE** — Top pick: Marketing Funnels (Predictions Peter)
+### Ready for Lyubo's Review
+**Location:** `/projects/job-replacement/`
 
-### Awaiting Lyubo's Decision
-**Recommendation:** Marketing Funnels (prediction markets content → email → course)
+**Start here:** [INDEX.md](projects/job-replacement/INDEX.md) - Complete table of contents
 
-**Once approved, build queue:**
-- [ ] Create lead magnet (Beginner's Guide to Prediction Markets PDF)
-- [ ] Set up email funnel (ConvertKit or Beehiiv)
-- [ ] Publish 30 pieces of content (30 days)
-- [ ] Collect first 100 email subscribers
-- [ ] Map out course outline
-- [ ] Build MVP course
+### What's Built (Overnight)
+- ✅ 10 automation categories researched
+- ✅ $0 launch stack (no tool costs)
+- ✅ Multi-niche outreach system
+- ✅ Risk backtest for every automation
+- ✅ 48-hour delivery playbook
+- ✅ n8n workflow templates (3)
+- ✅ Python scripts for outreach (2)
+- ✅ Cold email templates
+- ✅ Landing page copy (Carrd-ready)
+- ✅ Google Sheets CRM template
+
+### Awaiting Lyubo
+- [ ] Pick business name
+- [ ] Review LAUNCH-BRIEF.md
+- [ ] Approve landing page copy
+- [ ] Start Day 1 actions
 
 ### Background Tasks
-- [ ] Push new work to GitHub
-- [ ] Update memory files if significant progress
-- [ ] Check on Moltipedia (DB schema still needed?)
-- [ ] Monitor Predictions Peter progress
+- [ ] Push any uncommitted work to GitHub
+- [ ] Update memory files if needed
 
 ## If nothing to do:
 Reply HEARTBEAT_OK
