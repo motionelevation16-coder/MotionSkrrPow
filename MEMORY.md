@@ -24,14 +24,15 @@
 
 ## Active Projects
 
-### Automation Agency (NEW - Feb 2026)
+### Automation Agency — Motion Elevation (Feb 2026)
+- **Business Name:** Motion Elevation ✅
 - **Concept:** Automation-as-a-Service for all business types
 - **Model:** $297-1,497/month recurring
 - **Target:** Solopreneurs, SMBs, Agencies, Local Services
 - **Unique angle:** AI-powered, zero-cost start, 48h delivery
-- **Progress:** Full research + playbook built
+- **Categories:** 13 niches (customer support, marketing, sales, HR, admin, finance, ops, IT, security, data, e-commerce, healthcare, legal)
 - **Location:** `/projects/job-replacement/`
-- **Status:** Ready to launch, awaiting name + landing page
+- **Status:** Name chosen, ready for domain + landing page
 
 ### Predictions Peter (Polymarket Content)
 - Peter Griffin-style prediction market commentary
