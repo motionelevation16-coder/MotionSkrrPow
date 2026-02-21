@@ -35,6 +35,9 @@
 | IT/DevOps | [it-devops/](./it-devops/) | Servers, monitoring |
 | Security | [security/](./security/) | Phishing, alerts |
 | Data Analysis | [data-analysis/](./data-analysis/) | Reports, dashboards |
+| **E-commerce** | [ecommerce-retail/](./ecommerce-retail/) | Orders, inventory, support |
+| **Healthcare** | [healthcare-medical/](./healthcare-medical/) | Scheduling, intake, compliance |
+| **Legal** | [legal-compliance/](./legal-compliance/) | Documents, deadlines, billing |
 
 ---
 
@@ -147,4 +150,4 @@
 
 ---
 
-*Total files: 25+ | Ready to launch: Yes | Cost: $0*
+*Total files: 28+ | 13 automation categories | Ready to launch: Yes | Cost: $0*
