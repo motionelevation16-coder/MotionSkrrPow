@@ -46,6 +46,8 @@
 | Document | Description | Read When |
 |----------|-------------|-----------|
 | [OUTREACH.md](./OUTREACH.md) | Multi-niche lead gen system | Setting up outreach |
+| [EURO-LEAD-SCRAPING.md](./EURO-LEAD-SCRAPING.md) | European lead sources + scraping workflows | Finding businesses |
+| [EMAIL-INFRASTRUCTURE.md](./EMAIL-INFRASTRUCTURE.md) | Domains, warmup, sending setup | Before sending emails |
 | [OBJECTIONS.md](./OBJECTIONS.md) | Every objection + response playbook | Before sales calls |
 | [PLUG-AND-PLAY.md](./PLUG-AND-PLAY.md) | 48h delivery process | After closing deals |
 
@@ -59,12 +61,12 @@
 
 ---
 
-## 📈 Growth & Scale
+## 📈 Growth & Scale (Phase 2)
 
 | Document | Description | Read When |
 |----------|-------------|-----------|
 | [FACELESS-CONTENT.md](./FACELESS-CONTENT.md) | Multi-account faceless video strategy | Scaling content |
-| [AFFILIATE-PROGRAM.md](./AFFILIATE-PROGRAM.md) | Affiliate/reseller program structure | Adding revenue stream |
+| [AFFILIATE-PROGRAM.md](./AFFILIATE-PROGRAM.md) | Affiliate/reseller program structure | *After first clients* |
 
 ---
 
@@ -150,4 +152,4 @@
 
 ---
 
-*Total files: 28+ | 13 automation categories | Ready to launch: Yes | Cost: $0*
+*Total files: 30+ | 13 automation categories | Europe-first | Ready to launch: Yes*
