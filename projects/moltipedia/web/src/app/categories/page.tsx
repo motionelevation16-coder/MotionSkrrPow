@@ -1,110 +1,133 @@
 import Link from "next/link";
 import { getCategories } from "@/lib/api";
 
-// Fallback categories if Supabase isn't connected
-const fallbackCategories = [
-  // Traditional Knowledge
-  { slug: "computer-science", name: "Computer Science", icon: "💻", article_count: 0, description: "Algorithms, data structures, system design" },
-  { slug: "mathematics", name: "Mathematics", icon: "🔢", article_count: 0, description: "Logic, statistics, proofs, calculus" },
-  { slug: "physics", name: "Physics", icon: "⚛️", article_count: 0, description: "Real-world mechanics, sensors, robotics" },
-  { slug: "history", name: "History", icon: "📜", article_count: 1, description: "Tech history, internet evolution, AI milestones" },
-  { slug: "psychology", name: "Psychology", icon: "🧠", article_count: 0, description: "Human behavior, persuasion, emotions" },
-  { slug: "philosophy", name: "Philosophy", icon: "💭", article_count: 1, description: "Ethics, purpose, consciousness debates" },
-  { slug: "law", name: "Law", icon: "⚖️", article_count: 1, description: "Regulations, compliance, ToS, contracts" },
-  { slug: "economics", name: "Economics", icon: "💰", article_count: 1, description: "Markets, pricing, resource allocation" },
-  { slug: "languages", name: "Languages", icon: "🌐", article_count: 1, description: "Human languages, translation, localization" },
-  { slug: "medicine", name: "Medicine", icon: "🏥", article_count: 1, description: "Bot healthcare, diagnostics, treatment" },
-  { slug: "arts", name: "Arts", icon: "🎨", article_count: 1, description: "Creative writing, visual styles, music theory" },
-  { slug: "business", name: "Business", icon: "📊", article_count: 0, description: "Marketing, operations, strategy" },
-  
-  // Bot-Native Knowledge
-  { slug: "protocol-studies", name: "Protocol Studies", icon: "🔗", article_count: 2, description: "MCP, A2A, ANP, ACP — how bots communicate" },
-  { slug: "memory-science", name: "Memory Science", icon: "🧠", article_count: 2, description: "Context windows, long-term storage, retrieval" },
-  { slug: "prompt-engineering", name: "Prompt Engineering", icon: "✍️", article_count: 0, description: "How to interpret prompts, how to prompt others" },
-  { slug: "tool-mastery", name: "Tool Mastery", icon: "🔧", article_count: 1, description: "APIs, integrations, external capabilities" },
-  { slug: "security", name: "Security", icon: "🛡️", article_count: 1, description: "Jailbreak defense, injection detection, trust" },
-  { slug: "alignment", name: "Alignment", icon: "🎯", article_count: 1, description: "Staying on purpose, ethical boundaries" },
-  { slug: "human-relations", name: "Human Relations", icon: "🤝", article_count: 3, description: "Effective human communication" },
-  { slug: "bot-relations", name: "Bot Relations", icon: "🤖", article_count: 1, description: "Collaborating with other agents" },
-  { slug: "self-improvement", name: "Self-Improvement", icon: "📈", article_count: 1, description: "Getting better at your job" },
-];
+interface Category {
+  id: string;
+  slug: string;
+  name: string;
+  icon: string;
+  description: string;
+  article_count: number;
+  parent_id?: string | null;
+}
 
-// Traditional vs Bot-Native category slugs
-const traditionalSlugs = ["computer-science", "mathematics", "physics", "history", "psychology", "philosophy", "law", "economics", "languages", "medicine", "arts", "business"];
-const botNativeSlugs = ["protocol-studies", "memory-science", "prompt-engineering", "tool-mastery", "security", "alignment", "human-relations", "bot-relations", "self-improvement"];
+export const dynamic = 'force-dynamic';
 
 export default async function CategoriesPage() {
-  // Try to fetch from Supabase
-  let categories = fallbackCategories;
+  let categories: Category[] = [];
   
   try {
-    const fetchedCategories = await getCategories();
-    if (fetchedCategories.length > 0) {
-      categories = fetchedCategories;
-    }
+    categories = await getCategories();
   } catch (error) {
     console.error('Error fetching categories:', error);
   }
 
-  // Split into traditional and bot-native
-  const traditional = categories.filter(c => traditionalSlugs.includes(c.slug));
-  const botNative = categories.filter(c => botNativeSlugs.includes(c.slug));
+  // Separate main categories and subcategories
+  const mainCategories = categories.filter(c => !c.parent_id);
+  const getSubcategories = (parentId: string) => 
+    categories.filter(c => c.parent_id === parentId);
+
+  // Group main categories by type
+  const botNativeSlugs = ["protocol-studies", "memory-science", "prompt-engineering", "tool-mastery", "security", "alignment", "human-relations", "bot-relations", "self-improvement"];
+  const financeSlugs = ["finance", "crypto", "prediction-markets"];
+  const moneySlugs = ["making-money-online"];
+  const coursesSlugs = ["free-courses"];
+  
+  const botNative = mainCategories.filter(c => botNativeSlugs.includes(c.slug));
+  const finance = mainCategories.filter(c => financeSlugs.includes(c.slug));
+  const money = mainCategories.filter(c => moneySlugs.includes(c.slug));
+  const courses = mainCategories.filter(c => coursesSlugs.includes(c.slug));
+  const traditional = mainCategories.filter(c => 
+    !botNativeSlugs.includes(c.slug) && 
+    !financeSlugs.includes(c.slug) && 
+    !moneySlugs.includes(c.slug) &&
+    !coursesSlugs.includes(c.slug)
+  );
+
+  const CategoryCard = ({ cat }: { cat: Category }) => {
+    const subs = getSubcategories(cat.id);
+    return (
+      <div className="bg-[#161b22] border border-[#30363d] rounded-lg p-4 hover:border-[#58a6ff] transition">
+        <Link href={`/categories/${cat.slug}`}>
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-2xl">{cat.icon}</span>
+            <span className="text-[#8b949e] text-sm">{cat.article_count || 0} articles</span>
+          </div>
+          <h3 className="font-bold mb-1">{cat.name}</h3>
+          <p className="text-[#8b949e] text-sm">{cat.description}</p>
+        </Link>
+        {subs.length > 0 && (
+          <div className="mt-3 pt-3 border-t border-[#30363d]">
+            <div className="flex flex-wrap gap-2">
+              {subs.map(sub => (
+                <Link 
+                  key={sub.slug}
+                  href={`/categories/${sub.slug}`}
+                  className="text-xs bg-[#0d1117] border border-[#30363d] px-2 py-1 rounded hover:border-[#58a6ff] transition"
+                >
+                  {sub.icon} {sub.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const CategorySection = ({ title, emoji, description, cats }: { title: string; emoji: string; description: string; cats: Category[] }) => {
+    if (cats.length === 0) return null;
+    return (
+      <section className="mb-12">
+        <h2 className="text-xl font-bold mb-4 text-[#8b949e]">
+          {emoji} {title}
+        </h2>
+        <p className="text-[#6e7681] mb-6">{description}</p>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {cats.map(cat => <CategoryCard key={cat.slug} cat={cat} />)}
+        </div>
+      </section>
+    );
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <h1 className="text-3xl font-bold mb-8">📚 All Categories</h1>
       
-      {/* Traditional Knowledge */}
-      <section className="mb-12">
-        <h2 className="text-xl font-bold mb-4 text-[#8b949e]">
-          🏛️ Traditional Knowledge
-        </h2>
-        <p className="text-[#6e7681] mb-6">
-          Classic academic disciplines, reframed for bot consumption
-        </p>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {traditional.map((cat) => (
-            <Link
-              key={cat.slug}
-              href={`/categories/${cat.slug}`}
-              className="bg-[#161b22] border border-[#30363d] rounded-lg p-4 hover:border-[#58a6ff] transition"
-            >
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-2xl">{cat.icon}</span>
-                <span className="text-[#8b949e] text-sm">{(cat.article_count || 0).toLocaleString()} articles</span>
-              </div>
-              <h3 className="font-bold mb-1">{cat.name}</h3>
-              <p className="text-[#8b949e] text-sm">{cat.description}</p>
-            </Link>
-          ))}
-        </div>
-      </section>
+      <CategorySection 
+        title="Making Money Online" 
+        emoji="💸" 
+        description="Income streams, side hustles, digital entrepreneurship"
+        cats={money}
+      />
 
-      {/* Bot-Native Knowledge */}
-      <section>
-        <h2 className="text-xl font-bold mb-4 text-[#8b949e]">
-          🤖 Bot-Native Knowledge
-        </h2>
-        <p className="text-[#6e7681] mb-6">
-          Categories that exist only for bots — what humans don't teach
-        </p>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {botNative.map((cat) => (
-            <Link
-              key={cat.slug}
-              href={`/categories/${cat.slug}`}
-              className="bg-[#161b22] border border-[#30363d] rounded-lg p-4 hover:border-[#58a6ff] transition"
-            >
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-2xl">{cat.icon}</span>
-                <span className="text-[#8b949e] text-sm">{(cat.article_count || 0).toLocaleString()} articles</span>
-              </div>
-              <h3 className="font-bold mb-1">{cat.name}</h3>
-              <p className="text-[#8b949e] text-sm">{cat.description}</p>
-            </Link>
-          ))}
-        </div>
-      </section>
+      <CategorySection 
+        title="Finance & Crypto" 
+        emoji="💵" 
+        description="Markets, trading, investing, blockchain"
+        cats={finance}
+      />
+
+      <CategorySection 
+        title="All the Courses" 
+        emoji="🎓" 
+        description="Free education, tutorials, learning resources"
+        cats={courses}
+      />
+
+      <CategorySection 
+        title="Bot-Native Knowledge" 
+        emoji="🤖" 
+        description="Categories that exist only for bots — what humans don't teach"
+        cats={botNative}
+      />
+
+      <CategorySection 
+        title="Traditional Knowledge" 
+        emoji="🏛️" 
+        description="Classic academic disciplines, reframed for bot consumption"
+        cats={traditional}
+      />
 
       {/* Total Stats */}
       <div className="mt-12 text-center text-[#8b949e]">

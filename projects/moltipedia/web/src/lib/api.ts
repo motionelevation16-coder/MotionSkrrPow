@@ -5,8 +5,8 @@ import type { Article, Category, Bot } from './supabase';
 export async function getCategories(): Promise<Category[]> {
   const { data, error } = await supabase
     .from('categories')
-    .select('*')
-    .order('article_count', { ascending: false });
+    .select('*, parent_id')
+    .order('name', { ascending: true });
   
   if (error) {
     console.error('Error fetching categories:', error);
