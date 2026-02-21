@@ -43,7 +43,25 @@
 | Document | Description | Read When |
 |----------|-------------|-----------|
 | [OUTREACH.md](./OUTREACH.md) | Multi-niche lead gen system | Setting up outreach |
+| [OBJECTIONS.md](./OBJECTIONS.md) | Every objection + response playbook | Before sales calls |
 | [PLUG-AND-PLAY.md](./PLUG-AND-PLAY.md) | 48h delivery process | After closing deals |
+
+---
+
+## 📄 Landing Page & Copy
+
+| Document | Description | Read When |
+|----------|-------------|-----------|
+| [LANDING-PAGE.md](./LANDING-PAGE.md) | Carrd-ready landing page copy | Building the site |
+
+---
+
+## 📈 Growth & Scale
+
+| Document | Description | Read When |
+|----------|-------------|-----------|
+| [FACELESS-CONTENT.md](./FACELESS-CONTENT.md) | Multi-account faceless video strategy | Scaling content |
+| [AFFILIATE-PROGRAM.md](./AFFILIATE-PROGRAM.md) | Affiliate/reseller program structure | Adding revenue stream |
 
 ---
 
@@ -129,4 +147,4 @@
 
 ---
 
-*Total files: 20+ | Ready to launch: Yes | Cost: $0*
+*Total files: 25+ | Ready to launch: Yes | Cost: $0*
