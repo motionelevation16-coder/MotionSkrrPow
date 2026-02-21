@@ -7,17 +7,25 @@
 
 **Start here:** [INDEX.md](projects/job-replacement/INDEX.md) - Complete table of contents
 
-### What's Built (Overnight)
-- ✅ 10 automation categories researched
+### What's Built (Complete)
+
+**Strategy & Planning**
+- ✅ 13 automation categories researched (added e-commerce, healthcare, legal)
 - ✅ $0 launch stack (no tool costs)
-- ✅ Multi-niche outreach system
+- ✅ Multi-niche outreach system (810 touches/day)
 - ✅ Risk backtest for every automation
 - ✅ 48-hour delivery playbook
+
+**Sales & Outreach**
+- ✅ Landing page copy (LANDING-PAGE.md) — Carrd-ready, plain + stylish
+- ✅ Objection playbook (OBJECTIONS.md) — 15+ objections with responses
+- ✅ Cold email templates for all niches
 - ✅ n8n workflow templates (3)
 - ✅ Python scripts for outreach (2)
-- ✅ Cold email templates
-- ✅ Landing page copy (Carrd-ready)
-- ✅ Google Sheets CRM template
+
+**Growth**
+- ✅ Faceless content strategy (FACELESS-CONTENT.md) — multi-account automation
+- ✅ Affiliate/reseller program (AFFILIATE-PROGRAM.md) — 3 tiers ready
 
 ### Awaiting Lyubo
 - [ ] Pick business name
@@ -26,8 +34,8 @@
 - [ ] Start Day 1 actions
 
 ### Background Tasks
-- [ ] Push any uncommitted work to GitHub
-- [ ] Update memory files if needed
+- [x] Push all work to GitHub ✅
+- [x] Update memory files ✅
 
 ## If nothing to do:
 Reply HEARTBEAT_OK
