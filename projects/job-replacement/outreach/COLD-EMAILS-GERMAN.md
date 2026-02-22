@@ -178,3 +178,269 @@ Grüße,
 ---
 
 *Bereit für Anpassung. Lyubo, sag mir welche Branchen priorisiert werden sollen.*
+
+---
+
+# Einwandbehandlung — Deutsch
+
+*Jeder Zweifel beantwortet. Jede Unsicherheit gelöst.*
+
+---
+
+## Preis-Einwände
+
+### "Das ist zu teuer"
+
+**Antwort:**
+```
+Das verstehe ich — es ist eine Investition.
+
+Kurze Frage: Wie viele Stunden pro Woche verbringen Sie (oder Ihr Team) 
+mit den Aufgaben, die wir automatisieren würden?
+
+[Antwort abwarten, z.B. "10-15 Stunden"]
+
+Bei selbst 25€/Stunde sind das 1.000-1.500€/Monat an Arbeitskosten.
+Unsere Automatisierung kostet 247-397€ und arbeitet 24/7, ohne Krankheitstage.
+
+Die Frage ist nicht "Kann ich mir das leisten?" — sondern 
+"Kann ich es mir leisten, es NICHT zu tun?"
+```
+
+### "Ich kann mir das gerade nicht leisten"
+
+**Antwort:**
+```
+Cashflow-Bedenken verstehe ich vollkommen.
+
+Eine Option: Wir starten mit einer einzelnen Automatisierung für 197€/Monat.
+Wenn Sie damit 10+ Stunden/Monat sparen (was Sie werden), haben Sie bereits Geld verdient.
+
+Dann skalieren wir, wenn Sie bereit sind.
+
+Würde das funktionieren?
+```
+
+### "Ich mache das einfach selbst / nutze Zapier"
+
+**Antwort:**
+```
+Absolut fair — Zapier ist ein tolles Tool.
+
+Was normalerweise passiert: Man verbringt 20 Stunden damit, etwas zu bauen,
+das halbwegs funktioniert, dann weitere 10 Stunden mit Reparaturen.
+
+Wir haben 50+ dieser Workflows gebaut. Wir kennen die Grenzfälle,
+die API-Eigenheiten, die Fehlerquellen.
+
+Sie könnten es selbst machen — oder Sie haben es in 48 Stunden laufen,
+während Sie sich auf das konzentrieren, was Sie wirklich gut können.
+
+Was klingt besser?
+```
+
+---
+
+## Vertrauens-Einwände
+
+### "Woher weiß ich, dass das funktioniert?"
+
+**Antwort:**
+```
+Gute Frage — Sie sollten mir nicht einfach vertrauen.
+
+So machen wir es:
+1. Kostenloses Audit-Gespräch — wir zeigen Ihnen genau, was wir automatisieren würden
+2. Sie sehen den Workflow, bevor wir ihn bauen
+3. Wir testen alles in einer Testumgebung, bevor es live geht
+4. Erste 30 Tage: Wenn es nicht funktioniert, beheben wir es oder erstatten Ihnen das Geld
+
+Es gibt kein Risiko auf Ihrer Seite.
+```
+
+### "Ich wurde schon von Agenturen enttäuscht"
+
+**Antwort:**
+```
+Ja, das höre ich oft. Die meisten Agenturen versprechen zu viel und liefern zu wenig.
+
+So sind wir anders:
+- Wir bauen konkrete Automatisierungen, keine vagen "Strategien"
+- Sie sehen Ergebnisse in Tagen, nicht Monaten
+- Wir dokumentieren alles — die Workflows gehören Ihnen
+- Keine Vertragsbindung
+
+Wenn Sie möchten, kann ich Ihnen etwas zeigen, das wir für ein ähnliches 
+Unternehmen gebaut haben. Sie sehen genau, was Sie bekommen.
+```
+
+### "Ich muss darüber nachdenken"
+
+**Antwort:**
+```
+Natürlich — nehmen Sie sich Zeit.
+
+Kurze Frage, damit ich Ihnen beim Nachdenken helfen kann:
+Was genau wägen Sie ab? Ist es der Preis, der Zeitpunkt,
+oder ob Automatisierung zu Ihrem Unternehmen passt?
+
+[Antwort abwarten, dann dieses spezifische Anliegen ansprechen]
+```
+
+### "Ich muss mit meinem Partner/Team sprechen"
+
+**Antwort:**
+```
+Verstehe ich — große Entscheidungen brauchen Input.
+
+Würde es helfen, wenn ich eine Zusammenfassung erstelle, die Sie teilen können?
+Enthält genau, was wir bauen würden, die Kosten und den erwarteten ROI.
+
+Dann können wir einen kurzen Call mit allen machen, falls Fragen aufkommen.
+```
+
+---
+
+## Technische Einwände
+
+### "Ich verstehe nicht, wie das funktioniert"
+
+**Antwort:**
+```
+Lassen Sie mich es ganz einfach machen:
+
+1. Sie sagen uns, welche Aufgaben Ihre Zeit fressen
+2. Wir bauen ein System, das diese Aufgaben automatisch erledigt
+3. Sie genehmigen es, wir schalten es ein
+4. Es läuft im Hintergrund, Sie prüfen die Ergebnisse
+
+Sie müssen keinen Code, keine APIs oder irgendetwas Technisches anfassen.
+Das ist unser Job.
+
+Stellen Sie es sich vor wie einen Roboter-Mitarbeiter — einen, der nie schläft
+und keine Fehler macht.
+```
+
+### "Was wenn etwas kaputt geht?"
+
+**Antwort:**
+```
+Gute Frage — manchmal müssen Dinge angepasst werden.
+
+So handhaben wir das:
+- Alle Workflows haben eingebaute Fehlerüberwachung
+- Wenn etwas fehlschlägt, werden wir sofort benachrichtigt
+- Monatliche Wartung ist in Ihrem Plan enthalten
+- Kritische Probleme: Wir antworten innerhalb von 24 Stunden (oft am selben Tag)
+
+Sie sind nicht allein. Wir überwachen das System, damit Sie es nicht müssen.
+```
+
+### "Mein Unternehmen ist zu speziell/kompliziert"
+
+**Antwort:**
+```
+Das ist tatsächlich ziemlich häufig — jedes Unternehmen denkt, es sei besonders.
+(Und in mancher Hinsicht stimmt das!)
+
+Aber hier ist die Sache: Die zugrundeliegenden Probleme sind meist dieselben.
+- Lead-Nachverfolgung
+- Wiederkehrende E-Mails
+- Dateneingabe zwischen Tools
+- Terminkoordination hin und her
+
+Wir haben Unternehmen in ähnlichen Branchen automatisiert.
+Die Oberfläche sieht anders aus, aber die Struktur ist ähnlich.
+
+Lassen Sie mich fragen: Was ist DIE EINE Aufgabe, die am meisten Zeit 
+in Ihrem Unternehmen frisst?
+[Dann zeigen, wie Sie genau das automatisieren würden]
+```
+
+---
+
+## Timing-Einwände
+
+### "Ich bin gerade zu beschäftigt, das einzurichten"
+
+**Antwort:**
+```
+Das höre ich oft — und ehrlich gesagt ist das genau der Grund, es jetzt zu tun.
+
+Die Sache ist: Wir machen 95% der Arbeit.
+Ihre einzige Aufgabe ist ein 30-Minuten-Kickoff-Gespräch und das Genehmigen dessen, was wir bauen.
+
+Wir automatisieren buchstäblich, damit Sie WENIGER beschäftigt sind.
+
+Wann passt ein 30-Minuten-Fenster diese oder nächste Woche?
+```
+
+### "Vielleicht in ein paar Monaten"
+
+**Antwort:**
+```
+Verstehe ich. Aus Neugier — was ändert sich in ein paar Monaten,
+das es zu einem besseren Zeitpunkt machen würde?
+
+[Antwort anhören]
+
+Die Sache ist: Jeder Monat, den Sie warten, ist ein weiterer Monat
+manueller Arbeit. Je früher Sie anfangen, desto früher bekommen Sie diese Stunden zurück.
+
+Was wenn wir jetzt einfach das Audit-Gespräch machen — ohne Verpflichtung — 
+damit Sie, wenn Sie bereit sind, schon genau wissen, was wir bauen würden?
+```
+
+---
+
+## Wettbewerbs-Einwände
+
+### "Ich nutze bereits [Wettbewerber/ähnlichen Service]"
+
+**Antwort:**
+```
+Schön — gut, dass Sie bereits in Automatisierung investieren.
+
+Kurze Frage: Sind Sie zufrieden mit den Ergebnissen, oder gibt es
+etwas, das nicht ganz funktioniert?
+
+[Wenn zufrieden]: Super, klingt so, als wären Sie versorgt.
+[Wenn nicht zufrieden]: Was fehlt?
+[Dann diese spezifische Lücke ansprechen]
+```
+
+### "Meine VA erledigt das bereits"
+
+**Antwort:**
+```
+VAs sind großartig für Aufgaben, die menschliches Urteilsvermögen erfordern.
+
+Aber für wiederkehrende Dinge — dieselben E-Mails senden, Daten kopieren,
+in sozialen Medien posten — ist Automatisierung schneller, günstiger und braucht keinen Urlaub.
+
+Die meisten unserer Kunden behalten ihre VA für anspruchsvolle Arbeit und
+automatisieren die Routinearbeit. Die VA wird effektiver, nicht ersetzt.
+
+Klingt das nützlich?
+```
+
+---
+
+## Schnellreferenz
+
+| Einwand | Kernantwort |
+|---------|-------------|
+| Zu teuer | Mit Arbeitskosten vergleichen, klein starten |
+| Kann mir's nicht leisten | Mit einer Automatisierung starten |
+| Mache es selbst | Zeitaufwand + Expertise, 48h Lieferung |
+| Funktioniert das? | Audit → Testumgebung → 30-Tage-Garantie |
+| Wurde schon enttäuscht | Konkret zeigen, Sie besitzen alles |
+| Muss nachdenken | Fragen was genau, das ansprechen |
+| Mit Partner sprechen | Zusammenfassung senden, Gruppenmeeting anbieten |
+| Verstehe nicht | Roboter-Mitarbeiter-Analogie |
+| Was wenn es kaputt geht? | Überwachung + Wartung inklusive |
+| Zu speziell | Grundprobleme sind universell |
+| Zu beschäftigt | Wir machen 95% der Arbeit, 30 Min von Ihnen |
+| Vielleicht später | Was ändert sich? Audit jetzt, bauen später |
+| Nutze Wettbewerber | Was funktioniert nicht? |
+| VA erledigt das | Routine automatisieren, VA macht Anspruchsvolles |
