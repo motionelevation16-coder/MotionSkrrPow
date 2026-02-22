@@ -221,20 +221,22 @@ Dann skalieren wir, wenn Sie bereit sind.
 Würde das funktionieren?
 ```
 
-### "Ich mache das einfach selbst / nutze Zapier"
+### "Ich mache das einfach selbst"
 
 **Antwort:**
 ```
-Absolut fair — Zapier ist ein tolles Tool.
+Absolut fair — und Sie könnten es wahrscheinlich auch.
 
 Was normalerweise passiert: Man verbringt 20 Stunden damit, etwas zu bauen,
 das halbwegs funktioniert, dann weitere 10 Stunden mit Reparaturen.
+Dann muss es aktualisiert werden. Dann ändert sich etwas. Dann wird es zum Nebenjob.
 
 Wir haben 50+ dieser Workflows gebaut. Wir kennen die Grenzfälle,
-die API-Eigenheiten, die Fehlerquellen.
+die Fehlerquellen, die Dinge, die um 2 Uhr nachts kaputtgehen.
 
-Sie könnten es selbst machen — oder Sie haben es in 48 Stunden laufen,
-während Sie sich auf das konzentrieren, was Sie wirklich gut können.
+Sie könnten Ihre Wochenenden mit Debugging verbringen —
+oder Sie haben es in 48 Stunden laufen, während Sie sich auf das konzentrieren,
+was Ihnen wirklich Geld bringt.
 
 Was klingt besser?
 ```

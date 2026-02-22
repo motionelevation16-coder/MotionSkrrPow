@@ -240,20 +240,22 @@ Ensuite on passe à l'échelle quand vous êtes prêt.
 Ça vous conviendrait ?
 ```
 
-### "Je vais le faire moi-même / utiliser Zapier"
+### "Je vais le faire moi-même"
 
 **Réponse:**
 ```
-Tout à fait juste — Zapier est un excellent outil.
+Tout à fait juste — et vous pourriez probablement y arriver.
 
 Voilà ce qui se passe généralement : Les gens passent 20 heures à construire 
 quelque chose qui fonctionne à peu près, puis 10 heures à réparer quand ça casse.
+Ensuite il faut mettre à jour. Ensuite quelque chose change. Ensuite c'est un travail à mi-temps.
 
 On a construit plus de 50 de ces workflows. On connaît les cas limites,
-les particularités des API, les points de défaillance.
+les points de défaillance, les trucs qui cassent à 2h du matin.
 
-Vous pourriez le faire vous-même — ou vous pourriez l'avoir fonctionnel en 48 heures
-pendant que vous vous concentrez sur ce que vous faites vraiment bien.
+Vous pourriez passer vos week-ends à débugger des automatisations —
+ou vous pourriez l'avoir fonctionnel en 48 heures pendant que vous vous concentrez
+sur ce qui vous rapporte vraiment de l'argent.
 
 Qu'est-ce qui vous semble mieux ?
 ```

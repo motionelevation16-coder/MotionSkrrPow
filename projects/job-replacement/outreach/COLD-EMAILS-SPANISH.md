@@ -244,20 +244,22 @@ Luego escalamos cuando estés listo.
 ¿Te funciona?
 ```
 
-### "Lo haré yo mismo / usaré Zapier"
+### "Lo haré yo mismo"
 
 **Respuesta:**
 ```
-Totalmente justo — Zapier es una gran herramienta.
+Totalmente justo — y probablemente podrías hacerlo.
 
 Esto es lo que suele pasar: La gente pasa 20 horas construyendo algo 
 que más o menos funciona, luego otras 10 horas arreglándolo cuando se rompe.
+Luego hay que actualizarlo. Luego algo cambia. Luego se convierte en un trabajo a tiempo parcial.
 
 Hemos construido más de 50 de estos workflows. Conocemos los casos límite,
-las peculiaridades de las APIs, los puntos de fallo.
+los puntos de fallo, las cosas que se rompen a las 2 de la mañana.
 
-Podrías hacerlo tú mismo — o podrías tenerlo funcionando en 48 horas
-mientras te centras en lo que realmente se te da bien.
+Podrías pasar tus fines de semana haciendo debugging —
+o podrías tenerlo funcionando en 48 horas mientras te centras en 
+lo que realmente te da dinero.
 
 ¿Qué suena mejor?
 ```

@@ -253,20 +253,22 @@ Then we scale when you're ready.
 Would that work?
 ```
 
-### "I'll just do it myself / use Zapier"
+### "I'll just do it myself"
 
 **Response:**
 ```
-Totally fair—Zapier's a great tool.
+Totally fair — and you probably could.
 
-Here's what usually happens: People spend 20 hours building something 
+Here's what usually happens though: People spend 20 hours building something 
 that kind of works, then another 10 hours fixing it when it breaks.
+Then it needs updating. Then something changes. Then it's a part-time job.
 
 We've built 50+ of these workflows. We know the edge cases, 
-the API quirks, the failure points.
+the failure points, the things that break at 2am.
 
-You could do it yourself—or you could have it running in 48 hours 
-while you focus on what you're actually good at.
+You could spend your weekends debugging automations — 
+or you could have it running in 48 hours while you focus on 
+what actually makes you money.
 
 Which sounds better?
 ```
@@ -464,7 +466,7 @@ Does that sound useful?
 |-----------|---------------|
 | Too expensive | Compare to labor cost, start small |
 | Can't afford now | Start with one automation |
-| I'll DIY it | Time cost + expertise, 48hr delivery |
+| I'll do it myself | Time cost + expertise, 48hr delivery |
 | Will it work? | Audit → Sandbox → 30-day guarantee |
 | Been burned before | Show specifics, you own everything |
 | Need to think | Ask what specifically, address it |
