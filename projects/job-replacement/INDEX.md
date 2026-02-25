@@ -64,6 +64,16 @@
 
 ---
 
+## 🔍 Research & Competition
+
+| Document | Description | Read When |
+|----------|-------------|-----------|
+| [COMPETITOR-RESEARCH.md](./COMPETITOR-RESEARCH.md) | **DACH automation agencies analysis** | Know the competition |
+| [LEAD-LIST.md](./LEAD-LIST.md) | Lead research template + strategy | Finding prospects |
+| [OUTREACH-PREP.md](./OUTREACH-PREP.md) | **Email warm-up, LinkedIn, launch checklist** | Before outreach |
+
+---
+
 ## 📄 Landing Page & Copy
 
 | Document | Description | Read When |
@@ -105,6 +115,9 @@
 | CRM Setup | [google-sheets-crm.md](./templates/google-sheets-crm.md) | Free CRM in Sheets |
 | Cold Emails | [cold-email-templates.md](./templates/cold-email-templates.md) | Proven email frameworks |
 | Landing Page | [landing-page-copy.md](./templates/landing-page-copy.md) | Carrd-ready copy |
+| **Tally Onboarding** | [TALLY-ONBOARDING-FORM.md](./templates/TALLY-ONBOARDING-FORM.md) | Client intake form spec |
+| **Loom Scripts** | [LOOM-SCRIPTS.md](./templates/LOOM-SCRIPTS.md) | Video tutorial scripts |
+| **n8n Workflows** | [N8N-WORKFLOWS-DETAILED.md](./templates/N8N-WORKFLOWS-DETAILED.md) | Detailed workflow specs |
 
 ---
 

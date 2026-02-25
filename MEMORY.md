@@ -74,6 +74,8 @@
 4. **Think global** — Bots don't have borders.
 5. **Bootstrap first** — Don't spend money on tools until there's revenue. Free tiers exist for everything.
 6. **Go wide, then narrow** — Lyubo wants to target ALL niches initially, optimize later based on traction.
+7. **Model names without prefix** — Use `claude-sonnet-4-6` not `anthropic/claude-sonnet-4-6` in OpenClaw config.
+8. **Save API quota** — Use Sonnet for routine work, Haiku for heartbeats, Opus only for complex tasks.
 
 ---
 
