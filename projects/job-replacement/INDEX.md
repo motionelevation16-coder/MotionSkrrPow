@@ -49,7 +49,18 @@
 | [EURO-LEAD-SCRAPING.md](./EURO-LEAD-SCRAPING.md) | European lead sources + scraping workflows | Finding businesses |
 | [EMAIL-INFRASTRUCTURE.md](./EMAIL-INFRASTRUCTURE.md) | Domains, warmup, sending setup | Before sending emails |
 | [OBJECTIONS.md](./OBJECTIONS.md) | Every objection + response playbook | Before sales calls |
+| [CLIENT-JOURNEY.md](./CLIENT-JOURNEY.md) | **Full flow from cold email → delivery** | Understanding the process |
+
+---
+
+## 📦 Delivery & Fulfillment
+
+| Document | Description | Read When |
+|----------|-------------|-----------|
 | [PLUG-AND-PLAY.md](./PLUG-AND-PLAY.md) | 48h delivery process | After closing deals |
+| [DELIVERY-VARIANTS.md](./DELIVERY-VARIANTS.md) | n8n/Make/Zapier options | Choosing tech stack |
+| [CLIENT-SETUP-GUIDE.md](./CLIENT-SETUP-GUIDE.md) | **German grandpa-proof setup instructions** | Send to clients |
+| [CLIENT-TROUBLESHOOTING.md](./CLIENT-TROUBLESHOOTING.md) | **Client self-help for problems** | Send to clients |
 
 ---
 
