@@ -39,29 +39,29 @@ Tomorrow I'll show you a real business that had a similar score — and what cha
 
 ### 🇩🇪 Deutsch
 
-**Betreff:** Dein Automatisierungs-Score: [X]/100 – das bedeutet er für dich
+**Betreff:** Ihr Automatisierungs-Score: [X]/100 – das bedeutet er für Sie
 
-**Vorschautext:** Du verlierst jede Woche Stunden an Aufgaben, die eine Maschine erledigen könnte.
+**Vorschautext:** Sie verlieren jede Woche Stunden an Aufgaben, die eine Maschine erledigen könnte.
 
 **Text:**
 
-Du hast den Audit abgeschlossen. Hier ist das Ergebnis.
+Sie haben den Audit abgeschlossen. Hier ist das Ergebnis.
 
-Dein Automatisierungs-Score: **[X]/100**
+Ihr Automatisierungs-Score: **[X]/100**
 
-Das bedeutet: [X]% deiner wöchentlichen Admin-Arbeit könnte automatisch laufen. Im Moment machst du das alles noch selbst.
+Das bedeutet: [X]% Ihrer wöchentlichen Admin-Arbeit könnte automatisch laufen. Im Moment machen Sie das alles noch selbst.
 
-Basierend auf deinen Antworten sind das deine drei größten Hebel:
+Basierend auf Ihren Antworten sind das Ihre drei größten Hebel:
 
 1. **[Automatisierung #1]** – spart ~[X]h/Woche
 2. **[Automatisierung #2]** – spart ~[X]h/Woche
 3. **[Automatisierung #3]** – spart ~[X]h/Woche
 
-Konservative Schätzung: **[X] Stunden pro Monat gespart.** Bei einem Stundenwert von €20 sind das €[X] – zurück in deinem Leben.
+Konservative Schätzung: **[X] Stunden pro Monat gespart.** Bei einem Stundenwert von €20 sind das €[X] – zurück in Ihrem Leben.
 
-Das ist keine Verkaufsbotschaft. Das sind die Zahlen aus deinem eigenen Quiz.
+Das ist keine Verkaufsbotschaft. Das sind die Zahlen aus Ihrem eigenen Quiz.
 
-Morgen zeige ich dir, was mit einem ähnlichen Unternehmen passiert ist – und was sich nach sechs Wochen verändert hat.
+Morgen zeige ich Ihnen, was mit einem ähnlichen Unternehmen passiert ist – und was sich nach sechs Wochen verändert hat.
 
 — Das Motion Elevation Team
 
@@ -127,7 +127,7 @@ Vor Motion Elevation:
 - Dieselbe „Ich hake kurz nach"-Mail sechs Mal pro Woche tippen
 - Donnerstagabends Überstunden, um den Admin-Berg abzutragen
 
-Kommt dir das bekannt vor?
+Kommt Ihnen das bekannt vor?
 
 Nach sechs Wochen:
 
@@ -140,7 +140,7 @@ Sie hat niemanden eingestellt. Sie hat nicht programmieren gelernt. Sie hat ein 
 
 Zurückgewonnen: rund 11 Stunden pro Monat. Ein ganzer Arbeitstag.
 
-Morgen zeige ich dir genau, was drin ist – welche Automatisierungen es gibt und wie das Ganze funktioniert.
+Morgen zeige ich Ihnen genau, was drin ist – welche Automatisierungen es gibt und wie das Ganze funktioniert.
 
 — Motion Elevation
 
@@ -195,7 +195,7 @@ No hard sell. If the timing's not right, this sequence ends in a couple of days 
 
 **Betreff:** Was unter der Haube wirklich läuft
 
-**Vorschautext:** Fünf Automatisierungen für die Aufgaben, die du immer wieder vor dir herschiebst.
+**Vorschautext:** Fünf Automatisierungen für die Aufgaben, die Sie immer wieder vor sich herschieben.
 
 **Text:**
 
@@ -203,25 +203,25 @@ Hier ist, was Motion Elevation konkret macht.
 
 **Die Automatisierungen:**
 
-- **E-Mail-Triage** — eingehende Mails werden sortiert, markiert und priorisiert. Du siehst nur, was zählt.
+- **E-Mail-Triage** — eingehende Mails werden sortiert, markiert und priorisiert. Sie sehen nur, was zählt.
 - **Rechnungserinnerungen** — Zahlungsrückstand? Die Nachverfolgung läuft automatisch. Kein unangenehmes Nachfragen mehr.
-- **Lead-Follow-up** — jemand füllt dein Kontaktformular aus. Er bekommt innerhalb von Minuten eine Antwort, nicht nach Tagen.
-- **Kundensupport-Chatbot** — häufige Fragen werden rund um die Uhr beantwortet, ohne dass du dabei sein musst.
+- **Lead-Follow-up** — jemand füllt Ihr Kontaktformular aus. Er bekommt innerhalb von Minuten eine Antwort, nicht nach Tagen.
+- **Kundensupport-Chatbot** — häufige Fragen werden rund um die Uhr beantwortet, ohne dass Sie dabei sein müssen.
 - **Social-Media-Scheduling** — Inhalte gehen pünktlich raus. Immer.
 
 **So funktioniert es:**
 
-Du füllst einmalig ein Setup-Formular aus. Wir konfigurieren alles auf unserer Seite. Innerhalb von 48 Stunden ist es live.
+Sie füllen einmalig ein Setup-Formular aus. Wir konfigurieren alles auf unserer Seite. Innerhalb von 48 Stunden ist es live.
 
-Die Ergebnisse kommen per Webhook zu dir – in dein Postfach, dein CRM, deinen Slack oder wo auch immer du arbeitest.
+Die Ergebnisse kommen per Webhook zu Ihnen – in Ihr Postfach, Ihr CRM, Ihren Slack oder wo auch immer Sie arbeiten.
 
-Du berührst die Workflows nie. Das ist auch nicht nötig.
+Sie berühren die Workflows nie. Das ist auch nicht nötig.
 
 **Preise:**
 - €100/Monat, jederzeit kündbar
 - €500 einmalig – einmal zahlen, für immer dabei
 
-Wenn du starten möchtest: [Jetzt loslegen →]
+Wenn Sie starten möchten: [Jetzt loslegen →]
 
 Kein Druck. Wenn der Zeitpunkt gerade nicht passt – diese Serie endet in ein paar Tagen ohnehin.
 
@@ -275,17 +275,17 @@ If the numbers make sense to you: [Get Started →]
 
 ### 🇩🇪 Deutsch
 
-**Betreff:** Die €150, die du jeden Monat liegen lässt
+**Betreff:** Die €150, die Sie jeden Monat liegen lassen
 
 **Vorschautext:** Kurz nachgerechnet. Das Ergebnis ist eindeutig.
 
 **Text:**
 
-Lass uns kurz rechnen.
+Lassen Sie uns kurz rechnen.
 
 Die meisten Selbstständigen und Kleinunternehmer, mit denen wir sprechen, verbringen **10+ Stunden pro Monat** mit Aufgaben, die automatisiert werden könnten. Rechnungen, Nachverfolgungen, E-Mails sortieren, Daten übertragen.
 
-Wenn deine Zeit **€25/Stunde** wert ist (konservativ gerechnet):
+Wenn Ihre Zeit **€25/Stunde** wert ist (konservativ gerechnet):
 
 > 10h × €25 = **€250 verschwendet pro Monat**
 
@@ -298,13 +298,13 @@ Jeden Monat.
 Und das ist die untere Schätzung. Viele unserer Kunden sparen eher 15–20 Stunden.
 
 Bei 20h × €25:
-> €500 verloren → €100 Kosten → **€400 zurück in deiner Tasche**
+> €500 verloren → €100 Kosten → **€400 zurück in Ihrer Tasche**
 
-Du zahlst nicht für Software. Du kaufst Zeit zurück.
+Sie zahlen nicht für Software. Sie kaufen Zeit zurück.
 
 Die Lifetime-Option (€500) amortisiert sich in fünf Monaten. Danach ist es kostenlos.
 
-Wenn die Rechnung für dich aufgeht: [Jetzt loslegen →]
+Wenn die Rechnung für Sie aufgeht: [Jetzt loslegen →]
 
 — Motion Elevation
 
@@ -374,13 +374,13 @@ Drei Einwände tauchen fast immer auf. Hier die ehrlichen Antworten.
 
 **„Ich bin kein Technikmensch."**
 
-Gut. Das musst du auch nicht sein. Du füllst ein Formular aus, beschreibst, was du brauchst – wir setzen es um. Du bekommst das Ergebnis. Kein Dashboard, das du lernen musst. Keine Workflows, die du verwaltest. Es läuft einfach.
+Gut. Das müssen Sie auch nicht sein. Sie füllen ein Formular aus, beschreiben, was Sie brauchen – wir setzen es um. Sie bekommen das Ergebnis. Kein Dashboard, das Sie lernen müssen. Keine Workflows, die Sie verwalten. Es läuft einfach.
 
 ---
 
 **„Ich nutze schon Zapier."**
 
-Zapier ist nützlich – wenn du Zeit hast, Automatisierungen zu bauen, fehlerhafte Zaps zu debuggen und alles anzupassen, wenn sich etwas ändert. Die meisten haben diese Zeit nicht. Bei Motion Elevation ist das unsere Aufgabe. Du nutzt das Ergebnis. Wir kümmern uns um den Rest.
+Zapier ist nützlich – wenn Sie Zeit haben, Automatisierungen zu bauen, fehlerhafte Zaps zu debuggen und alles anzupassen, wenn sich etwas ändert. Die meisten haben diese Zeit nicht. Bei Motion Elevation ist das unsere Aufgabe. Sie nutzen das Ergebnis. Wir kümmern uns um den Rest.
 
 ---
 
@@ -392,10 +392,10 @@ Es ist ein Formular. Etwa 10 Minuten. 48 Stunden später ist alles live. Das ist
 
 Noch etwas, das sich lohnt zu wissen:
 
-**2 Kunden empfehlen → dein Abo ist kostenlos.**
+**2 Kunden empfehlen → Ihr Abo ist kostenlos.**
 7 Kunden empfehlen → kostenlos auf Lebenszeit.
 
-Wir zahlen 15% Provision pro Empfehlung. Falls du andere Selbstständige oder Kleinunternehmer kennst, die davon profitieren würden – der Gedanke ist es wert.
+Wir zahlen 15% Provision pro Empfehlung. Falls Sie andere Selbstständige oder Kleinunternehmer kennen, die davon profitieren würden – der Gedanke ist es wert.
 
 [Jetzt starten →]
 
@@ -452,17 +452,17 @@ Das ist die letzte Mail in dieser Sequenz.
 
 Keine künstliche Dringlichkeit. Kein „Nur noch heute gültig." Nur ein kurzes Fazit.
 
-Du hast den Automatisierungs-Audit gemacht. Dein Score hat gezeigt, dass du potenziell [X] Stunden pro Monat sparen könntest. Wir haben dir die Rechnung gezeigt, die Automatisierungen erklärt und den Setup-Prozess beschrieben.
+Sie haben den Automatisierungs-Audit gemacht. Ihr Score hat gezeigt, dass Sie potenziell [X] Stunden pro Monat sparen könnten. Wir haben Ihnen die Rechnung gezeigt, die Automatisierungen erklärt und den Setup-Prozess beschrieben.
 
-Wenn das für dich Sinn ergibt: Der nächste Schritt ist ein Formular. 48 Stunden später läuft es.
+Wenn das für Sie Sinn ergibt: Der nächste Schritt ist ein Formular. 48 Stunden später läuft es.
 
 **€100/Monat** – oder **€500 einmalig**, lebenslanger Zugang.
 
 Noch ein Gedanke:
 
-Falls du selbst gerade nicht startest, aber jemanden kennst, der davon profitieren würde: Unser Partnerprogramm zahlt 15% Provision pro Empfehlung. Zwei Empfehlungen – dein eigenes Abo ist kostenlos. Sieben Empfehlungen – kostenlos für immer.
+Falls Sie selbst gerade nicht starten, aber jemanden kennen, der davon profitieren würde: Unser Partnerprogramm zahlt 15% Provision pro Empfehlung. Zwei Empfehlungen – Ihr eigenes Abo ist kostenlos. Sieben Empfehlungen – kostenlos für immer.
 
-Kein Druck. Wenn du Fragen hast, antworte einfach auf diese Mail.
+Kein Druck. Wenn Sie Fragen haben, antworten Sie einfach auf diese Mail.
 
 [Jetzt starten →]
 
