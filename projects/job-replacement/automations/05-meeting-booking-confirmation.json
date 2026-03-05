@@ -1,0 +1,350 @@
+{
+  "name": "ME-05 | Meeting Booking Confirmation + Prep Flow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "booking-confirmation",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "e5f6a7b8-0001-0001-0001-000000000001",
+      "name": "Webhook - New Booking",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "REPLACE_WITH_UNIQUE_WEBHOOK_ID",
+      "notes": "SETUP: Connect this to your booking tool's webhook. Works with: Calendly (paste this URL in Calendly → Integrations → Webhooks), Cal.com, TidyCal, or any scheduling tool that fires webhooks on new bookings."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Normalize booking data from different platforms (Calendly, Cal.com, etc.)\nconst raw = $input.first().json;\nconst body = raw.body || raw.payload || raw;\n\n// Support Calendly format\nconst calendlyPayload = body.payload;\nconst isCalendly = !!calendlyPayload;\n\nlet booking = {};\n\nif (isCalendly) {\n  // Calendly v2 webhook format\n  const invitee = calendlyPayload.invitee || {};\n  const event = calendlyPayload.event || {};\n  booking = {\n    platform: 'Calendly',\n    guestName: invitee.name || '',\n    guestEmail: invitee.email || '',\n    meetingTitle: event.name || 'Meeting',\n    startTime: event.start_time || '',\n    endTime: event.end_time || '',\n    meetingUrl: event.location?.join_url || event.location?.location || '',\n    cancelUrl: invitee.cancel_url || '',\n    rescheduleUrl: invitee.reschedule_url || '',\n    timezone: invitee.timezone || 'UTC',\n    questions: invitee.questions_and_answers || []\n  };\n} else {\n  // Generic format - normalize common field names\n  booking = {\n    platform: body.platform || 'Unknown',\n    guestName: body.name || body.guest_name || body.attendee_name || '',\n    guestEmail: body.email || body.guest_email || body.attendee_email || '',\n    meetingTitle: body.event_type || body.meeting_type || body.title || 'Meeting',\n    startTime: body.start_time || body.scheduled_at || body.start || '',\n    endTime: body.end_time || body.end || '',\n    meetingUrl: body.meeting_url || body.join_url || body.location || '',\n    cancelUrl: body.cancel_url || '',\n    rescheduleUrl: body.reschedule_url || '',\n    timezone: body.timezone || 'UTC',\n    questions: []\n  };\n}\n\n// Format the date nicely\nlet formattedDate = 'TBD';\nlet formattedTime = 'TBD';\nif (booking.startTime) {\n  const dt = new Date(booking.startTime);\n  formattedDate = dt.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });\n  formattedTime = dt.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });\n}\n\nconst bookingId = 'BK-' + Date.now();\n\nreturn [{\n  json: {\n    ...booking,\n    bookingId,\n    formattedDate,\n    formattedTime,\n    receivedAt: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "e5f6a7b8-0002-0002-0002-000000000002",
+      "name": "Normalize Booking Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300],
+      "notes": "Handles Calendly webhook format and generic formats. CUSTOMIZE: Add more platform-specific parsers if needed."
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "toEmail": "={{ $json.guestEmail }}",
+        "subject": "✅ Confirmed: {{ $json.meetingTitle }} on {{ $json.formattedDate }}",
+        "emailType": "html",
+        "message": "<html>\n<body style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;'>\n\n<div style='background: #f8f9fa; padding: 30px; border-radius: 8px;'>\n  <h1 style='color: #2d3748; margin-bottom: 5px;'>You're booked! 🎉</h1>\n  <p style='color: #718096; margin-top: 0;'>Here are your meeting details:</p>\n</div>\n\n<div style='padding: 30px;'>\n  <table style='width: 100%; border-collapse: collapse;'>\n    <tr>\n      <td style='padding: 12px 0; border-bottom: 1px solid #e2e8f0;'>\n        <strong style='color: #4a5568;'>📅 Date</strong>\n      </td>\n      <td style='padding: 12px 0; border-bottom: 1px solid #e2e8f0;'>{{ $json.formattedDate }}</td>\n    </tr>\n    <tr>\n      <td style='padding: 12px 0; border-bottom: 1px solid #e2e8f0;'>\n        <strong style='color: #4a5568;'>⏰ Time</strong>\n      </td>\n      <td style='padding: 12px 0; border-bottom: 1px solid #e2e8f0;'>{{ $json.formattedTime }} ({{ $json.timezone }})</td>\n    </tr>\n    <tr>\n      <td style='padding: 12px 0; border-bottom: 1px solid #e2e8f0;'>\n        <strong style='color: #4a5568;'>📋 Meeting</strong>\n      </td>\n      <td style='padding: 12px 0; border-bottom: 1px solid #e2e8f0;'>{{ $json.meetingTitle }}</td>\n    </tr>\n    {{ $json.meetingUrl ? \"<tr><td style='padding: 12px 0; border-bottom: 1px solid #e2e8f0;'><strong style='color: #4a5568;'>🔗 Join Link</strong></td><td style='padding: 12px 0; border-bottom: 1px solid #e2e8f0;'><a href='\" + $json.meetingUrl + \"' style='color: #4299e1;'>\" + $json.meetingUrl + \"</a></td></tr>\" : '' }}\n  </table>\n\n  <div style='margin-top: 30px; padding: 20px; background: #ebf8ff; border-radius: 8px; border-left: 4px solid #4299e1;'>\n    <h3 style='margin-top: 0; color: #2b6cb0;'>📝 How to prepare</h3>\n    <ul style='color: #2c5282;'>\n      <li>[REPLACE_WITH_PREP_TIP_1]</li>\n      <li>[REPLACE_WITH_PREP_TIP_2]</li>\n      <li>Have any questions you want answered ready</li>\n    </ul>\n  </div>\n\n  {{ $json.cancelUrl || $json.rescheduleUrl ? \"<p style='margin-top: 20px; font-size: 14px; color: #718096;'>Need to change plans? <a href='\" + $json.rescheduleUrl + \"'>Reschedule</a> | <a href='\" + $json.cancelUrl + \"'>Cancel</a></p>\" : '' }}\n\n  <hr style='border: none; border-top: 1px solid #e2e8f0; margin: 30px 0;'>\n  \n  <p>Looking forward to speaking with you, {{ $json.guestName.split(' ')[0] }}! If you have any questions beforehand, reply to this email.</p>\n  \n  <p style='margin-bottom: 0;'>Best,<br><strong>[REPLACE_WITH_YOUR_NAME]</strong><br>[REPLACE_WITH_COMPANY_NAME]</p>\n</div>\n\n</body>\n</html>",
+        "options": {}
+      },
+      "id": "e5f6a7b8-0003-0003-0003-000000000003",
+      "name": "Send Guest Confirmation",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [680, 160],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID",
+          "name": "Client SMTP Account"
+        }
+      },
+      "notes": "CUSTOMIZE: Edit the preparation tips and email signature. Replace all [REPLACE_WITH_*] placeholders."
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "toEmail": "REPLACE_WITH_HOST_EMAIL",
+        "subject": "📅 New Booking: {{ $json.guestName }} — {{ $json.formattedDate }} at {{ $json.formattedTime }}",
+        "emailType": "html",
+        "message": "<html><body style='font-family: Arial, sans-serif;'>\n<h2>New Meeting Booked</h2>\n<table style='border-collapse: collapse; width: 100%;'>\n  <tr><td style='padding: 8px; border: 1px solid #ddd;'><strong>Booking ID</strong></td><td style='padding: 8px; border: 1px solid #ddd;'>{{ $json.bookingId }}</td></tr>\n  <tr><td style='padding: 8px; border: 1px solid #ddd;'><strong>Guest Name</strong></td><td style='padding: 8px; border: 1px solid #ddd;'>{{ $json.guestName }}</td></tr>\n  <tr><td style='padding: 8px; border: 1px solid #ddd;'><strong>Guest Email</strong></td><td style='padding: 8px; border: 1px solid #ddd;'>{{ $json.guestEmail }}</td></tr>\n  <tr><td style='padding: 8px; border: 1px solid #ddd;'><strong>Meeting</strong></td><td style='padding: 8px; border: 1px solid #ddd;'>{{ $json.meetingTitle }}</td></tr>\n  <tr><td style='padding: 8px; border: 1px solid #ddd;'><strong>Date & Time</strong></td><td style='padding: 8px; border: 1px solid #ddd;'>{{ $json.formattedDate }} at {{ $json.formattedTime }}</td></tr>\n  <tr><td style='padding: 8px; border: 1px solid #ddd;'><strong>Join URL</strong></td><td style='padding: 8px; border: 1px solid #ddd;'>{{ $json.meetingUrl || 'Not set' }}</td></tr>\n</table>\n</body></html>",
+        "options": {}
+      },
+      "id": "e5f6a7b8-0004-0004-0004-000000000004",
+      "name": "Notify Meeting Host",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [680, 380],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID",
+          "name": "Client SMTP Account"
+        }
+      },
+      "notes": "SETUP: Replace REPLACE_WITH_HOST_EMAIL with the meeting host's email address."
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Bookings",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Booking_ID": "={{ $json.bookingId }}",
+            "Guest_Name": "={{ $json.guestName }}",
+            "Guest_Email": "={{ $json.guestEmail }}",
+            "Meeting_Title": "={{ $json.meetingTitle }}",
+            "Date": "={{ $json.formattedDate }}",
+            "Time": "={{ $json.formattedTime }}",
+            "Timezone": "={{ $json.timezone }}",
+            "Platform": "={{ $json.platform }}",
+            "Join_URL": "={{ $json.meetingUrl }}",
+            "Status": "Confirmed",
+            "Created_At": "={{ $json.receivedAt }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "e5f6a7b8-0005-0005-0005-000000000005",
+      "name": "Log Booking to Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [900, 300],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets OAuth"
+        }
+      },
+      "notes": "SETUP: Create 'Bookings' tab in your Google Sheet with appropriate column headers."
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * *"
+            }
+          ]
+        }
+      },
+      "id": "e5f6a7b8-0006-0006-0006-000000000006",
+      "name": "Daily 8AM - Send Reminders",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 600],
+      "notes": "Second trigger path: runs every morning to send 24-hour-ahead reminders to guests. This is separate from the booking confirmation flow above."
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Bookings",
+          "mode": "name"
+        },
+        "filters": {},
+        "options": {}
+      },
+      "id": "e5f6a7b8-0007-0007-0007-000000000007",
+      "name": "Get Tomorrow's Bookings",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [460, 600],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets OAuth"
+        }
+      },
+      "notes": "Reads all bookings to filter for tomorrow's meetings."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filter for bookings tomorrow and send reminders\nconst items = $input.all();\nconst tomorrow = new Date();\ntomorrow.setDate(tomorrow.getDate() + 1);\ntomorrow.setHours(0, 0, 0, 0);\n\nconst dayAfter = new Date(tomorrow);\ndayAfter.setDate(dayAfter.getDate() + 1);\n\nconst tomorrowBookings = items.filter(item => {\n  const b = item.json;\n  if (b.Status === 'Cancelled' || !b.Date || !b.Guest_Email) return false;\n  \n  // Try to parse the date from the sheet\n  const bookingDate = new Date(b.Date);\n  return bookingDate >= tomorrow && bookingDate < dayAfter;\n});\n\nif (tomorrowBookings.length === 0) {\n  return [{ json: { noReminders: true } }];\n}\n\nreturn tomorrowBookings;"
+      },
+      "id": "e5f6a7b8-0008-0008-0008-000000000008",
+      "name": "Filter Tomorrow's Meetings",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 600],
+      "notes": "Only sends reminder emails for meetings happening in the next 24 hours."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.noReminders }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "e5f6a7b8-0009-0009-0009-000000000009",
+      "name": "Any Reminders?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [900, 600]
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "toEmail": "={{ $json.Guest_Email }}",
+        "subject": "⏰ Reminder: Your meeting tomorrow at {{ $json.Time }}",
+        "emailType": "html",
+        "message": "<html><body style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>\n<h2>Your meeting is tomorrow! ⏰</h2>\n<p>Hi {{ $json.Guest_Name.split(' ')[0] }}, just a reminder about your upcoming meeting:</p>\n<table style='border-collapse: collapse; width: 100%;'>\n  <tr><td style='padding: 8px; border: 1px solid #ddd;'><strong>Meeting</strong></td><td style='padding: 8px; border: 1px solid #ddd;'>{{ $json.Meeting_Title }}</td></tr>\n  <tr><td style='padding: 8px; border: 1px solid #ddd;'><strong>Date</strong></td><td style='padding: 8px; border: 1px solid #ddd;'>{{ $json.Date }}</td></tr>\n  <tr><td style='padding: 8px; border: 1px solid #ddd;'><strong>Time</strong></td><td style='padding: 8px; border: 1px solid #ddd;'>{{ $json.Time }} ({{ $json.Timezone }})</td></tr>\n  {{ $json.Join_URL ? \"<tr><td style='padding: 8px; border: 1px solid #ddd;'><strong>Join Link</strong></td><td style='padding: 8px; border: 1px solid #ddd;'><a href='\" + $json.Join_URL + \"'>Click to join</a></td></tr>\" : '' }}\n</table>\n<p style='margin-top: 20px;'>See you tomorrow!</p>\n<p>[REPLACE_WITH_YOUR_NAME]<br>[REPLACE_WITH_COMPANY_NAME]</p>\n</body></html>",
+        "options": {}
+      },
+      "id": "e5f6a7b8-0010-0010-0010-000000000010",
+      "name": "Send 24h Reminder",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1120, 600],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID",
+          "name": "Client SMTP Account"
+        }
+      },
+      "notes": "Sends a 24-hour reminder to each guest with their meeting details and join link."
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, bookingId: $json.bookingId, message: 'Booking confirmed' }) }}"
+      },
+      "id": "e5f6a7b8-0011-0011-0011-000000000011",
+      "name": "Booking Webhook Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1120, 300],
+      "notes": "Returns confirmation to the booking platform."
+    }
+  ],
+  "connections": {
+    "Webhook - New Booking": {
+      "main": [
+        [
+          {
+            "node": "Normalize Booking Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Booking Data": {
+      "main": [
+        [
+          {
+            "node": "Send Guest Confirmation",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notify Meeting Host",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Guest Confirmation": {
+      "main": [
+        [
+          {
+            "node": "Log Booking to Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Meeting Host": {
+      "main": [
+        [
+          {
+            "node": "Log Booking to Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Booking to Sheet": {
+      "main": [
+        [
+          {
+            "node": "Booking Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily 8AM - Send Reminders": {
+      "main": [
+        [
+          {
+            "node": "Get Tomorrow's Bookings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Tomorrow's Bookings": {
+      "main": [
+        [
+          {
+            "node": "Filter Tomorrow's Meetings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Tomorrow's Meetings": {
+      "main": [
+        [
+          {
+            "node": "Any Reminders?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Any Reminders?": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send 24h Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true
+  },
+  "tags": ["motion-elevation", "meetings", "booking", "calendly", "reminders"],
+  "meta": {
+    "motionElevation": {
+      "version": "1.0.0",
+      "category": "Operations Automation",
+      "deployTime": "~45 minutes",
+      "credentialsNeeded": ["SMTP", "Google Sheets OAuth2"],
+      "description": "Dual-trigger workflow: (1) Instant booking confirmation to guest + host notification + logging when a meeting is booked. (2) Daily 8AM reminder emails for next-day meetings. Integrates with Calendly, Cal.com, TidyCal, or any webhook-capable scheduler."
+    }
+  }
+}

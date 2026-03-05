@@ -18,4 +18,6 @@ Thumbs.db
 !package.json
 !package-lock.json
 !tsconfig.json
+# n8n workflow files are safe to commit
+!projects/job-replacement/automations/*.json
 projects/polymarket/course/peter_griffin_course.zip

@@ -1,0 +1,293 @@
+{
+  "name": "ME-04 | AI Customer Support Chatbot",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "support-chat",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "d4e5f6a7-0001-0001-0001-000000000001",
+      "name": "Webhook - Receive Message",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "REPLACE_WITH_UNIQUE_WEBHOOK_ID",
+      "notes": "SETUP: This webhook receives chat messages from your website widget, WhatsApp, or any chat platform. Expected body: { sessionId, message, customerEmail (optional), customerName (optional) }. Integrate with Crisp, Tidio, or a custom chat widget."
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json.body || $input.first().json;\n\nconst sessionId = data.sessionId || 'session-' + Date.now();\nconst message = (data.message || data.text || data.query || '').trim();\nconst customerEmail = data.customerEmail || data.email || '';\nconst customerName = data.customerName || data.name || 'there';\n\nif (!message) {\n  throw new Error('No message provided');\n}\n\n// Simple intent detection before hitting AI (saves API calls for obvious cases)\nconst msgLower = message.toLowerCase();\n\nlet detectedIntent = 'general';\n\nconst intents = {\n  pricing: ['price', 'cost', 'how much', 'pricing', 'plan', 'fee', 'charge', 'preis', 'kosten'],\n  hours: ['hours', 'open', 'close', 'schedule', 'when', 'öffnungszeiten'],\n  refund: ['refund', 'return', 'money back', 'cancel', 'cancellation'],\n  contact: ['phone', 'email', 'contact', 'reach', 'talk to', 'speak'],\n  human: ['human', 'agent', 'person', 'real person', 'speak to someone', 'escalate']\n};\n\nfor (const [intent, keywords] of Object.entries(intents)) {\n  if (keywords.some(kw => msgLower.includes(kw))) {\n    detectedIntent = intent;\n    break;\n  }\n}\n\nreturn [{\n  json: {\n    sessionId,\n    message,\n    customerEmail,\n    customerName,\n    detectedIntent,\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "d4e5f6a7-0002-0002-0002-000000000002",
+      "name": "Parse & Detect Intent",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300],
+      "notes": "CUSTOMIZE: Add your own intent keywords. 'human' intent triggers escalation to a real agent."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.detectedIntent }}",
+              "operation": "equals",
+              "value2": "human"
+            }
+          ]
+        }
+      },
+      "id": "d4e5f6a7-0003-0003-0003-000000000003",
+      "name": "Wants Human Agent?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [680, 300],
+      "notes": "If customer explicitly asks for a human, skip AI and escalate immediately."
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are a helpful customer support agent for [REPLACE_WITH_COMPANY_NAME]. \n\nAbout us: [REPLACE_WITH_COMPANY_DESCRIPTION]\n\nBusiness hours: [REPLACE_WITH_HOURS]\nContact email: [REPLACE_WITH_EMAIL]\nContact phone: [REPLACE_WITH_PHONE]\nWebsite: [REPLACE_WITH_WEBSITE]\n\nFAQ:\n- [REPLACE_WITH_FAQ_1]\n- [REPLACE_WITH_FAQ_2]\n- [REPLACE_WITH_FAQ_3]\n\nRules:\n1. Be friendly, concise, and helpful\n2. If you don't know something, say so and offer to connect them with a human\n3. Never make up information\n4. Always end with an offer to help further\n5. Keep responses under 150 words\n6. If the customer seems frustrated, show empathy first"
+            },
+            {
+              "role": "user",
+              "content": "={{ $json.message }}"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.7,
+          "maxTokens": 300
+        }
+      },
+      "id": "d4e5f6a7-0004-0004-0004-000000000004",
+      "name": "AI Response (OpenAI)",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.3,
+      "position": [900, 160],
+      "credentials": {
+        "openAiApi": {
+          "id": "REPLACE_WITH_OPENAI_CREDENTIAL_ID",
+          "name": "OpenAI API"
+        }
+      },
+      "notes": "SETUP: Add OpenAI API credentials. CUSTOMIZE: Edit the system prompt with your company info and FAQ. Using gpt-4o-mini to keep costs low (~$0.0001 per message)."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Package the escalation response\nreturn [{\n  json: {\n    ...$input.first().json,\n    aiResponse: null,\n    escalated: true,\n    reply: `Hi ${$input.first().json.customerName}, I understand you'd like to speak with a human agent. I'm connecting you now!\\n\\nIn the meantime, you can also reach us at:\\n📧 [REPLACE_WITH_EMAIL]\\n📞 [REPLACE_WITH_PHONE]\\n⏰ [REPLACE_WITH_HOURS]\\n\\nA team member will be with you shortly.`\n  }\n}];"
+      },
+      "id": "d4e5f6a7-0005-0005-0005-000000000005",
+      "name": "Escalation Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 400],
+      "notes": "Generates a polite escalation message and triggers a notification to the support team."
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "toEmail": "REPLACE_WITH_SUPPORT_TEAM_EMAIL",
+        "subject": "🚨 Live Chat Escalation - Customer Needs Human Agent",
+        "emailType": "text",
+        "message": "Customer escalation requested!\n\nSession: {{ $json.sessionId }}\nCustomer: {{ $json.customerName }}\nEmail: {{ $json.customerEmail || 'Not provided' }}\nMessage: {{ $json.message }}\nTime: {{ $json.timestamp }}\n\nPlease log in to the chat platform and assist this customer.",
+        "options": {}
+      },
+      "id": "d4e5f6a7-0006-0006-0006-000000000006",
+      "name": "Alert Support Team",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1120, 400],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID",
+          "name": "Client SMTP Account"
+        }
+      },
+      "notes": "SETUP: Replace with support team email. Could also be extended to send a Slack/Telegram notification instead."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Package the AI response for the webhook reply\nconst aiText = $input.first().json.message?.content || \n               $input.first().json.choices?.[0]?.message?.content || \n               'I apologize, but I had trouble generating a response. Please contact us directly.';\n\nreturn [{\n  json: {\n    ...$('Parse & Detect Intent').first().json,\n    reply: aiText,\n    escalated: false\n  }\n}];"
+      },
+      "id": "d4e5f6a7-0007-0007-0007-000000000007",
+      "name": "Package AI Reply",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 160],
+      "notes": "Extracts the text from OpenAI's response format."
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Chat_Log",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $json.timestamp }}",
+            "Session_ID": "={{ $json.sessionId }}",
+            "Customer": "={{ $json.customerName }}",
+            "Email": "={{ $json.customerEmail }}",
+            "Intent": "={{ $json.detectedIntent }}",
+            "Customer_Message": "={{ $json.message }}",
+            "Bot_Reply": "={{ $json.reply }}",
+            "Escalated": "={{ $json.escalated ? 'Yes' : 'No' }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "d4e5f6a7-0008-0008-0008-000000000008",
+      "name": "Log Conversation",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [1340, 300],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets OAuth"
+        }
+      },
+      "notes": "Logs all conversations for review and training. SETUP: Create 'Chat_Log' tab in your Google Sheet."
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, reply: $json.reply, sessionId: $json.sessionId, escalated: $json.escalated }) }}"
+      },
+      "id": "d4e5f6a7-0009-0009-0009-000000000009",
+      "name": "Send Chat Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1560, 300],
+      "notes": "Returns the bot reply to the chat widget/platform."
+    }
+  ],
+  "connections": {
+    "Webhook - Receive Message": {
+      "main": [
+        [
+          {
+            "node": "Parse & Detect Intent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse & Detect Intent": {
+      "main": [
+        [
+          {
+            "node": "Wants Human Agent?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wants Human Agent?": {
+      "main": [
+        [
+          {
+            "node": "Escalation Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Response (OpenAI)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Response (OpenAI)": {
+      "main": [
+        [
+          {
+            "node": "Package AI Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Escalation Response": {
+      "main": [
+        [
+          {
+            "node": "Alert Support Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alert Support Team": {
+      "main": [
+        [
+          {
+            "node": "Log Conversation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Package AI Reply": {
+      "main": [
+        [
+          {
+            "node": "Log Conversation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Conversation": {
+      "main": [
+        [
+          {
+            "node": "Send Chat Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true
+  },
+  "tags": ["motion-elevation", "customer-support", "ai", "chatbot", "openai"],
+  "meta": {
+    "motionElevation": {
+      "version": "1.0.0",
+      "category": "Customer Support",
+      "deployTime": "~60 minutes",
+      "credentialsNeeded": ["OpenAI API", "SMTP", "Google Sheets OAuth2"],
+      "estimatedCostPerMessage": "$0.0001 (gpt-4o-mini)",
+      "description": "AI-powered customer support chatbot. Detects intent, answers common questions using GPT-4o-mini, escalates to humans when requested, and logs all conversations."
+    }
+  }
+}
