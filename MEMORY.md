@@ -119,6 +119,33 @@ projects/
 - Tailscale: running (100.75.132.19)
 - OpenClaw: v2026.3.2
 
+### Revenue Layers (Long-Term Stack)
+
+| Layer | When | What | Model |
+|-------|------|------|-------|
+| 1 | NOW | Motion Elevation — Handwerk service | €197-597/mo recurring |
+| 2 | Month 2–3 | n8n Template Marketplace on Gumroad/Lemonsqueezy | €29-79/workflow, €149-249 bundles |
+| 3 | Month 3–5 | Micro-SaaS from most-used ME automation (likely missed call responder) | €19-49/mo self-serve |
+| 4 | Month 5+ | German Business Lead Data Subscription | €49-149/mo per city/niche |
+
+Layer 2 requires zero extra work — the 19 workflows already exist, the README documentation IS the product.
+
+### The Live Demo (conversion moment)
+After quiz results, prospect fills a form (name, phone, service) and within 60 seconds:
+- Receives SMS/WhatsApp confirmation
+- Receives branded email response + calendar link
+- 5 min later: follow-up message
+This replaces fake testimonials as proof. Build with n8n webhook → WhatsApp Business API + Brevo.
+
+---
+
+## xHeal (Secondary — Learning Accelerator)
+
+- Health tracking app built by a team including senior developers + Miami sales/marketing lead
+- Lyubo's role: automations, vibecoding, sales/marketing
+- NOT a distraction — skills gained directly accelerate ME quality
+- Balance: xHeal = main learning environment, ME = solo income lab
+
 ---
 
 ## Shelved Projects (archive/)
