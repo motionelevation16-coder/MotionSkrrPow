@@ -21,3 +21,4 @@ Thumbs.db
 # n8n workflow files are safe to commit
 !projects/job-replacement/automations/*.json
 projects/polymarket/course/peter_griffin_course.zip
+*.zip
