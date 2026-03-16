@@ -1,220 +1,379 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Motion Elevation — AI Automation for Growing Businesses</title>
+  <title>Motion Elevation — Automatisierung für Handwerksbetriebe</title>
+  <meta name="description" content="Nie wieder einen Kundenanruf verpassen. Automatische Anfrage-Bearbeitung, Nachverfolgung und Terminbuchung für Handwerker — in 48 Stunden einsatzbereit." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #0A0A0F;
-      --bg2: #111118;
-      --bg3: #16161F;
-      --accent: #6C63FF;
-      --accent2: #9B93FF;
-      --text: #F0F0F8;
-      --muted: #8888AA;
-      --border: #2A2A3A;
-      --card: #13131C;
+      --bg: #0C0C0E;
+      --bg2: #111113;
+      --bg3: #18181B;
+      --surface: #1E1E22;
+      --accent: #E8A838;
+      --accent-dim: rgba(232, 168, 56, 0.12);
+      --accent-glow: rgba(232, 168, 56, 0.25);
+      --text: #ECECEF;
+      --text-dim: #8E8E96;
+      --border: #2A2A2E;
+      --green: #34D399;
+      --red-soft: #F87171;
+      --serif: 'Instrument Serif', Georgia, serif;
+      --sans: 'DM Sans', system-ui, sans-serif;
     }
 
     html { scroll-behavior: smooth; }
 
     body {
-      font-family: 'Inter', sans-serif;
+      font-family: var(--sans);
       background: var(--bg);
       color: var(--text);
-      line-height: 1.6;
+      line-height: 1.65;
+      overflow-x: hidden;
     }
 
-    /* NAV */
+    /* ============ NAV ============ */
     nav {
       position: fixed; top: 0; width: 100%; z-index: 100;
       display: flex; justify-content: space-between; align-items: center;
-      padding: 1.2rem 5%;
-      background: rgba(10,10,15,0.85);
-      backdrop-filter: blur(12px);
+      padding: 1rem 6%;
+      background: rgba(12,12,14,0.88);
+      backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border);
     }
-    .logo { font-weight: 800; font-size: 1.2rem; letter-spacing: -0.5px; }
-    .logo span { color: var(--accent); }
-    nav a.btn-nav {
-      background: var(--accent); color: #fff; text-decoration: none;
-      padding: 0.55rem 1.3rem; border-radius: 8px; font-weight: 600; font-size: 0.9rem;
-      transition: opacity 0.2s;
+    .logo {
+      font-weight: 800; font-size: 1.1rem; letter-spacing: -0.3px;
+      color: var(--text);
     }
-    nav a.btn-nav:hover { opacity: 0.85; }
+    .logo span { color: var(--accent); }
+    .nav-badge {
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--accent);
+      border: 1px solid rgba(232,168,56,0.3);
+      padding: 0.2rem 0.6rem; border-radius: 4px;
+      margin-left: 0.6rem; vertical-align: middle;
+    }
+    nav a.nav-cta {
+      background: var(--accent); color: var(--bg);
+      text-decoration: none; font-weight: 700; font-size: 0.85rem;
+      padding: 0.55rem 1.4rem; border-radius: 6px;
+      transition: all 0.2s;
+    }
+    nav a.nav-cta:hover { box-shadow: 0 0 20px var(--accent-glow); }
 
-    /* HERO */
+    /* ============ LAYOUT ============ */
+    .container { max-width: 1080px; margin: 0 auto; padding: 0 6%; }
+    section { padding: 5.5rem 0; }
+
+    /* ============ HERO ============ */
     .hero {
       min-height: 100vh;
-      display: flex; flex-direction: column; justify-content: center; align-items: center;
-      text-align: center; padding: 8rem 5% 5rem;
-      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(108,99,255,0.15) 0%, transparent 70%);
+      display: flex; flex-direction: column; justify-content: center;
+      padding-top: 5rem;
+      position: relative;
     }
-    .hero-badge {
-      display: inline-block;
-      background: rgba(108,99,255,0.15);
-      border: 1px solid rgba(108,99,255,0.4);
-      color: var(--accent2);
-      font-size: 0.8rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
-      padding: 0.4rem 1rem; border-radius: 999px; margin-bottom: 1.5rem;
+    .hero::before {
+      content: '';
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 800px; height: 600px;
+      background: radial-gradient(ellipse at center, var(--accent-dim) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-overline {
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 2.5px;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: 1.2rem;
+      opacity: 0; animation: fadeUp 0.6s 0.2s forwards;
     }
     .hero h1 {
-      font-size: clamp(2.4rem, 6vw, 4.2rem);
-      font-weight: 900; line-height: 1.1; letter-spacing: -1.5px;
-      max-width: 800px; margin-bottom: 1.5rem;
+      font-family: var(--serif);
+      font-size: clamp(2.4rem, 5.5vw, 3.8rem);
+      font-weight: 400; font-style: normal;
+      line-height: 1.15; letter-spacing: -0.5px;
+      max-width: 700px;
+      margin-bottom: 1.5rem;
+      opacity: 0; animation: fadeUp 0.6s 0.35s forwards;
     }
-    .hero h1 span { color: var(--accent); }
+    .hero h1 em {
+      font-style: italic; color: var(--accent);
+    }
     .hero p {
-      font-size: 1.15rem; color: var(--muted); max-width: 520px; margin-bottom: 2.5rem;
+      font-size: 1.1rem; color: var(--text-dim);
+      max-width: 520px; margin-bottom: 2.2rem;
+      opacity: 0; animation: fadeUp 0.6s 0.5s forwards;
     }
-    .btn-primary {
-      display: inline-block;
-      background: var(--accent); color: #fff; text-decoration: none;
-      padding: 0.9rem 2.2rem; border-radius: 10px; font-weight: 700; font-size: 1rem;
-      transition: transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 0 30px rgba(108,99,255,0.4);
+    .hero-cta-row {
+      display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;
+      opacity: 0; animation: fadeUp 0.6s 0.65s forwards;
     }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 40px rgba(108,99,255,0.6); }
-    .hero-sub { margin-top: 1.2rem; font-size: 0.85rem; color: var(--muted); }
+    .btn-main {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: var(--accent); color: var(--bg);
+      text-decoration: none; font-weight: 700; font-size: 1rem;
+      padding: 0.9rem 2rem; border-radius: 8px;
+      transition: all 0.25s;
+      box-shadow: 0 2px 20px var(--accent-glow);
+    }
+    .btn-main:hover { transform: translateY(-2px); box-shadow: 0 4px 30px var(--accent-glow); }
+    .btn-main svg { width: 18px; height: 18px; }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      color: var(--text-dim); text-decoration: none; font-weight: 600; font-size: 0.9rem;
+      padding: 0.8rem 1.4rem; border: 1px solid var(--border); border-radius: 8px;
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+    .trust-row {
+      display: flex; flex-wrap: wrap; gap: 1.5rem;
+      margin-top: 2.5rem;
+      opacity: 0; animation: fadeUp 0.6s 0.8s forwards;
+    }
+    .trust-item {
+      font-size: 0.78rem; font-weight: 600; color: var(--text-dim);
+      display: flex; align-items: center; gap: 0.4rem;
+      letter-spacing: 0.3px;
+    }
+    .trust-item .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
 
-    /* SECTION COMMON */
-    section { padding: 6rem 5%; }
+    /* ============ PROBLEM ============ */
+    .problem { background: var(--bg2); }
     .section-label {
-      font-size: 0.75rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
-      color: var(--accent); margin-bottom: 0.8rem;
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 2.5px;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 0.8rem;
     }
     .section-title {
-      font-size: clamp(1.8rem, 4vw, 2.8rem);
-      font-weight: 800; letter-spacing: -1px; line-height: 1.2;
-      max-width: 680px; margin-bottom: 1rem;
+      font-family: var(--serif);
+      font-size: clamp(1.7rem, 4vw, 2.5rem);
+      font-weight: 400; line-height: 1.2; letter-spacing: -0.3px;
+      max-width: 600px; margin-bottom: 1rem;
     }
-    .section-sub { font-size: 1.05rem; color: var(--muted); max-width: 560px; margin-bottom: 3rem; }
-    .center { text-align: center; margin-left: auto; margin-right: auto; }
-
-    /* PROBLEM */
-    .problem { background: var(--bg2); }
-    .problem-list {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 1.5rem; margin-top: 2rem;
+    .section-sub {
+      font-size: 1rem; color: var(--text-dim);
+      max-width: 500px; margin-bottom: 3rem;
     }
-    .problem-item {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 12px; padding: 1.5rem;
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.2rem;
     }
-    .problem-item .icon { font-size: 1.8rem; margin-bottom: 0.8rem; }
-    .problem-item h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; }
-    .problem-item p { font-size: 0.9rem; color: var(--muted); }
-
-    /* PILLARS */
-    .pillars-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1.5rem;
-    }
-    .pillar {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 14px; padding: 2rem 1.5rem;
+    .problem-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.6rem;
       transition: border-color 0.2s;
     }
-    .pillar:hover { border-color: var(--accent); }
-    .pillar .icon { font-size: 2rem; margin-bottom: 1rem; }
-    .pillar h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.5rem; }
-    .pillar p { font-size: 0.9rem; color: var(--muted); }
+    .problem-card:hover { border-color: var(--red-soft); }
+    .problem-card .icon {
+      font-size: 1.6rem; margin-bottom: 0.8rem;
+      filter: grayscale(0.3);
+    }
+    .problem-card h3 {
+      font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem;
+    }
+    .problem-card p { font-size: 0.88rem; color: var(--text-dim); }
 
-    /* WHAT WE AUTOMATE */
-    .automate { background: var(--bg2); }
-    .automate-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1rem;
+    /* ============ SOLUTION ============ */
+    .before-after {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 2rem; align-items: stretch;
+      margin-top: 2.5rem;
     }
-    .automate-card {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 10px; padding: 1.2rem 1.4rem;
-      display: flex; align-items: flex-start; gap: 0.8rem;
+    .ba-col {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 2rem;
     }
-    .automate-card .icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 2px; }
-    .automate-card h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.2rem; }
-    .automate-card p { font-size: 0.83rem; color: var(--muted); }
+    .ba-col.after { border-color: var(--accent); background: rgba(232,168,56,0.04); }
+    .ba-col h3 {
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; margin-bottom: 1.2rem;
+    }
+    .ba-col.before h3 { color: var(--red-soft); }
+    .ba-col.after h3 { color: var(--green); }
+    .ba-item {
+      font-size: 0.9rem; padding: 0.6rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      display: flex; align-items: flex-start; gap: 0.6rem;
+    }
+    .ba-item:last-child { border-bottom: none; }
+    .ba-item .marker { flex-shrink: 0; margin-top: 2px; font-size: 0.8rem; }
+    .ba-divider {
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; color: var(--accent); font-weight: 300;
+    }
+    @media (max-width: 768px) {
+      .before-after { grid-template-columns: 1fr; }
+      .ba-divider { transform: rotate(90deg); padding: 1rem 0; }
+    }
 
-    /* PRICING */
-    .pricing-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 1.5rem; max-width: 900px; margin: 0 auto;
+    /* ============ QUIZ CTA ============ */
+    .quiz-section {
+      background: var(--bg2);
+      text-align: center;
     }
-    .pricing-card {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 16px; padding: 2rem;
-      position: relative; transition: border-color 0.2s;
+    .quiz-box {
+      background: linear-gradient(135deg, rgba(232,168,56,0.06) 0%, var(--surface) 100%);
+      border: 1px solid rgba(232,168,56,0.25);
+      border-radius: 16px;
+      padding: 3.5rem 2.5rem;
+      max-width: 640px; margin: 0 auto;
     }
-    .pricing-card.featured {
-      border-color: var(--accent);
-      background: linear-gradient(135deg, rgba(108,99,255,0.08) 0%, var(--card) 100%);
+    .quiz-box h2 {
+      font-family: var(--serif);
+      font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+      font-weight: 400; line-height: 1.25;
+      margin-bottom: 1rem;
     }
-    .popular-badge {
-      position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
-      background: var(--accent); color: #fff;
-      font-size: 0.72rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
-      padding: 0.3rem 1rem; border-radius: 999px;
+    .quiz-box p {
+      font-size: 0.95rem; color: var(--text-dim);
+      margin-bottom: 2rem; max-width: 440px; margin-left: auto; margin-right: auto;
     }
-    .pricing-card h3 { font-size: 1rem; font-weight: 700; color: var(--muted); margin-bottom: 0.5rem; }
-    .price { font-size: 2.6rem; font-weight: 900; letter-spacing: -1px; margin-bottom: 0.2rem; }
-    .price span { font-size: 1rem; font-weight: 400; color: var(--muted); }
-    .pricing-desc { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.5rem; }
-    .pricing-features { list-style: none; margin-bottom: 2rem; }
-    .pricing-features li {
-      font-size: 0.9rem; padding: 0.4rem 0;
+    .quiz-box .btn-main { font-size: 1.05rem; padding: 1rem 2.5rem; }
+    .quiz-note {
+      font-size: 0.78rem; color: var(--text-dim);
+      margin-top: 1.2rem;
+    }
+
+    /* ============ HOW IT WORKS ============ */
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      margin-top: 2.5rem;
+      counter-reset: step;
+    }
+    .step {
+      position: relative;
+      padding: 2rem 1.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      counter-increment: step;
+    }
+    .step::before {
+      content: counter(step);
+      position: absolute; top: -14px; left: 1.5rem;
+      width: 28px; height: 28px; border-radius: 6px;
+      background: var(--accent); color: var(--bg);
+      font-weight: 800; font-size: 0.8rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .step h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; margin-top: 0.5rem; }
+    .step p { font-size: 0.88rem; color: var(--text-dim); }
+    @media (max-width: 768px) { .steps-grid { grid-template-columns: 1fr; } }
+
+    /* ============ STATS BAR ============ */
+    .stats-bar {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
       border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; gap: 0.5rem;
+      padding: 3rem 0;
     }
-    .pricing-features li::before { content: "→"; color: var(--accent); font-weight: 700; }
-    .btn-outline {
-      display: block; text-align: center; text-decoration: none;
-      border: 1.5px solid var(--accent); color: var(--accent);
-      padding: 0.8rem; border-radius: 8px; font-weight: 700; font-size: 0.9rem;
-      transition: background 0.2s, color 0.2s;
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem; text-align: center;
     }
-    .btn-outline:hover, .pricing-card.featured .btn-outline {
-      background: var(--accent); color: #fff;
+    .stat-number {
+      font-family: var(--serif);
+      font-size: 2.4rem; color: var(--accent);
+      line-height: 1; margin-bottom: 0.4rem;
     }
+    .stat-label { font-size: 0.82rem; color: var(--text-dim); font-weight: 500; }
 
-    /* SOCIAL PROOF */
-    .proof { background: var(--bg2); }
-    .proof-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 1.5rem;
+    /* ============ FAQ ============ */
+    .faq-list {
+      max-width: 700px;
+      margin-top: 2.5rem;
     }
-    .proof-card {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 12px; padding: 1.8rem;
+    .faq-item {
+      border-bottom: 1px solid var(--border);
+      padding: 1.4rem 0;
     }
-    .proof-card p { font-size: 0.95rem; font-style: italic; margin-bottom: 1rem; color: var(--text); }
-    .proof-author { font-size: 0.82rem; color: var(--muted); font-weight: 600; }
-    .stars { color: #FFD700; font-size: 0.9rem; margin-bottom: 0.8rem; }
+    .faq-q {
+      font-weight: 700; font-size: 1rem;
+      cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center;
+      user-select: none;
+    }
+    .faq-q .toggle {
+      font-size: 1.3rem; color: var(--accent);
+      transition: transform 0.3s;
+      flex-shrink: 0; margin-left: 1rem;
+    }
+    .faq-a {
+      font-size: 0.9rem; color: var(--text-dim);
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s;
+      padding-top: 0;
+    }
+    .faq-item.open .faq-a {
+      max-height: 200px;
+      padding-top: 1rem;
+    }
+    .faq-item.open .toggle { transform: rotate(45deg); }
 
-    /* FINAL CTA */
+    /* ============ FINAL CTA ============ */
     .final-cta {
       text-align: center;
-      background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(108,99,255,0.12) 0%, transparent 70%);
+      padding: 5rem 0 6rem;
     }
-    .final-cta .section-title { margin: 0 auto 1rem; }
-    .final-cta .section-sub { margin: 0 auto 2.5rem; }
+    .final-cta h2 {
+      font-family: var(--serif);
+      font-size: clamp(1.6rem, 4vw, 2.6rem);
+      font-weight: 400; line-height: 1.25;
+      margin-bottom: 1rem;
+    }
+    .final-cta p {
+      font-size: 1rem; color: var(--text-dim);
+      max-width: 480px; margin: 0 auto 2rem;
+    }
+    .final-cta-row {
+      display: flex; flex-wrap: wrap; gap: 1rem;
+      justify-content: center; align-items: center;
+    }
+    .whatsapp-link {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      color: var(--green); text-decoration: none;
+      font-weight: 600; font-size: 0.9rem;
+      padding: 0.8rem 1.4rem;
+      border: 1px solid rgba(52,211,153,0.3); border-radius: 8px;
+      transition: all 0.2s;
+    }
+    .whatsapp-link:hover { border-color: var(--green); background: rgba(52,211,153,0.06); }
 
-    /* FOOTER */
+    /* ============ FOOTER ============ */
     footer {
-      background: var(--bg2); border-top: 1px solid var(--border);
-      text-align: center; padding: 2rem 5%;
-      font-size: 0.85rem; color: var(--muted);
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 0;
+      font-size: 0.8rem; color: var(--text-dim);
     }
-    footer a { color: var(--muted); text-decoration: none; }
-    footer a:hover { color: var(--text); }
+    .footer-inner {
+      display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
 
+    /* ============ ANIMATIONS ============ */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ============ RESPONSIVE ============ */
     @media (max-width: 600px) {
-      nav .logo { font-size: 1rem; }
-      .hero h1 { font-size: 2rem; }
+      nav { padding: 0.8rem 4%; }
+      .container { padding: 0 5%; }
+      section { padding: 4rem 0; }
+      .quiz-box { padding: 2.5rem 1.5rem; }
+      .nav-badge { display: none; }
     }
   </style>
 </head>
@@ -222,220 +381,228 @@
 
   <!-- NAV -->
   <nav>
-    <div class="logo">Motion<span>Elevation</span></div>
-    <a href="#cta" class="btn-nav">Book Free Audit →</a>
+    <div>
+      <span class="logo">Motion<span>Elevation</span></span>
+      <span class="nav-badge">Handwerk</span>
+    </div>
+    <a href="#quiz" class="nav-cta">Kostenlose Analyse →</a>
   </nav>
 
   <!-- HERO -->
   <section class="hero">
-    <div class="hero-badge">AI Automation Agency</div>
-    <h1>Your business is begging<br/>for <span>automation.</span></h1>
-    <p>We build the systems that work while you sleep. No code. No chaos. Live in 48 hours.</p>
-    <a href="#cta" class="btn-primary">See What We Can Automate →</a>
-    <p class="hero-sub">Free strategy call · No commitment · Results in 48h</p>
+    <div class="container">
+      <div class="hero-overline">Für Handwerksbetriebe in Deutschland</div>
+      <h1>Sie verlieren Aufträge, <em>während Sie arbeiten.</em></h1>
+      <p>Automatische Kundenanfragen-Bearbeitung, Angebots-Nachverfolgung und Terminbuchung — ohne dass Sie Ihr Werkzeug aus der Hand legen.</p>
+      <div class="hero-cta-row">
+        <a href="#quiz" class="btn-main">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          Finden Sie heraus, wie viel Sie verlieren
+        </a>
+        <a href="#ablauf" class="btn-secondary">So funktioniert's</a>
+      </div>
+      <div class="trust-row">
+        <div class="trust-item"><span class="dot"></span>DSGVO-konform</div>
+        <div class="trust-item"><span class="dot"></span>Keine Vertragsbindung</div>
+        <div class="trust-item"><span class="dot"></span>In 48 Stunden einsatzbereit</div>
+        <div class="trust-item"><span class="dot"></span>Kostenlose Erstanalyse</div>
+      </div>
+    </div>
   </section>
 
   <!-- PROBLEM -->
   <section class="problem">
-    <div class="section-label">The Problem</div>
-    <h2 class="section-title">You're doing the same tasks. Every. Single. Day.</h2>
-    <p class="section-sub">It's not just tedious — it's expensive. Every hour on admin is an hour not growing.</p>
-    <div class="problem-list">
-      <div class="problem-item">
-        <div class="icon">📋</div>
-        <h3>Copy-pasting data</h3>
-        <p>Between tools, spreadsheets, CRMs. Manually. Every time.</p>
-      </div>
-      <div class="problem-item">
-        <div class="icon">💸</div>
-        <h3>Chasing invoices</h3>
-        <p>Following up on payments that should follow themselves up.</p>
-      </div>
-      <div class="problem-item">
-        <div class="icon">💬</div>
-        <h3>Answering the same questions</h3>
-        <p>Your inbox is a graveyard of repetitive emails.</p>
-      </div>
-      <div class="problem-item">
-        <div class="icon">📅</div>
-        <h3>Scheduling by hand</h3>
-        <p>Back-and-forth emails just to pick a time slot.</p>
+    <div class="container">
+      <div class="section-label">Das Problem</div>
+      <h2 class="section-title">Ihr Telefon klingelt. Sie sind auf der Baustelle. Der Kunde ruft den Nächsten an.</h2>
+      <p class="section-sub">Das passiert jeden Tag. Und jeder verpasste Anruf kostet Sie Hunderte Euro.</p>
+      <div class="problem-grid">
+        <div class="problem-card">
+          <div class="icon">📱</div>
+          <h3>Verpasste Anrufe = Verlorene Aufträge</h3>
+          <p>Sie sind auf der Baustelle. Ihr Telefon klingelt. Sie können nicht rangehen. Der Kunde wartet maximal 5 Minuten — dann ruft er den nächsten Betrieb an.</p>
+        </div>
+        <div class="problem-card">
+          <div class="icon">📋</div>
+          <h3>Angebote verschickt, nie nachgefasst</h3>
+          <p>Sie verbringen 30 Minuten mit einem Kostenvoranschlag, verschicken ihn — und vergessen nachzufassen. 40% aller nicht nachverfolgten Angebote gehen an die Konkurrenz.</p>
+        </div>
+        <div class="problem-card">
+          <div class="icon">🌙</div>
+          <h3>Abends Büroarbeit statt Feierabend</h3>
+          <p>Nach einem vollen Tag auf der Baustelle setzen Sie sich hin, beantworten E-Mails, aktualisieren den Kalender, schreiben Rechnungen. Jede Woche 8–12 Stunden unbezahlte Arbeit.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- PILLARS -->
+  <!-- SOLUTION: BEFORE / AFTER -->
   <section>
-    <div class="section-label">The Solution</div>
-    <h2 class="section-title">What if those tasks just… handled themselves?</h2>
-    <p class="section-sub">We design, build, and deploy your automations — fully done for you.</p>
-    <div class="pillars-grid">
-      <div class="pillar">
-        <div class="icon">⚡</div>
-        <h3>Fast Setup</h3>
-        <p>Live in 48 hours, not 48 days. We build, you approve, it runs.</p>
-      </div>
-      <div class="pillar">
-        <div class="icon">🔄</div>
-        <h3>Always On</h3>
-        <p>Your automations work 24/7. Nights. Weekends. Holidays. You don't.</p>
-      </div>
-      <div class="pillar">
-        <div class="icon">📈</div>
-        <h3>Clear ROI</h3>
-        <p>Track exactly what's automated. See the hours saved. See the money kept.</p>
-      </div>
-      <div class="pillar">
-        <div class="icon">🔧</div>
-        <h3>Fully Managed</h3>
-        <p>We maintain everything. You focus on your business, not on tools.</p>
+    <div class="container">
+      <div class="section-label">Die Lösung</div>
+      <h2 class="section-title">Was sich ändert, wenn Ihre Prozesse automatisch laufen</h2>
+      <div class="before-after">
+        <div class="ba-col before">
+          <h3>❌ Vorher — Manuell</h3>
+          <div class="ba-item"><span class="marker">•</span>Anrufe verpasst, Kunden verloren</div>
+          <div class="ba-item"><span class="marker">•</span>Angebote ohne Nachverfolgung</div>
+          <div class="ba-item"><span class="marker">•</span>Termine per Telefon-Pingpong</div>
+          <div class="ba-item"><span class="marker">•</span>Bewertungen? Kommt von selbst (oder nicht)</div>
+          <div class="ba-item"><span class="marker">•</span>Abends am Schreibtisch statt mit der Familie</div>
+        </div>
+        <div class="ba-divider">→</div>
+        <div class="ba-col after">
+          <h3>✓ Nachher — Automatisiert</h3>
+          <div class="ba-item"><span class="marker">✓</span>Jeder Anrufer bekommt in 60 Sekunden eine Antwort</div>
+          <div class="ba-item"><span class="marker">✓</span>Automatische Nachverfolgung an Tag 3, 7 und 14</div>
+          <div class="ba-item"><span class="marker">✓</span>Online-Terminbuchung mit Bestätigung + Erinnerung</div>
+          <div class="ba-item"><span class="marker">✓</span>Google-Bewertungen automatisch nach jedem Auftrag</div>
+          <div class="ba-item"><span class="marker">✓</span>Feierabend ist Feierabend</div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- WHAT WE AUTOMATE -->
-  <section class="automate">
-    <div class="section-label center">What We Handle</div>
-    <h2 class="section-title center">If it's repetitive, we automate it.</h2>
-    <p class="section-sub center">From inbox to invoicing — we cover every corner of your operations.</p>
-    <div class="automate-grid">
-      <div class="automate-card">
-        <div class="icon">📧</div>
-        <div><h4>Email & Inbox</h4><p>Auto-replies, sorting, follow-ups</p></div>
-      </div>
-      <div class="automate-card">
-        <div class="icon">📅</div>
-        <div><h4>Scheduling</h4><p>Booking, reminders, no-show prevention</p></div>
-      </div>
-      <div class="automate-card">
-        <div class="icon">💬</div>
-        <div><h4>Customer Support</h4><p>AI chatbots, ticket routing, FAQs</p></div>
-      </div>
-      <div class="automate-card">
-        <div class="icon">📱</div>
-        <div><h4>Social Media</h4><p>Posting, cross-platform, engagement</p></div>
-      </div>
-      <div class="automate-card">
-        <div class="icon">💰</div>
-        <div><h4>Invoicing</h4><p>Send, track, chase payments automatically</p></div>
-      </div>
-      <div class="automate-card">
-        <div class="icon">📊</div>
-        <div><h4>Reporting</h4><p>Auto-generated dashboards & summaries</p></div>
-      </div>
-      <div class="automate-card">
-        <div class="icon">🏪</div>
-        <div><h4>E-commerce</h4><p>Order flows, reviews, upsells</p></div>
-      </div>
-      <div class="automate-card">
-        <div class="icon">🏥</div>
-        <div><h4>Healthcare</h4><p>Appointment reminders, patient follow-ups</p></div>
-      </div>
-      <div class="automate-card">
-        <div class="icon">🏡</div>
-        <div><h4>Real Estate</h4><p>Lead scoring, open house follow-ups</p></div>
-      </div>
-      <div class="automate-card">
-        <div class="icon">⚖️</div>
-        <div><h4>Legal</h4><p>Client intake, CRM onboarding, contracts</p></div>
-      </div>
-      <div class="automate-card">
-        <div class="icon">🏋️</div>
-        <div><h4>Fitness & Wellness</h4><p>Class reminders, churn prevention</p></div>
-      </div>
-      <div class="automate-card">
-        <div class="icon">🍽️</div>
-        <div><h4>Restaurants</h4><p>Reservations, no-show handling, reviews</p></div>
+  <!-- QUIZ CTA -->
+  <section class="quiz-section" id="quiz">
+    <div class="container">
+      <div class="quiz-box">
+        <div class="section-label">Kostenlose Analyse</div>
+        <h2>In 2 Minuten erfahren Sie, wie viel Umsatz Sie jeden Monat verlieren.</h2>
+        <p>8 kurze Fragen zu Ihrem Betrieb. Sofort Ergebnis — mit konkreten Zahlen und Empfehlungen.</p>
+        <a href="https://tally.so/r/REPLACE_WITH_QUIZ_ID" class="btn-main" style="font-size:1.05rem; padding:1rem 2.5rem;">
+          Jetzt kostenlos testen →
+        </a>
+        <div class="quiz-note">Keine Anmeldung notwendig · Ergebnis sofort · 100% unverbindlich</div>
       </div>
     </div>
   </section>
 
-  <!-- PRICING -->
-  <section id="pricing">
-    <div class="section-label center">Pricing</div>
-    <h2 class="section-title center">One flat price. Everything included.</h2>
-    <p class="section-sub center">No hidden fees. No hourly billing. Just results.</p>
-    <div class="pricing-grid">
-      <div class="pricing-card">
-        <h3>Starter</h3>
-        <div class="price">$297<span>/mo</span></div>
-        <p class="pricing-desc">Perfect for solopreneurs</p>
-        <ul class="pricing-features">
-          <li>1 core automation</li>
-          <li>Monthly maintenance</li>
-          <li>Email support</li>
-          <li>Live in 48 hours</li>
-        </ul>
-        <a href="#cta" class="btn-outline">Get Started</a>
-      </div>
-      <div class="pricing-card featured">
-        <div class="popular-badge">Most Popular</div>
-        <h3>Growth</h3>
-        <div class="price">$697<span>/mo</span></div>
-        <p class="pricing-desc">For small teams ready to scale</p>
-        <ul class="pricing-features">
-          <li>3 automations</li>
-          <li>CRM integration</li>
-          <li>Weekly reporting</li>
-          <li>Slack support</li>
-          <li>Live in 48 hours</li>
-        </ul>
-        <a href="#cta" class="btn-outline">Get Started</a>
-      </div>
-      <div class="pricing-card">
-        <h3>Scale</h3>
-        <div class="price">$1,497<span>/mo</span></div>
-        <p class="pricing-desc">For growing businesses</p>
-        <ul class="pricing-features">
-          <li>Unlimited automations</li>
-          <li>Full stack integration</li>
-          <li>Custom workflows</li>
-          <li>Priority support</li>
-          <li>Monthly strategy call</li>
-        </ul>
-        <a href="#cta" class="btn-outline">Get Started</a>
+  <!-- HOW IT WORKS -->
+  <section id="ablauf">
+    <div class="container">
+      <div class="section-label">So funktioniert's</div>
+      <h2 class="section-title">In drei Schritten zur automatisierten Kundenbetreuung</h2>
+      <div class="steps-grid">
+        <div class="step">
+          <h3>Analyse ausfüllen</h3>
+          <p>2 Minuten, 8 Fragen zu Ihrem Betrieb. Sie erfahren sofort, wo Sie Zeit und Geld verlieren — mit konkreten Euro-Beträgen.</p>
+        </div>
+        <div class="step">
+          <h3>System einrichten</h3>
+          <p>Wir richten Ihre Automatisierungen ein — maßgeschneidert für Ihren Betrieb, Ihre Branche und Ihre bestehenden Tools. Innerhalb von 48 Stunden.</p>
+        </div>
+        <div class="step">
+          <h3>Aufträge gewinnen</h3>
+          <p>Ihre Kunden werden in Sekunden bedient. Angebote werden automatisch nachgefasst. Bewertungen kommen rein. Sie machen das, was Sie am besten können: Ihre Arbeit.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- SOCIAL PROOF -->
-  <section class="proof">
-    <div class="section-label center">Results</div>
-    <h2 class="section-title center">Built for businesses like yours.</h2>
-    <p class="section-sub center">Real outcomes from real clients.</p>
-    <div class="proof-grid">
-      <div class="proof-card">
-        <div class="stars">★★★★★</div>
-        <p>"Saved 15 hours a week. Best investment this year."</p>
-        <div class="proof-author">— Client, E-commerce Store</div>
+  <!-- STATS BAR -->
+  <div class="stats-bar">
+    <div class="container">
+      <div class="stats-grid">
+        <div>
+          <div class="stat-number">60s</div>
+          <div class="stat-label">Durchschnittliche Antwortzeit nach Anfrage</div>
+        </div>
+        <div>
+          <div class="stat-number">40%</div>
+          <div class="stat-label">Der Angebote gehen ohne Nachverfolgung verloren</div>
+        </div>
+        <div>
+          <div class="stat-number">12h</div>
+          <div class="stat-label">Pro Woche Büroarbeit, die automatisierbar ist</div>
+        </div>
+        <div>
+          <div class="stat-number">48h</div>
+          <div class="stat-label">Von Beauftragung bis System läuft</div>
+        </div>
       </div>
-      <div class="proof-card">
-        <div class="stars">★★★★★</div>
-        <p>"I used to dread admin. Now it just happens."</p>
-        <div class="proof-author">— Client, Coaching Business</div>
-      </div>
-      <div class="proof-card">
-        <div class="stars">★★★★★</div>
-        <p>"Paid for itself in week one. Genuinely shocked."</p>
-        <div class="proof-author">— Client, Law Firm</div>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <section>
+    <div class="container">
+      <div class="section-label">Häufige Fragen</div>
+      <h2 class="section-title">Ihre Fragen — ehrlich beantwortet</h2>
+      <div class="faq-list">
+        <div class="faq-item">
+          <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+            Ist das DSGVO-konform?
+            <span class="toggle">+</span>
+          </div>
+          <div class="faq-a">Ja. Alle Daten werden auf EU-Servern verarbeitet. Wir verwenden keine US-Cloud-Dienste für Kundendaten. Brevo (unser E-Mail-Provider) ist in der EU ansässig und DSGVO-zertifiziert. Auf Wunsch stellen wir Ihnen einen Auftragsverarbeitungsvertrag (AVV) aus.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+            Brauche ich technische Kenntnisse?
+            <span class="toggle">+</span>
+          </div>
+          <div class="faq-a">Nein. Wir richten alles ein. Sie müssen nichts programmieren, nichts konfigurieren und keine Software installieren. Alles läuft im Hintergrund. Sie bekommen ein kurzes Erklärvideo, wie Sie Ergebnisse sehen und bei Bedarf Anpassungen anfragen können.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+            Was wenn es nicht funktioniert?
+            <span class="toggle">+</span>
+          </div>
+          <div class="faq-a">Es gibt keine langfristige Vertragsbindung. Sie können monatlich kündigen. Wenn Sie in den ersten 30 Tagen nicht zufrieden sind, erstatten wir Ihnen den vollen Monatsbeitrag — ohne Diskussion.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+            Wie schnell sehe ich Ergebnisse?
+            <span class="toggle">+</span>
+          </div>
+          <div class="faq-a">Die meisten Betriebe sehen innerhalb von 48 Stunden die erste automatisierte Kundenantwort. Messbare Ergebnisse (mehr Anfragen beantwortet, bessere Google-Bewertungen, weniger verlorene Angebote) zeigen sich typischerweise in den ersten 2–3 Wochen.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+            Was kostet das?
+            <span class="toggle">+</span>
+          </div>
+          <div class="faq-a">Ab €197/Monat für 3 Kern-Automatisierungen. Das ist weniger als 3 Stunden Ihrer Arbeitszeit — dafür sparen Sie 40+ Stunden im Monat. Genaue Kosten erfahren Sie nach der kostenlosen Analyse, weil sie davon abhängen, welche Prozesse bei Ihnen den größten Hebel haben.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+            Funktioniert das für meinen Betrieb?
+            <span class="toggle">+</span>
+          </div>
+          <div class="faq-a">Wenn Sie ein Handwerksbetrieb sind, der Kundenanfragen bearbeitet, Angebote verschickt und Termine koordiniert — ja. Egal ob Elektriker, Maler, Dachdecker, Sanitär, Heizung, Schreiner oder Garten- und Landschaftsbau. Die Prozesse sind überall ähnlich. Die Automatisierung wird an Ihre Branche angepasst.</div>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- FINAL CTA -->
-  <section class="final-cta" id="cta">
-    <div class="section-label center">Get Started</div>
-    <h2 class="section-title">Still doing it manually?</h2>
-    <p class="section-sub">Every day you wait is another day of wasted hours. Let's fix that — free audit, no commitment.</p>
-    <a href="mailto:hello@motionelevation.com" class="btn-primary">Get Your Free Automation Audit →</a>
-    <p style="margin-top:1rem; font-size:0.85rem; color:var(--muted);">Reply within 24 hours · No credit card required</p>
+  <section class="final-cta">
+    <div class="container">
+      <h2>Bereit herauszufinden, was Sie jeden Monat verlieren?</h2>
+      <p>2 Minuten. 8 Fragen. Sofort Ergebnis mit konkreten Zahlen für Ihren Betrieb.</p>
+      <div class="final-cta-row">
+        <a href="#quiz" class="btn-main">Kostenlose Analyse starten →</a>
+        <a href="https://wa.me/REPLACE_WITH_WHATSAPP_NUMBER?text=Hallo%2C%20ich%20interessiere%20mich%20für%20die%20Automatisierung%20meines%20Betriebs." class="whatsapp-link">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492a.5.5 0 00.611.611l4.458-1.495A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.316 0-4.48-.676-6.313-1.835l-.44-.264-2.646.887.887-2.646-.264-.44A9.963 9.963 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+          Lieber direkt schreiben?
+        </a>
+      </div>
+    </div>
   </section>
 
   <!-- FOOTER -->
   <footer>
-    <p style="font-weight:800; font-size:1rem; margin-bottom:0.5rem;">Motion<span style="color:var(--accent)">Elevation</span></p>
-    <p>Questions? <a href="mailto:hello@motionelevation.com">hello@motionelevation.com</a></p>
-    <p style="margin-top:0.5rem;">© 2026 Motion Elevation. All rights reserved.</p>
+    <div class="container">
+      <div class="footer-inner">
+        <div>
+          © 2026 Motion Elevation · <a href="/impressum">Impressum</a> · <a href="/datenschutz">Datenschutzerklärung</a>
+        </div>
+        <div>
+          Automatisierung für Handwerksbetriebe in Deutschland
+        </div>
+      </div>
+    </div>
   </footer>
 
 </body>
