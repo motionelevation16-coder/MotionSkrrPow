@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — Motion Elevation</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* ─── Layout ──────────────────────────────────────────── */
+    body { display: flex; flex-direction: column; min-height: 100vh; }
+
+    /* Demo banner */
+    .demo-banner { flex-shrink: 0; }
+
+    /* Top nav */
+    .topnav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      height: 64px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-subtle);
+      position: sticky; top: 0; z-index: 100;
+      flex-shrink: 0;
+    }
+    .nav-brand {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 600; font-size: 1rem; color: var(--text-primary);
+      text-decoration: none;
+    }
+    .nav-logo {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--accent), #818cf8);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+    }
+    .nav-right { display: flex; align-items: center; gap: 16px; }
+    .client-info { text-align: right; }
+    .client-name { font-size: 0.875rem; font-weight: 600; }
+    .client-email { font-size: 0.75rem; color: var(--text-muted); }
+    .avatar {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--accent), #818cf8);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; font-weight: 700; color: #fff;
+      flex-shrink: 0;
+    }
+
+    /* Main content area */
+    .main-layout {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 0;
+      max-width: 1280px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 32px 28px;
+      align-items: start;
+    }
+
+    /* Left column: automations */
+    .automations-section { padding-right: 32px; }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .section-title { font-size: 1.1rem; font-weight: 600; }
+    .section-subtitle { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
+
+    /* Automation grid */
+    .automations-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    /* Automation card */
+    .automation-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+    }
+    .automation-card:hover {
+      border-color: var(--border);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+      transform: translateY(-2px);
+    }
+    .automation-card.status-error { border-color: rgba(239,68,68,0.25); }
+    .automation-card.status-running { border-color: rgba(59,130,246,0.25); }
+    .automation-card.status-inactive { opacity: 0.6; }
+
+    .card-header-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .card-icon-name { display: flex; align-items: center; gap: 10px; }
+    .card-icon {
+      font-size: 1.5rem;
+      width: 40px; height: 40px;
+      background: var(--bg-secondary);
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .card-name { font-size: 0.9375rem; font-weight: 600; line-height: 1.3; }
+
+    .card-description {
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .card-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .last-run-label { font-size: 0.75rem; color: var(--text-muted); }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .run-btn {
+      flex: 1;
+    }
+
+    /* Error message in card */
+    .card-error-msg {
+      font-size: 0.75rem;
+      color: var(--error);
+      background: rgba(239,68,68,0.08);
+      border-radius: 6px;
+      padding: 8px 10px;
+      line-height: 1.4;
+    }
+    .card-disabled-msg {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      background: rgba(148,163,184,0.06);
+      border-radius: 6px;
+      padding: 8px 10px;
+    }
+
+    /* Running overlay */
+    .card-running-bar {
+      height: 2px;
+      background: linear-gradient(90deg, var(--running), transparent);
+      border-radius: 2px;
+      animation: shimmer 1.5s infinite;
+      background-size: 200% 100%;
+    }
+    @keyframes shimmer {
+      0%   { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    /* ─── Subscription inactive overlay ──────────────────── */
+    .sub-inactive-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(8,12,18,0.85);
+      backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: center;
+    }
+    .sub-inactive-overlay.visible { display: flex; }
+    .sub-inactive-box {
+      background: var(--bg-card);
+      border: 1px solid rgba(239,68,68,0.3);
+      border-radius: var(--radius-lg);
+      padding: 48px 40px;
+      text-align: center;
+      max-width: 440px;
+      width: 90%;
+      box-shadow: var(--shadow);
+    }
+    .sub-inactive-box .icon { font-size: 3rem; margin-bottom: 16px; }
+    .sub-inactive-box h2 { margin-bottom: 10px; }
+    .sub-inactive-box p  { margin-bottom: 28px; font-size: 0.9rem; }
+
+    /* ─── Sidebar ─────────────────────────────────────────── */
+    .sidebar { display: flex; flex-direction: column; gap: 16px; }
+
+    /* Time saved hero card */
+    .time-saved-card {
+      background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(99,102,241,0.05));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      text-align: center;
+    }
+    .time-saved-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .time-saved-number {
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .time-saved-unit { font-size: 1.1rem; color: var(--text-secondary); font-weight: 400; }
+    .time-saved-sub { font-size: 0.8rem; color: var(--text-muted); margin-top: 8px; }
+
+    /* Stats grid */
+    .stats-card { padding: 20px; }
+    .stats-card h3 { font-size: 0.8125rem; margin-bottom: 16px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+    .stats-list { display: flex; flex-direction: column; gap: 14px; }
+    .stat-row { display: flex; align-items: center; justify-content: space-between; }
+    .stat-label { font-size: 0.875rem; color: var(--text-secondary); }
+    .stat-value { font-size: 0.9375rem; font-weight: 600; color: var(--text-primary); }
+
+    /* Subscription card */
+    .sub-card { padding: 20px; }
+    .sub-card h3 { font-size: 0.8125rem; margin-bottom: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+    .sub-plan { font-size: 1rem; font-weight: 600; margin-bottom: 4px; }
+    .sub-renewal { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px; }
+
+    /* Quick links */
+    .quick-links { display: flex; flex-direction: column; gap: 8px; }
+    .quick-link {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .quick-link:hover { background: var(--bg-card-hover); color: var(--text-primary); border-color: var(--border); }
+
+    /* ─── Footer ──────────────────────────────────────────── */
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-subtle);
+      flex-shrink: 0;
+    }
+    footer a { color: var(--text-muted); text-decoration: none; margin: 0 8px; }
+    footer a:hover { color: var(--text-secondary); }
+
+    /* ─── Responsive ──────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .main-layout {
+        grid-template-columns: 1fr;
+        padding: 20px 16px;
+      }
+      .automations-section { padding-right: 0; margin-bottom: 24px; }
+      .topnav { padding: 0 16px; }
+      .client-info { display: none; }
+    }
+
+    @media (max-width: 600px) {
+      .automations-grid { grid-template-columns: 1fr; }
+      .topnav { height: 56px; }
+    }
+
+    /* ─── Result popup (response from webhook) ────────────── */
+    .result-overlay {
+      display: none;
+      position: fixed; inset: 0; z-index: 300;
+      background: rgba(8,12,18,0.75);
+      backdrop-filter: blur(4px);
+      align-items: center; justify-content: center;
+    }
+    .result-overlay.visible { display: flex; }
+    .result-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      max-width: 480px;
+      width: 90%;
+      box-shadow: var(--shadow);
+    }
+    .result-box h3 { margin-bottom: 12px; }
+    .result-box pre {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      overflow-x: auto;
+      color: var(--text-secondary);
+      margin: 12px 0 20px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Demo banner (shown in demo mode) -->
+<div class="demo-banner" id="demo-banner" style="display:none;">
+  👋 You're viewing a <strong>live demo</strong> — this is exactly what your clients see.
+  Ready to get started? <a href="https://motion-elevation.com">Book a call →</a>
+</div>
+
+<!-- Navigation -->
+<nav class="topnav">
+  <a href="#" class="nav-brand">
+    <div class="nav-logo">⚡</div>
+    Motion Elevation
+  </a>
+  <div class="nav-right">
+    <div class="client-info" id="client-info-nav">
+      <div class="client-name" id="nav-client-name">—</div>
+      <div class="client-email" id="nav-client-email">—</div>
+    </div>
+    <div id="sub-badge" class="badge badge-sub-active">
+      <span class="dot dot-green"></span>
+      Active
+    </div>
+    <div class="avatar" id="nav-avatar">?</div>
+    <button class="btn btn-ghost btn-sm" id="logout-btn" onclick="logout()">Sign out</button>
+  </div>
+</nav>
+
+<!-- Main layout -->
+<div class="main-layout">
+
+  <!-- ── Left: Automations ── -->
+  <div class="automations-section">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Your Automations</div>
+        <div class="section-subtitle" id="automation-subtitle">Loading…</div>
+      </div>
+    </div>
+
+    <div class="automations-grid" id="automations-grid">
+      <!-- Cards injected by JS -->
+    </div>
+  </div>
+
+  <!-- ── Right: Sidebar ── -->
+  <aside class="sidebar">
+
+    <!-- Time saved hero -->
+    <div class="time-saved-card">
+      <div class="time-saved-label">⏱ Time Saved This Month</div>
+      <div class="time-saved-number" id="stat-hours">—</div>
+      <div class="time-saved-unit">hours</div>
+      <div class="time-saved-sub" id="stat-hours-eq">Equivalent to <span id="stat-days">—</span> full work days</div>
+    </div>
+
+    <!-- Stats -->
+    <div class="card stats-card">
+      <h3>This Month</h3>
+      <div class="stats-list">
+        <div class="stat-row">
+          <span class="stat-label">🔁 Total Runs</span>
+          <span class="stat-value" id="stat-runs">—</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">📧 Emails Sent</span>
+          <span class="stat-value" id="stat-emails">—</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">🎯 Leads Captured</span>
+          <span class="stat-value" id="stat-leads">—</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">✅ Success Rate</span>
+          <span class="stat-value text-success" id="stat-success">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Subscription -->
+    <div class="card sub-card">
+      <h3>Subscription</h3>
+      <div class="sub-plan" id="sub-plan">—</div>
+      <div class="sub-renewal" id="sub-renewal">—</div>
+      <div class="quick-links">
+        <a href="mailto:billing@motion-elevation.com" class="quick-link">
+          💳 Billing &amp; Invoices
+        </a>
+        <a href="mailto:support@motion-elevation.com" class="quick-link">
+          🛟 Support
+        </a>
+        <a href="mailto:support@motion-elevation.com?subject=Upgrade" class="quick-link">
+          🚀 Upgrade Plan
+        </a>
+      </div>
+    </div>
+
+  </aside>
+
+</div><!-- /main-layout -->
+
+<!-- Footer -->
+<footer>
+  <a href="mailto:support@motion-elevation.com">Support</a>
+  <a href="mailto:billing@motion-elevation.com">Billing</a>
+  <a href="#">Privacy</a>
+  <a href="#">Terms</a>
+  &nbsp;· © 2026 Motion Elevation
+</footer>
+
+<!-- Subscription Inactive Overlay -->
+<div class="sub-inactive-overlay" id="sub-inactive-overlay">
+  <div class="sub-inactive-box">
+    <div class="icon">🔒</div>
+    <h2>Subscription Inactive</h2>
+    <p>Your automations are paused. Renew your subscription to resume your workflows and keep your business running on autopilot.</p>
+    <a href="mailto:billing@motion-elevation.com?subject=Renew%20Subscription" class="btn btn-primary btn-lg">
+      Renew Subscription
+    </a>
+    <div class="mt-4">
+      <a href="mailto:support@motion-elevation.com" style="font-size:0.8rem;color:var(--text-muted);text-decoration:none;">
+        Questions? Contact support →
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Webhook Result Overlay -->
+<div class="result-overlay" id="result-overlay">
+  <div class="result-box">
+    <h3 id="result-title">Automation Result</h3>
+    <pre id="result-body">—</pre>
+    <button class="btn btn-primary" onclick="closeResult()">Done</button>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<!-- Demo data -->
+<script src="demo-data.js"></script>
+
+<script>
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Config — set base webhook URL here (or use environment)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const CONFIG = {
+  n8nBase: 'https://your-n8n.domain',   // <-- change this
+  magicLinkBase: 'https://your-dashboard.com',
+};
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// State
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+let clientData   = null;
+let statsData    = null;
+let automations  = [];
+let isDemo       = false;
+let subActive    = true;
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Init
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+(async function init() {
+  const params = new URLSearchParams(window.location.search);
+
+  // Handle magic-link token from URL params
+  const urlToken = params.get('token');
+  const urlEmail = params.get('email');
+  if (urlToken && urlEmail) {
+    localStorage.setItem('clientToken', urlToken);
+    localStorage.setItem('clientEmail', urlEmail);
+    // Clean URL
+    window.history.replaceState({}, '', 'dashboard.html');
+  }
+
+  isDemo = params.get('demo') === 'true';
+
+  if (isDemo) {
+    loadDemoMode();
+    return;
+  }
+
+  const token = localStorage.getItem('clientToken');
+  const email = localStorage.getItem('clientEmail');
+
+  if (!token || !email) {
+    window.location.href = 'login.html';
+    return;
+  }
+
+  await loadClientData(token, email);
+})();
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Demo Mode
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function loadDemoMode() {
+  document.getElementById('demo-banner').style.display = 'block';
+  document.getElementById('logout-btn').style.display  = 'none';
+
+  clientData  = DEMO_CLIENT;
+  statsData   = DEMO_STATS;
+  automations = DEMO_AUTOMATIONS;
+  subActive   = clientData.subscriptionStatus === 'active';
+
+  renderAll();
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Real Client Load
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+async function loadClientData(token, email) {
+  try {
+    /**
+     * PRODUCTION: POST to your n8n client-info webhook.
+     * It should return the client record + their automations + stats.
+     *
+     * Expected response shape:
+     * {
+     *   client: { id, name, email, subscriptionStatus, subscriptionPlan, subscriptionRenewal, avatarInitials },
+     *   stats:  { runsThisMonth, emailsSent, leadsCaptures, timeSavedHours, successRate },
+     *   automations: [ { id, icon, name, description, status, lastRun, webhookUrl, enabled, ... } ]
+     * }
+     */
+    const res = await fetch(`${CONFIG.n8nBase}/webhook/client-data`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Client-Token': token,
+      },
+      body: JSON.stringify({ email }),
+    });
+
+    if (res.status === 401) {
+      handleSessionExpired();
+      return;
+    }
+    if (!res.ok) throw new Error('Server error');
+
+    const data = await res.json();
+    clientData  = data.client;
+    statsData   = data.stats;
+    automations = data.automations;
+    subActive   = clientData.subscriptionStatus === 'active';
+
+    renderAll();
+  } catch (err) {
+    console.error('Load error:', err);
+    // Fallback to demo for dev purposes — remove this in production:
+    showToast('Could not reach server — showing demo data.', 'info');
+    loadDemoMode();
+  }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Render
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function renderAll() {
+  renderNav();
+  renderSidebar();
+  renderAutomations();
+  if (!subActive) showSubInactiveOverlay();
+}
+
+function renderNav() {
+  document.getElementById('nav-client-name').textContent  = clientData.name;
+  document.getElementById('nav-client-email').textContent = clientData.email;
+  document.getElementById('nav-avatar').textContent       = clientData.avatarInitials || clientData.name.slice(0,2).toUpperCase();
+
+  const badge = document.getElementById('sub-badge');
+  if (subActive) {
+    badge.className = 'badge badge-sub-active';
+    badge.innerHTML = '<span class="dot dot-green"></span> Active';
+  } else {
+    badge.className = 'badge badge-sub-inactive';
+    badge.innerHTML = '<span class="dot dot-red"></span> Inactive';
+  }
+}
+
+function renderSidebar() {
+  const hours = statsData.timeSavedHours;
+  const days  = (hours / 8).toFixed(1);
+
+  document.getElementById('stat-hours').textContent   = hours;
+  document.getElementById('stat-days').textContent    = days;
+  document.getElementById('stat-runs').textContent    = statsData.runsThisMonth.toLocaleString();
+  document.getElementById('stat-emails').textContent  = statsData.emailsSent.toLocaleString();
+  document.getElementById('stat-leads').textContent   = (statsData.leadsCaptures || 0).toLocaleString();
+  document.getElementById('stat-success').textContent = statsData.successRate + '%';
+
+  document.getElementById('sub-plan').textContent    = clientData.subscriptionPlan + ' Plan';
+  document.getElementById('sub-renewal').textContent = clientData.subscriptionRenewal
+    ? 'Renews ' + formatDate(clientData.subscriptionRenewal)
+    : '';
+}
+
+function renderAutomations() {
+  const grid = document.getElementById('automations-grid');
+  const active = automations.filter(a => a.status !== 'inactive' || !a.enabled).length;
+  document.getElementById('automation-subtitle').textContent =
+    `${automations.length} automations · ${automations.filter(a => a.status === 'active').length} running`;
+
+  grid.innerHTML = automations.map(a => buildCard(a)).join('');
+}
+
+function buildCard(a) {
+  const statusMap = {
+    active:   { label: 'Active',  cls: 'badge-active',  dot: 'dot-green' },
+    error:    { label: 'Error',   cls: 'badge-error',   dot: 'dot-red'   },
+    running:  { label: 'Running', cls: 'badge-running', dot: 'dot-blue'  },
+    inactive: { label: 'Inactive',cls: 'badge-inactive',dot: 'dot-gray'  },
+  };
+  const s = statusMap[a.status] || statusMap.inactive;
+
+  const lastRunHtml = a.lastRun
+    ? `<span class="last-run-label">Last run: ${timeAgo(a.lastRun)}</span>`
+    : `<span class="last-run-label text-muted">Never run</span>`;
+
+  const runDisabled = (!a.enabled || !subActive || a.status === 'running' || isDemo && !a.enabled) ? 'disabled' : '';
+  const runLabel    = a.status === 'running' ? '<div class="spinner"></div> Running…' : '▶ Run Now';
+
+  const runningBar  = a.status === 'running' ? '<div class="card-running-bar"></div>' : '';
+
+  let extraHtml = '';
+  if (a.errorMessage) {
+    extraHtml = `<div class="card-error-msg">⚠️ ${a.errorMessage}</div>`;
+  } else if (a.disabledReason) {
+    extraHtml = `<div class="card-disabled-msg">🔒 ${a.disabledReason}</div>`;
+  }
+
+  const runsLabel = a.runsThisMonth > 0
+    ? `${a.runsThisMonth} run${a.runsThisMonth !== 1 ? 's' : ''} this month`
+    : '';
+
+  return `
+  <div class="automation-card status-${a.status}" id="card-${a.id}">
+    ${runningBar}
+    <div class="card-header-row">
+      <div class="card-icon-name">
+        <div class="card-icon">${a.icon}</div>
+        <div class="card-name">${a.name}</div>
+      </div>
+      <span class="badge ${s.cls}"><span class="dot ${s.dot}"></span>${s.label}</span>
+    </div>
+    <div class="card-description">${a.description}</div>
+    ${extraHtml}
+    <div class="card-meta">
+      ${lastRunHtml}
+      <span>${runsLabel}</span>
+    </div>
+    <div class="card-footer">
+      <button
+        class="btn btn-primary btn-sm run-btn"
+        id="run-btn-${a.id}"
+        onclick="runAutomation('${a.id}', '${a.webhookUrl}')"
+        ${runDisabled}
+      >${runLabel}</button>
+    </div>
+  </div>`;
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Run Automation
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+async function runAutomation(automationId, webhookUrl) {
+  if (!subActive) { showSubInactiveOverlay(); return; }
+
+  const btn = document.getElementById(`run-btn-${automationId}`);
+  const card = document.getElementById(`card-${automationId}`);
+  const auto = automations.find(a => a.id === automationId);
+
+  if (!btn || !auto) return;
+
+  // Set running state
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Running…';
+  card.classList.remove('status-active', 'status-error', 'status-inactive');
+  card.classList.add('status-running');
+
+  const token = isDemo ? 'demo-token' : localStorage.getItem('clientToken');
+
+  try {
+    /**
+     * PRODUCTION: fires the webhook with the client token.
+     * n8n should validate X-Client-Token before executing.
+     * Response can include a message/result to show the user.
+     */
+    const res = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Client-Token': token,
+      },
+      body: JSON.stringify({
+        automationId,
+        clientId: clientData.id,
+        triggeredAt: new Date().toISOString(),
+      }),
+    });
+
+    if (res.status === 401) { handleSessionExpired(); return; }
+
+    let responseText = '';
+    try {
+      const json = await res.json();
+      responseText = typeof json.message === 'string'
+        ? json.message
+        : JSON.stringify(json, null, 2);
+    } catch {
+      responseText = await res.text() || 'Automation completed successfully.';
+    }
+
+    // Update local state
+    auto.status  = res.ok ? 'active' : 'error';
+    auto.lastRun = new Date().toISOString();
+    auto.runsThisMonth = (auto.runsThisMonth || 0) + 1;
+
+    if (res.ok) {
+      showToast(`${auto.icon} ${auto.name} completed.`, 'success');
+      showResult(auto.name, responseText, true);
+    } else {
+      auto.errorMessage = `HTTP ${res.status}: ${responseText.slice(0, 120)}`;
+      showToast(`${auto.name} returned an error.`, 'error');
+      showResult(auto.name, responseText, false);
+    }
+
+  } catch (err) {
+    auto.status = 'error';
+    auto.lastRun = new Date().toISOString();
+    auto.errorMessage = isDemo
+      ? 'Demo mode — webhook not called.'
+      : `Network error: ${err.message}`;
+
+    if (isDemo) {
+      // In demo: pretend it worked
+      auto.status = 'active';
+      auto.errorMessage = null;
+      auto.runsThisMonth = (auto.runsThisMonth || 0) + 1;
+      showToast(`${auto.icon} ${auto.name} would run here!`, 'info');
+      showResult(auto.name, '✅ Demo mode — in production, your n8n workflow fires here and returns a result.', true);
+    } else {
+      showToast(`Could not reach ${auto.name}.`, 'error');
+    }
+  }
+
+  // Re-render just this card
+  const newCardHtml = buildCard(auto);
+  const tmp = document.createElement('div');
+  tmp.innerHTML = newCardHtml;
+  card.replaceWith(tmp.firstElementChild);
+
+  // Update stats
+  if (statsData) {
+    statsData.runsThisMonth++;
+    document.getElementById('stat-runs').textContent = statsData.runsThisMonth.toLocaleString();
+  }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Result popup
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function showResult(name, body, success) {
+  document.getElementById('result-title').textContent = (success ? '✅ ' : '❌ ') + name;
+  document.getElementById('result-body').textContent  = body;
+  document.getElementById('result-overlay').classList.add('visible');
+}
+function closeResult() {
+  document.getElementById('result-overlay').classList.remove('visible');
+}
+document.getElementById('result-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeResult();
+});
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Subscription inactive
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function showSubInactiveOverlay() {
+  document.getElementById('sub-inactive-overlay').classList.add('visible');
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Session expired
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function handleSessionExpired() {
+  localStorage.removeItem('clientToken');
+  localStorage.removeItem('clientEmail');
+  showToast('Session expired — please sign in again.', 'error');
+  setTimeout(() => { window.location.href = 'login.html'; }, 2000);
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Auth
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function logout() {
+  localStorage.removeItem('clientToken');
+  localStorage.removeItem('clientEmail');
+  window.location.href = 'login.html';
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Helpers
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function timeAgo(isoString) {
+  const diff = Date.now() - new Date(isoString).getTime();
+  const mins  = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days  = Math.floor(diff / 86400000);
+  if (mins < 1)   return 'just now';
+  if (mins < 60)  return `${mins}m ago`;
+  if (hours < 24) return `${hours}h ago`;
+  return `${days}d ago`;
+}
+
+function formatDate(dateStr) {
+  return new Date(dateStr).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+function showToast(message, type = 'info') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+  toast.innerHTML = `<span>${icons[type] || 'ℹ️'}</span><span>${message}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transition = 'opacity 0.3s';
+    setTimeout(() => toast.remove(), 300);
+  }, 5000);
+}
+</script>
+</body>
+</html>

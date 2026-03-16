@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In — Motion Elevation</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* ─── Login-specific layout ───────────────────────────── */
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(99,102,241,0.12), transparent),
+                  var(--bg-primary);
+    }
+
+    .login-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 16px;
+    }
+
+    .login-box {
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+    .brand-logo {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, var(--accent), #818cf8);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+    .brand-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.1;
+    }
+    .brand-tagline {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .login-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 36px 32px;
+      box-shadow: var(--shadow);
+    }
+
+    .login-card h1 {
+      font-size: 1.4rem;
+      margin-bottom: 6px;
+    }
+    .login-card > p {
+      font-size: 0.9rem;
+      margin-bottom: 28px;
+      color: var(--text-secondary);
+    }
+
+    .form-stack { display: flex; flex-direction: column; gap: 18px; }
+
+    /* Success state — magic link sent */
+    .success-state {
+      display: none;
+      text-align: center;
+      padding: 8px 0;
+    }
+    .success-icon {
+      width: 56px; height: 56px;
+      background: rgba(16,185,129,0.1);
+      border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 16px;
+    }
+    .success-state h2 { font-size: 1.2rem; margin-bottom: 8px; }
+    .success-state p  { font-size: 0.875rem; }
+
+    /* Dev token login (shown below divider) */
+    .dev-login { margin-top: 24px; }
+    .dev-toggle {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-family: inherit;
+      padding: 0;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+    .dev-toggle:hover { color: var(--text-secondary); }
+    .dev-form { display: none; margin-top: 14px; gap: 10px; flex-direction: column; }
+
+    .login-footer {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .login-footer a { color: var(--accent); text-decoration: none; }
+    .login-footer a:hover { text-decoration: underline; }
+
+    /* Demo link */
+    .demo-bar {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.825rem;
+      color: var(--text-muted);
+    }
+    .demo-bar a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    .demo-bar a:hover { text-decoration: underline; }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    footer a { color: var(--text-muted); text-decoration: none; }
+    footer a:hover { color: var(--text-secondary); }
+  </style>
+</head>
+<body>
+
+<div class="login-wrapper">
+  <div class="login-box">
+
+    <!-- Brand -->
+    <div class="brand">
+      <div class="brand-logo">⚡</div>
+      <div>
+        <div class="brand-name">Motion Elevation</div>
+        <div class="brand-tagline">Automation as a Service</div>
+      </div>
+    </div>
+
+    <!-- Login Card -->
+    <div class="login-card">
+
+      <!-- Default: email form -->
+      <div id="email-state">
+        <h1>Welcome back</h1>
+        <p>Enter your email to access your automation dashboard.</p>
+
+        <div class="form-stack">
+          <div class="input-group">
+            <label for="email">Email address</label>
+            <input
+              type="email"
+              id="email"
+              placeholder="you@company.com"
+              autocomplete="email"
+              required
+            />
+          </div>
+
+          <button class="btn btn-primary btn-full btn-lg" id="send-btn" onclick="sendMagicLink()">
+            Send Magic Link
+          </button>
+        </div>
+
+        <hr class="divider" />
+
+        <!-- Dev / direct token login -->
+        <div class="dev-login">
+          <button class="dev-toggle" onclick="toggleDevLogin()">
+            Have a token? Sign in directly
+          </button>
+          <div class="dev-form" id="dev-form">
+            <div class="input-group">
+              <label for="token-input">Access Token</label>
+              <input type="text" id="token-input" placeholder="Paste your token here" />
+            </div>
+            <div class="input-group">
+              <label for="email-direct">Email</label>
+              <input type="email" id="email-direct" placeholder="you@company.com" />
+            </div>
+            <button class="btn btn-ghost btn-full" onclick="tokenLogin()">
+              Sign In with Token
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Success: magic link sent -->
+      <div class="success-state" id="success-state">
+        <div class="success-icon">✉️</div>
+        <h2>Check your inbox</h2>
+        <p>We've sent a magic link to <strong id="sent-to-email"></strong>.</p>
+        <p class="mt-2">Click the link in the email to sign in. It expires in 15 minutes.</p>
+        <button class="btn btn-ghost btn-full mt-6" onclick="resetForm()">
+          Use a different email
+        </button>
+      </div>
+
+    </div><!-- /login-card -->
+
+    <div class="demo-bar">
+      Curious what the dashboard looks like? <a href="dashboard.html?demo=true">View live demo →</a>
+    </div>
+
+  </div><!-- /login-box -->
+</div><!-- /login-wrapper -->
+
+<footer>
+  <a href="#">Privacy</a> &nbsp;·&nbsp;
+  <a href="#">Terms</a> &nbsp;·&nbsp;
+  <a href="mailto:support@motion-elevation.com">Support</a>
+  &nbsp;·&nbsp; © 2026 Motion Elevation
+</footer>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<script>
+  // ── Check if already logged in ──────────────────────────
+  (function () {
+    const token = localStorage.getItem('clientToken');
+    const email = localStorage.getItem('clientEmail');
+    if (token && email) {
+      window.location.href = 'dashboard.html';
+    }
+  })();
+
+  // ── Send magic link ─────────────────────────────────────
+  async function sendMagicLink() {
+    const emailEl = document.getElementById('email');
+    const btn     = document.getElementById('send-btn');
+    const email   = emailEl.value.trim();
+
+    if (!email || !email.includes('@')) {
+      showToast('Please enter a valid email address.', 'error');
+      emailEl.focus();
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner"></div> Sending…';
+
+    try {
+      /**
+       * PRODUCTION: replace this with your actual magic-link endpoint.
+       * e.g. POST https://your-n8n.domain/webhook/auth/magic-link
+       * Body: { email }
+       * n8n generates a signed token, stores it, and emails a link like:
+       *   https://your-dashboard.com/dashboard.html?token=XXX&email=YYY
+       */
+      await fakeMagicLinkRequest(email);
+
+      document.getElementById('sent-to-email').textContent = email;
+      document.getElementById('email-state').style.display   = 'none';
+      document.getElementById('success-state').style.display = 'block';
+    } catch (err) {
+      showToast('Something went wrong. Please try again.', 'error');
+      btn.disabled = false;
+      btn.innerHTML = 'Send Magic Link';
+    }
+  }
+
+  function resetForm() {
+    document.getElementById('email-state').style.display   = 'block';
+    document.getElementById('success-state').style.display = 'none';
+    const btn = document.getElementById('send-btn');
+    btn.disabled = false;
+    btn.innerHTML = 'Send Magic Link';
+    document.getElementById('email').value = '';
+    document.getElementById('email').focus();
+  }
+
+  // ── Token login (dev / direct link) ────────────────────
+  function tokenLogin() {
+    const token = document.getElementById('token-input').value.trim();
+    const email = document.getElementById('email-direct').value.trim();
+
+    if (!token || !email) {
+      showToast('Please enter both email and token.', 'error');
+      return;
+    }
+
+    localStorage.setItem('clientToken', token);
+    localStorage.setItem('clientEmail', email);
+    window.location.href = 'dashboard.html';
+  }
+
+  function toggleDevLogin() {
+    const form = document.getElementById('dev-form');
+    form.style.display = form.style.display === 'flex' ? 'none' : 'flex';
+  }
+
+  // ── Magic link auto-login (token in URL) ────────────────
+  // When the user clicks the email link: dashboard.html?token=XXX&email=YYY
+  // That page handles it. But if they land here with a token, redirect them.
+  (function handleURLToken() {
+    const params = new URLSearchParams(window.location.search);
+    const token  = params.get('token');
+    const email  = params.get('email');
+    if (token && email) {
+      localStorage.setItem('clientToken', token);
+      localStorage.setItem('clientEmail', email);
+      window.location.href = 'dashboard.html';
+    }
+  })();
+
+  // ── Fake async request (replace in production) ──────────
+  function fakeMagicLinkRequest(email) {
+    return new Promise((resolve) => setTimeout(resolve, 900));
+  }
+
+  // ── Enter key shortcut ──────────────────────────────────
+  document.getElementById('email').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') sendMagicLink();
+  });
+
+  // ── Toast helper ────────────────────────────────────────
+  function showToast(message, type = 'info') {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+    toast.innerHTML = `<span>${icons[type] || 'ℹ️'}</span><span>${message}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transition = 'opacity 0.3s';
+      setTimeout(() => toast.remove(), 300);
+    }, 4000);
+  }
+</script>
+</body>
+</html>
