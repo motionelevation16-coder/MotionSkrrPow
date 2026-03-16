@@ -1,0 +1,296 @@
+{
+  "name": "ME-13 | Fitness Studio — Class Reminder + Churn Prevention",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 7 * * *"
+            }
+          ]
+        }
+      },
+      "id": "me13-0001-0001-0001-000000000001",
+      "name": "Schedule: Daily 7am",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300],
+      "notes": "Runs every morning at 7am to send class reminders and check for at-risk members."
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Members",
+          "mode": "name"
+        },
+        "filters": {},
+        "options": {}
+      },
+      "id": "me13-0002-0002-0002-000000000002",
+      "name": "Read Members Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [460, 300],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets - Motion Elevation"
+        }
+      },
+      "notes": "Sheet tab: Members. Columns: Name | Email | Phone | Next_Class_Date | Next_Class_Time | Next_Class_Name | Last_Visit_Date | Membership_Type | Classes_This_Month | Reminder_Sent | Churn_Email_Sent | Status"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst now = new Date();\nnow.setHours(0,0,0,0);\n\nconst actions = [];\n\nfor (const item of items) {\n  const row = item.json;\n  if (!row.Email || row.Status === 'Cancelled') continue;\n\n  const base = {\n    name: row.Name || 'Member',\n    email: row.Email,\n    phone: row.Phone || '',\n    next_class_date: row.Next_Class_Date || '',\n    next_class_time: row.Next_Class_Time || '',\n    next_class_name: row.Next_Class_Name || 'your class',\n    last_visit_date: row.Last_Visit_Date || '',\n    membership_type: row.Membership_Type || 'Standard',\n    classes_this_month: parseInt(row.Classes_This_Month || '0'),\n    reminder_sent: row.Reminder_Sent || '',\n    churn_email_sent: row.Churn_Email_Sent || '',\n    status: row.Status || 'Active'\n  };\n\n  // Class reminder: has a class today and reminder not yet sent\n  if (base.next_class_date) {\n    let classDate;\n    try {\n      classDate = new Date(base.next_class_date);\n      classDate.setHours(0,0,0,0);\n    } catch { classDate = null; }\n\n    if (classDate) {\n      const daysUntilClass = Math.round((classDate - now) / (1000 * 60 * 60 * 24));\n      if (daysUntilClass === 1 && base.reminder_sent !== 'Yes') {\n        actions.push({ json: { ...base, _action: 'class_reminder' } });\n      }\n    }\n  }\n\n  // Churn detection: hasn't visited in 14+ days, is active, no churn email sent\n  if (base.last_visit_date && base.status === 'Active') {\n    let lastVisit;\n    try {\n      lastVisit = new Date(base.last_visit_date);\n      lastVisit.setHours(0,0,0,0);\n    } catch { lastVisit = null; }\n\n    if (lastVisit) {\n      const daysSinceVisit = Math.round((now - lastVisit) / (1000 * 60 * 60 * 24));\n      if (daysSinceVisit >= 14 && base.churn_email_sent !== 'Yes') {\n        actions.push({ json: { ...base, _action: 'churn_risk', days_inactive: daysSinceVisit } });\n      }\n    }\n  }\n\n  // Low engagement: fewer than 4 classes this month mid-month (day 15+)\n  const dayOfMonth = now.getDate();\n  if (dayOfMonth >= 15 && base.classes_this_month < 4 && base.status === 'Active' && base.churn_email_sent !== 'Yes') {\n    // only add if not already added for churn\n    const alreadyAdded = actions.find(a => a.json.email === base.email && a.json._action === 'churn_risk');\n    if (!alreadyAdded) {\n      actions.push({ json: { ...base, _action: 'low_engagement' } });\n    }\n  }\n}\n\nconsole.log(`Fitness actions: ${actions.length}`);\nreturn actions.length > 0 ? actions : [{ json: { _action: 'none' } }];"
+      },
+      "id": "me13-0003-0003-0003-000000000003",
+      "name": "Classify Member Actions",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "outputKey": "class_reminder",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json._action }}",
+                    "rightValue": "class_reminder",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "outputKey": "churn_risk",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json._action }}",
+                    "rightValue": "churn_risk",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "outputKey": "low_engagement",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json._action }}",
+                    "rightValue": "low_engagement",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ],
+          "fallbackOutput": "none"
+        },
+        "options": {}
+      },
+      "id": "me13-0004-0004-0004-000000000004",
+      "name": "Route by Action",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_SENDER_EMAIL",
+        "toEmail": "={{ $json.email }}",
+        "subject": "=💪 See you tomorrow — {{ $json.next_class_name }} at {{ $json.next_class_time }}!",
+        "emailType": "html",
+        "message": "=<html><body style=\"font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; background: #f8fafc;\">\n<div style=\"background: white; padding: 32px; border-radius: 12px; border-top: 4px solid #8b5cf6;\">\n  <h2 style=\"color: #1e1b4b;\">Get ready, {{ $json.name }}! 💪</h2>\n  <p>Your class is tomorrow and we can't wait to see you crush it!</p>\n  <div style=\"background: #f5f3ff; padding: 20px; border-radius: 8px; margin: 20px 0;\">\n    <p style=\"margin: 0; font-size: 16px;\"><strong>🏋️ Class:</strong> {{ $json.next_class_name }}</p>\n    <p style=\"margin: 8px 0 0;\"><strong>📅 Date:</strong> {{ $json.next_class_date }}</p>\n    <p style=\"margin: 8px 0 0;\"><strong>🕐 Time:</strong> {{ $json.next_class_time }}</p>\n    <p style=\"margin: 8px 0 0;\"><strong>📍 Location:</strong> REPLACE_WITH_STUDIO_ADDRESS</p>\n  </div>\n  <p><strong>Bring:</strong> Water bottle 💧 | Towel 🏃 | Good vibes ✨</p>\n  <p>Need to cancel? Please let us know <strong>at least 4 hours before</strong> so someone else can grab your spot.</p>\n  <p style=\"text-align: center; margin: 24px 0;\">\n    <a href=\"REPLACE_WITH_CANCEL_URL\" style=\"background: #ef4444; color: white; padding: 10px 24px; border-radius: 6px; text-decoration: none;\">Cancel Spot</a>\n  </p>\n  <p style=\"color: #94a3b8; font-size: 12px;\">— REPLACE_WITH_STUDIO_NAME</p>\n</div>\n</body></html>",
+        "options": {}
+      },
+      "id": "me13-0005-0005-0005-000000000005",
+      "name": "Send Class Reminder",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1160, 120],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID",
+          "name": "SMTP - Motion Elevation"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_SENDER_EMAIL",
+        "toEmail": "={{ $json.email }}",
+        "subject": "=We miss you, {{ $json.name }} 😢 — here's a special offer",
+        "emailType": "html",
+        "message": "=<html><body style=\"font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; background: #f8fafc;\">\n<div style=\"background: white; padding: 32px; border-radius: 12px; border-top: 4px solid #f43f5e;\">\n  <h2 style=\"color: #0f172a;\">We miss you! 😢</h2>\n  <p>Hi {{ $json.name }}, we noticed it's been a little while since we've seen you at REPLACE_WITH_STUDIO_NAME.</p>\n  <p>Life gets busy — we totally get it. But your fitness goals are still waiting! 💪</p>\n  <div style=\"background: #fff1f2; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f43f5e;\">\n    <p style=\"margin: 0; font-size: 18px; color: #be123c;\"><strong>🎁 Come back this week and get a FREE class on us!</strong></p>\n    <p style=\"margin: 8px 0 0; color: #64748b;\">Use code: <strong>COMEBACK{{ $json.name | upcase | slice(0,3) }}</strong> when booking</p>\n  </div>\n  <p style=\"text-align: center; margin: 28px 0;\">\n    <a href=\"REPLACE_WITH_BOOKING_URL\" style=\"background: #f43f5e; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px;\">Book My Free Class →</a>\n  </p>\n  <p style=\"color: #64748b;\">Have questions? Just reply to this email or call us at REPLACE_WITH_STUDIO_PHONE. We're here for you!</p>\n  <p style=\"color: #94a3b8; font-size: 12px;\">— REPLACE_WITH_STUDIO_NAME team</p>\n</div>\n</body></html>",
+        "options": {}
+      },
+      "id": "me13-0006-0006-0006-000000000006",
+      "name": "Send Churn Prevention Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1160, 300],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID",
+          "name": "SMTP - Motion Elevation"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_SENDER_EMAIL",
+        "toEmail": "={{ $json.email }}",
+        "subject": "={{ $json.name }}, you've got {{ $json.classes_this_month }} classes in — let's hit your goal! 🎯",
+        "emailType": "html",
+        "message": "=<html><body style=\"font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; background: #f8fafc;\">\n<div style=\"background: white; padding: 32px; border-radius: 12px; border-top: 4px solid #f59e0b;\">\n  <h2 style=\"color: #0f172a;\">You're halfway through the month! 🎯</h2>\n  <p>Hey {{ $json.name }}, you've attended <strong>{{ $json.classes_this_month }} classes</strong> so far this month. Amazing effort!</p>\n  <p>But there's still time to hit your goal — most members who come <strong>4+ times per month</strong> see the best results. Let's make the most of your {{ $json.membership_type }} membership!</p>\n  <p style=\"text-align: center; margin: 28px 0;\">\n    <a href=\"REPLACE_WITH_SCHEDULE_URL\" style=\"background: #f59e0b; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px;\">📅 View This Week's Classes</a>\n  </p>\n  <p style=\"color: #64748b;\">See you on the mat! 🧘‍♀️</p>\n  <p style=\"color: #94a3b8; font-size: 12px;\">— REPLACE_WITH_STUDIO_NAME</p>\n</div>\n</body></html>",
+        "options": {}
+      },
+      "id": "me13-0007-0007-0007-000000000007",
+      "name": "Send Low Engagement Nudge",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1160, 480],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID",
+          "name": "SMTP - Motion Elevation"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Members",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Reminder_Sent": "Yes"
+          }
+        },
+        "where": {
+          "values": [{ "lookupColumn": "Email", "lookupValue": "={{ $json.email }}" }]
+        },
+        "options": {}
+      },
+      "id": "me13-0008-0008-0008-000000000008",
+      "name": "Mark Reminder Sent",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [1400, 120],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets - Motion Elevation"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Members",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Churn_Email_Sent": "Yes"
+          }
+        },
+        "where": {
+          "values": [{ "lookupColumn": "Email", "lookupValue": "={{ $json.email }}" }]
+        },
+        "options": {}
+      },
+      "id": "me13-0009-0009-0009-000000000009",
+      "name": "Mark Churn Email Sent",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [1400, 390],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets - Motion Elevation"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule: Daily 7am": {
+      "main": [[{ "node": "Read Members Sheet", "type": "main", "index": 0 }]]
+    },
+    "Read Members Sheet": {
+      "main": [[{ "node": "Classify Member Actions", "type": "main", "index": 0 }]]
+    },
+    "Classify Member Actions": {
+      "main": [[{ "node": "Route by Action", "type": "main", "index": 0 }]]
+    },
+    "Route by Action": {
+      "main": [
+        [{ "node": "Send Class Reminder", "type": "main", "index": 0 }],
+        [{ "node": "Send Churn Prevention Email", "type": "main", "index": 0 }],
+        [{ "node": "Send Low Engagement Nudge", "type": "main", "index": 0 }]
+      ]
+    },
+    "Send Class Reminder": {
+      "main": [[{ "node": "Mark Reminder Sent", "type": "main", "index": 0 }]]
+    },
+    "Send Churn Prevention Email": {
+      "main": [[{ "node": "Mark Churn Email Sent", "type": "main", "index": 0 }]]
+    },
+    "Send Low Engagement Nudge": {
+      "main": [[{ "node": "Mark Churn Email Sent", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "tags": ["motion-elevation", "fitness", "studio", "churn-prevention", "class-reminder", "membership"],
+  "meta": {
+    "motionElevation": {
+      "version": "1.0.0",
+      "category": "Fitness & Wellness Automation",
+      "deployTime": "~45 minutes",
+      "credentialsNeeded": ["SMTP", "Google Sheets OAuth2"],
+      "suggestedPrice": "€497 setup + €97/month",
+      "description": "3 flows: day-before class reminder, 14-day churn rescue with free class offer, mid-month low-engagement nudge."
+    }
+  }
+}

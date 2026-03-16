@@ -1,0 +1,266 @@
+{
+  "name": "ME-17 | Coach — Session Prep + Follow-Up Drip",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            { "field": "cronExpression", "expression": "0 8 * * *" }
+          ]
+        }
+      },
+      "id": "me17-0001-0001-0001-000000000001",
+      "name": "Schedule: Daily 8am",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300],
+      "notes": "Runs every morning at 8am to send session prep and post-session follow-up emails."
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "documentId": { "__rl": true, "value": "REPLACE_WITH_GOOGLE_SHEET_ID", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Sessions", "mode": "name" },
+        "filters": {},
+        "options": {}
+      },
+      "id": "me17-0002-0002-0002-000000000002",
+      "name": "Read Sessions Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [460, 300],
+      "credentials": { "googleSheetsOAuth2Api": { "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID", "name": "Google Sheets - Motion Elevation" } },
+      "notes": "Sheet: Sessions. Columns: Client_Name | Client_Email | Session_Date | Session_Time | Session_Number | Focus_Area | Goals | Prep_Email_Sent | Followup_Email_Sent | Day3_Sent | Day7_Sent | Status | Notes"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst now = new Date();\nnow.setHours(0,0,0,0);\n\nconst today = now.toISOString().split('T')[0];\nconst yesterday = new Date(now - 86400000).toISOString().split('T')[0];\nconst threeDaysAgo = new Date(now - 3 * 86400000).toISOString().split('T')[0];\nconst sevenDaysAgo = new Date(now - 7 * 86400000).toISOString().split('T')[0];\n\nconst actions = [];\n\nfor (const item of items) {\n  const row = item.json;\n  if (!row.Client_Email || row.Status === 'Cancelled') continue;\n\n  const base = {\n    client_name: row.Client_Name || 'Friend',\n    client_email: row.Client_Email,\n    session_date: row.Session_Date || '',\n    session_time: row.Session_Time || '',\n    session_number: row.Session_Number || '1',\n    focus_area: row.Focus_Area || 'your goals',\n    goals: row.Goals || '',\n    prep_email_sent: row.Prep_Email_Sent || 'No',\n    followup_email_sent: row.Followup_Email_Sent || 'No',\n    day3_sent: row.Day3_Sent || 'No',\n    day7_sent: row.Day7_Sent || 'No',\n    status: row.Status || 'Scheduled',\n    notes: row.Notes || ''\n  };\n\n  // Prep email: session is tomorrow\n  const tomorrowStr = new Date(now.getTime() + 86400000).toISOString().split('T')[0];\n  if (base.session_date === tomorrowStr && base.prep_email_sent === 'No') {\n    actions.push({ json: { ...base, _action: 'prep_email' } });\n  }\n\n  // Post-session: session was yesterday, status is 'Completed'\n  if (base.session_date === yesterday && base.status === 'Completed' && base.followup_email_sent === 'No') {\n    actions.push({ json: { ...base, _action: 'followup_email' } });\n  }\n\n  // Day 3 accountability check-in\n  if (base.session_date === threeDaysAgo && base.status === 'Completed' && base.day3_sent === 'No') {\n    actions.push({ json: { ...base, _action: 'day3_checkin' } });\n  }\n\n  // Day 7: pre-session reflection + rebook nudge\n  if (base.session_date === sevenDaysAgo && base.status === 'Completed' && base.day7_sent === 'No') {\n    actions.push({ json: { ...base, _action: 'day7_rebook' } });\n  }\n}\n\nconsole.log(`Coach actions: ${actions.length}`);\nreturn actions.length > 0 ? actions : [{ json: { _action: 'none' } }];"
+      },
+      "id": "me17-0003-0003-0003-000000000003",
+      "name": "Classify Session Actions",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "outputKey": "prep_email",
+              "conditions": {
+                "conditions": [{ "leftValue": "={{ $json._action }}", "rightValue": "prep_email", "operator": { "type": "string", "operation": "equals" } }],
+                "combinator": "and"
+              }
+            },
+            {
+              "outputKey": "followup_email",
+              "conditions": {
+                "conditions": [{ "leftValue": "={{ $json._action }}", "rightValue": "followup_email", "operator": { "type": "string", "operation": "equals" } }],
+                "combinator": "and"
+              }
+            },
+            {
+              "outputKey": "day3_checkin",
+              "conditions": {
+                "conditions": [{ "leftValue": "={{ $json._action }}", "rightValue": "day3_checkin", "operator": { "type": "string", "operation": "equals" } }],
+                "combinator": "and"
+              }
+            },
+            {
+              "outputKey": "day7_rebook",
+              "conditions": {
+                "conditions": [{ "leftValue": "={{ $json._action }}", "rightValue": "day7_rebook", "operator": { "type": "string", "operation": "equals" } }],
+                "combinator": "and"
+              }
+            }
+          ],
+          "fallbackOutput": "none"
+        },
+        "options": {}
+      },
+      "id": "me17-0004-0004-0004-000000000004",
+      "name": "Route by Action",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_COACH_EMAIL",
+        "toEmail": "={{ $json.client_email }}",
+        "subject": "=🌅 Preparing for our session tomorrow — {{ $json.focus_area }}",
+        "emailType": "html",
+        "message": "=<html><body style=\"font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; background: #f8fafc;\">\n<div style=\"background: white; padding: 32px; border-radius: 12px; border-top: 4px solid #6366f1;\">\n  <h2 style=\"color: #0f172a;\">Ready for tomorrow? 🌅</h2>\n  <p>Hi {{ $json.client_name }}, I'm looking forward to our Session #{{ $json.session_number }} tomorrow!</p>\n  <div style=\"background: #eef2ff; padding: 20px; border-radius: 8px; margin: 20px 0;\">\n    <p style=\"margin: 0;\"><strong>📅 Date:</strong> {{ $json.session_date }}</p>\n    <p style=\"margin: 8px 0 0;\"><strong>🕐 Time:</strong> {{ $json.session_time }}</p>\n    <p style=\"margin: 8px 0 0;\"><strong>🎯 Focus:</strong> {{ $json.focus_area }}</p>\n    <p style=\"margin: 8px 0 0;\"><strong>🔗 Join link:</strong> <a href=\"REPLACE_WITH_ZOOM_LINK\">REPLACE_WITH_ZOOM_LINK</a></p>\n  </div>\n  <h3 style=\"color: #6366f1;\">✍️ To get the most from our session, reflect on:</h3>\n  <ol style=\"line-height: 2; color: #374151;\">\n    <li>What's one win you've had since our last session?</li>\n    <li>What's one challenge you're still working through?</li>\n    <li>What's the single most important thing you want clarity on tomorrow?</li>\n  </ol>\n  <p>Feel free to jot down your answers and bring them — we'll dive straight in.</p>\n  <p style=\"color: #94a3b8; font-size: 12px;\">— REPLACE_WITH_COACH_NAME | REPLACE_WITH_COACH_WEBSITE</p>\n</div>\n</body></html>",
+        "options": {}
+      },
+      "id": "me17-0005-0005-0005-000000000005",
+      "name": "Send Session Prep Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1160, 60],
+      "credentials": { "smtp": { "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID", "name": "SMTP - Motion Elevation" } }
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_COACH_EMAIL",
+        "toEmail": "={{ $json.client_email }}",
+        "subject": "=✨ Session recap + your action steps",
+        "emailType": "html",
+        "message": "=<html><body style=\"font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; background: #f8fafc;\">\n<div style=\"background: white; padding: 32px; border-radius: 12px; border-top: 4px solid #10b981;\">\n  <h2 style=\"color: #0f172a;\">You showed up — that's everything. ✨</h2>\n  <p>Hi {{ $json.client_name }}, thank you for an incredible session today! Here's your recap:</p>\n  <h3 style=\"color: #10b981;\">🎯 What we covered:</h3>\n  <p style=\"color: #374151;\">{{ $json.notes || 'REPLACE_WITH_SESSION_NOTES' }}</p>\n  <h3 style=\"color: #10b981;\">📋 Your action steps before next session:</h3>\n  <p style=\"color: #374151;\">REPLACE_WITH_ACTION_STEPS_OR_PULL_FROM_NOTES</p>\n  <div style=\"background: #f0fdf4; padding: 16px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #10b981;\">\n    <p style=\"margin: 0; color: #166534;\"><strong>💡 Remember:</strong> Progress happens in the spaces between sessions. Every small action counts!</p>\n  </div>\n  <p>I'll check in with you in a few days. If anything comes up before then, you can always reach me at REPLACE_WITH_COACH_EMAIL.</p>\n  <p style=\"color: #94a3b8; font-size: 12px;\">— REPLACE_WITH_COACH_NAME</p>\n</div>\n</body></html>",
+        "options": {}
+      },
+      "id": "me17-0006-0006-0006-000000000006",
+      "name": "Send Post-Session Recap",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1160, 240],
+      "credentials": { "smtp": { "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID", "name": "SMTP - Motion Elevation" } }
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_COACH_EMAIL",
+        "toEmail": "={{ $json.client_email }}",
+        "subject": "=👋 3-day check-in — how are the action steps going?",
+        "emailType": "html",
+        "message": "=<html><body style=\"font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; background: #f8fafc;\">\n<div style=\"background: white; padding: 32px; border-radius: 12px; border-top: 4px solid #f59e0b;\">\n  <h2 style=\"color: #0f172a;\">3-Day Check-In 👋</h2>\n  <p>Hi {{ $json.client_name }}, it's been 3 days since our session on <strong>{{ $json.focus_area }}</strong>.</p>\n  <p>Quick questions — and be honest with yourself:</p>\n  <ol style=\"line-height: 2; color: #374151;\">\n    <li>How have the action steps been going?</li>\n    <li>What's been harder than expected?</li>\n    <li>What's surprised you in a good way?</li>\n  </ol>\n  <p>You don't need to reply (though I love hearing from you!) — just sit with these questions for a few minutes. Reflection is where growth happens. 🌱</p>\n  <p style=\"color: #64748b;\">Having a challenge? Just hit reply and let me know — I'm here for you.</p>\n  <p style=\"color: #94a3b8; font-size: 12px;\">— REPLACE_WITH_COACH_NAME</p>\n</div>\n</body></html>",
+        "options": {}
+      },
+      "id": "me17-0007-0007-0007-000000000007",
+      "name": "Send Day 3 Check-In",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1160, 420],
+      "credentials": { "smtp": { "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID", "name": "SMTP - Motion Elevation" } }
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_COACH_EMAIL",
+        "toEmail": "={{ $json.client_email }}",
+        "subject": "=One week on — ready to go deeper? 🚀",
+        "emailType": "html",
+        "message": "=<html><body style=\"font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; background: #f8fafc;\">\n<div style=\"background: white; padding: 32px; border-radius: 12px; border-top: 4px solid #6366f1;\">\n  <h2 style=\"color: #0f172a;\">One week since our session 🚀</h2>\n  <p>Hi {{ $json.client_name }}, it's been a week since we worked on <strong>{{ $json.focus_area }}</strong> together. Time flies!</p>\n  <p>This is a good moment to reflect on what's shifted for you — even the subtle things matter.</p>\n  <h3 style=\"color: #6366f1;\">Your week in review:</h3>\n  <ul style=\"line-height: 2; color: #374151;\">\n    <li>What progress (big or small) have you made?</li>\n    <li>What's the next level you want to reach?</li>\n    <li>What would be possible if you had another session this week?</li>\n  </ul>\n  <p>If you're ready to keep the momentum going, let's book our next session:</p>\n  <p style=\"text-align: center; margin: 28px 0;\">\n    <a href=\"REPLACE_WITH_BOOKING_URL\" style=\"background: #6366f1; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px;\">Book Session #{{ parseInt($json.session_number) + 1 }} →</a>\n  </p>\n  <p style=\"color: #64748b;\">Not sure yet? Completely fine — just hit reply and let me know where you're at. No pressure, ever.</p>\n  <p style=\"color: #94a3b8; font-size: 12px;\">— REPLACE_WITH_COACH_NAME | REPLACE_WITH_COACH_WEBSITE</p>\n</div>\n</body></html>",
+        "options": {}
+      },
+      "id": "me17-0008-0008-0008-000000000008",
+      "name": "Send Day 7 Rebook Nudge",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1160, 600],
+      "credentials": { "smtp": { "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID", "name": "SMTP - Motion Elevation" } }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": { "__rl": true, "value": "REPLACE_WITH_GOOGLE_SHEET_ID", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Sessions", "mode": "name" },
+        "columns": { "mappingMode": "defineBelow", "value": { "Prep_Email_Sent": "Yes" } },
+        "where": { "values": [{ "lookupColumn": "Client_Email", "lookupValue": "={{ $json.client_email }}" }, { "lookupColumn": "Session_Date", "lookupValue": "={{ $json.session_date }}" }] },
+        "options": {}
+      },
+      "id": "me17-0009-0009-0009-000000000009",
+      "name": "Mark Prep Sent",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [1400, 60],
+      "credentials": { "googleSheetsOAuth2Api": { "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID", "name": "Google Sheets - Motion Elevation" } }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": { "__rl": true, "value": "REPLACE_WITH_GOOGLE_SHEET_ID", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Sessions", "mode": "name" },
+        "columns": { "mappingMode": "defineBelow", "value": { "Followup_Email_Sent": "Yes" } },
+        "where": { "values": [{ "lookupColumn": "Client_Email", "lookupValue": "={{ $json.client_email }}" }, { "lookupColumn": "Session_Date", "lookupValue": "={{ $json.session_date }}" }] },
+        "options": {}
+      },
+      "id": "me17-0010-0010-0010-000000000010",
+      "name": "Mark Followup Sent",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [1400, 240],
+      "credentials": { "googleSheetsOAuth2Api": { "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID", "name": "Google Sheets - Motion Elevation" } }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": { "__rl": true, "value": "REPLACE_WITH_GOOGLE_SHEET_ID", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Sessions", "mode": "name" },
+        "columns": { "mappingMode": "defineBelow", "value": { "Day3_Sent": "Yes" } },
+        "where": { "values": [{ "lookupColumn": "Client_Email", "lookupValue": "={{ $json.client_email }}" }, { "lookupColumn": "Session_Date", "lookupValue": "={{ $json.session_date }}" }] },
+        "options": {}
+      },
+      "id": "me17-0011-0011-0011-000000000011",
+      "name": "Mark Day3 Sent",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [1400, 420],
+      "credentials": { "googleSheetsOAuth2Api": { "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID", "name": "Google Sheets - Motion Elevation" } }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": { "__rl": true, "value": "REPLACE_WITH_GOOGLE_SHEET_ID", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Sessions", "mode": "name" },
+        "columns": { "mappingMode": "defineBelow", "value": { "Day7_Sent": "Yes" } },
+        "where": { "values": [{ "lookupColumn": "Client_Email", "lookupValue": "={{ $json.client_email }}" }, { "lookupColumn": "Session_Date", "lookupValue": "={{ $json.session_date }}" }] },
+        "options": {}
+      },
+      "id": "me17-0012-0012-0012-000000000012",
+      "name": "Mark Day7 Sent",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [1400, 600],
+      "credentials": { "googleSheetsOAuth2Api": { "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID", "name": "Google Sheets - Motion Elevation" } }
+    }
+  ],
+  "connections": {
+    "Schedule: Daily 8am": {
+      "main": [[{ "node": "Read Sessions Sheet", "type": "main", "index": 0 }]]
+    },
+    "Read Sessions Sheet": {
+      "main": [[{ "node": "Classify Session Actions", "type": "main", "index": 0 }]]
+    },
+    "Classify Session Actions": {
+      "main": [[{ "node": "Route by Action", "type": "main", "index": 0 }]]
+    },
+    "Route by Action": {
+      "main": [
+        [{ "node": "Send Session Prep Email", "type": "main", "index": 0 }],
+        [{ "node": "Send Post-Session Recap", "type": "main", "index": 0 }],
+        [{ "node": "Send Day 3 Check-In", "type": "main", "index": 0 }],
+        [{ "node": "Send Day 7 Rebook Nudge", "type": "main", "index": 0 }]
+      ]
+    },
+    "Send Session Prep Email": {
+      "main": [[{ "node": "Mark Prep Sent", "type": "main", "index": 0 }]]
+    },
+    "Send Post-Session Recap": {
+      "main": [[{ "node": "Mark Followup Sent", "type": "main", "index": 0 }]]
+    },
+    "Send Day 3 Check-In": {
+      "main": [[{ "node": "Mark Day3 Sent", "type": "main", "index": 0 }]]
+    },
+    "Send Day 7 Rebook Nudge": {
+      "main": [[{ "node": "Mark Day7 Sent", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "tags": ["motion-elevation", "coaching", "session-prep", "follow-up", "client-retention", "drip"],
+  "meta": {
+    "motionElevation": {
+      "version": "1.0.0",
+      "category": "Coaching Automation",
+      "deployTime": "~45 minutes",
+      "credentialsNeeded": ["SMTP", "Google Sheets OAuth2"],
+      "suggestedPrice": "€497 setup + €97/month",
+      "description": "4-email sequence per session: Day -1 prep, Day +0 recap, Day +3 accountability, Day +7 rebook nudge. Coaches love this."
+    }
+  }
+}

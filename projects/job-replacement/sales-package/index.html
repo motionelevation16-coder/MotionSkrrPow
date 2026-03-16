@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Motion Elevation – KI-Automatisierungen für Solopreneure und KMU im DACH-Raum. Wir bauen Workflows, die für dich arbeiten." />
+  <title>Motion Elevation — Dein Unternehmen. Automatisiert.</title>
+  <style>
+    /* ==================== RESET & BASE ==================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0b0f;
+      --bg-2: #0f1117;
+      --bg-card: #13161e;
+      --border: #1e2230;
+      --blue: #3b82f6;
+      --blue-light: #60a5fa;
+      --green: #10b981;
+      --green-light: #34d399;
+      --accent: #6366f1;
+      --text: #f0f2f7;
+      --text-muted: #8b92a9;
+      --text-dim: #4a5168;
+      --gradient-hero: linear-gradient(135deg, #3b82f6 0%, #10b981 100%);
+      --gradient-cta: linear-gradient(135deg, #6366f1 0%, #3b82f6 100%);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ==================== TYPOGRAPHY ==================== */
+    h1, h2, h3, h4 { line-height: 1.2; font-weight: 700; letter-spacing: -0.02em; }
+    h1 { font-size: clamp(2.4rem, 6vw, 4.5rem); }
+    h2 { font-size: clamp(1.8rem, 4vw, 2.8rem); }
+    h3 { font-size: 1.25rem; }
+    p { color: var(--text-muted); }
+
+    .gradient-text {
+      background: var(--gradient-hero);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ==================== LAYOUT ==================== */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    section { padding: 96px 0; }
+
+    .section-label {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--green);
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      border-radius: 100px;
+      padding: 4px 14px;
+      margin-bottom: 20px;
+    }
+
+    /* ==================== BUTTONS ==================== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: var(--gradient-hero);
+      color: #fff;
+      box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 50px rgba(59, 130, 246, 0.5);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-outline:hover {
+      border-color: var(--blue);
+      color: var(--blue-light);
+      background: rgba(59, 130, 246, 0.05);
+    }
+
+    .btn-large {
+      padding: 18px 40px;
+      font-size: 1.1rem;
+      border-radius: 14px;
+    }
+
+    /* ==================== NAVBAR ==================== */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 16px 0;
+      background: rgba(10, 11, 15, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      transition: background 0.3s ease;
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--gradient-hero);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .logo-text {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .logo-text span {
+      color: var(--blue-light);
+    }
+
+    /* ==================== HERO ==================== */
+    #hero {
+      padding-top: 160px;
+      padding-bottom: 100px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-glow {
+      position: absolute;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 600px;
+      background: radial-gradient(ellipse at center, rgba(59,130,246,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-glow-2 {
+      position: absolute;
+      top: 100px;
+      right: -200px;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(ellipse at center, rgba(16,185,129,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      text-align: center;
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 6px 16px;
+      margin-bottom: 28px;
+    }
+
+    .hero-badge .dot {
+      width: 6px;
+      height: 6px;
+      background: var(--green);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    #hero h1 { margin-bottom: 24px; }
+
+    .hero-sub {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      margin-bottom: 40px;
+      line-height: 1.7;
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 48px;
+      justify-content: center;
+      margin-top: 64px;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 800;
+      background: var(--gradient-hero);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+    }
+
+    /* ==================== PROBLEM ==================== */
+    #problem { background: var(--bg-2); }
+
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin-top: 56px;
+    }
+
+    .problem-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      transition: border-color 0.2s ease;
+    }
+
+    .problem-card:hover { border-color: rgba(59,130,246,0.3); }
+
+    .problem-emoji {
+      font-size: 2.5rem;
+      display: block;
+      margin-bottom: 16px;
+    }
+
+    .problem-card h3 {
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+
+    .problem-card p { font-size: 0.95rem; }
+
+    /* ==================== SOLUTION ==================== */
+    #solution { }
+
+    .solution-header {
+      text-align: center;
+      max-width: 640px;
+      margin: 0 auto 64px;
+    }
+
+    .solution-header h2 { margin-bottom: 16px; }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px 32px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(99, 102, 241, 0.4);
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--gradient-hero);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .feature-card:hover::before { opacity: 1; }
+
+    .feature-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+    }
+
+    .icon-blue { background: rgba(59,130,246,0.15); }
+    .icon-green { background: rgba(16,185,129,0.15); }
+    .icon-purple { background: rgba(99,102,241,0.15); }
+
+    .feature-card h3 {
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+
+    .feature-card p { font-size: 0.95rem; line-height: 1.7; }
+
+    .feature-tag {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--blue-light);
+      background: rgba(59,130,246,0.1);
+      border-radius: 6px;
+      padding: 3px 10px;
+      margin-top: 16px;
+    }
+
+    /* ==================== HOW IT WORKS ==================== */
+    #how-it-works { background: var(--bg-2); }
+
+    .how-header {
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto 64px;
+    }
+
+    .how-header h2 { margin-bottom: 16px; }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 0;
+      position: relative;
+    }
+
+    .steps::before {
+      content: '';
+      position: absolute;
+      top: 36px;
+      left: calc(16.66% + 36px);
+      right: calc(16.66% + 36px);
+      height: 2px;
+      background: linear-gradient(90deg, var(--blue), var(--green));
+      opacity: 0.3;
+    }
+
+    .step {
+      text-align: center;
+      padding: 0 24px;
+      position: relative;
+    }
+
+    .step-number {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      font-size: 1.5rem;
+      font-weight: 800;
+      position: relative;
+      z-index: 1;
+    }
+
+    .step:nth-child(1) .step-number { border-color: var(--blue); color: var(--blue); }
+    .step:nth-child(2) .step-number { border-color: var(--accent); color: var(--accent); }
+    .step:nth-child(3) .step-number { border-color: var(--green); color: var(--green); }
+
+    .step h3 { color: var(--text); margin-bottom: 12px; }
+
+    /* ==================== PRICING ==================== */
+    #pricing { }
+
+    .pricing-header {
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto 56px;
+    }
+
+    .pricing-header h2 { margin-bottom: 16px; }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      align-items: start;
+    }
+
+    .pricing-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px 32px;
+      transition: transform 0.2s ease;
+    }
+
+    .pricing-card:hover { transform: translateY(-4px); }
+
+    .pricing-card.featured {
+      border-color: var(--blue);
+      background: linear-gradient(180deg, rgba(59,130,246,0.08) 0%, var(--bg-card) 100%);
+      position: relative;
+    }
+
+    .pricing-badge {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--gradient-hero);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 4px 16px;
+      border-radius: 100px;
+      white-space: nowrap;
+    }
+
+    .plan-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .plan-price {
+      margin-bottom: 8px;
+    }
+
+    .plan-price .amount {
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .plan-price .period {
+      font-size: 1rem;
+      color: var(--text-muted);
+    }
+
+    .plan-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+      padding-bottom: 28px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .plan-features {
+      list-style: none;
+      margin-bottom: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .plan-features li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+
+    .plan-features li::before {
+      content: '✓';
+      color: var(--green);
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .btn-plan {
+      display: block;
+      text-align: center;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-plan-primary {
+      background: var(--gradient-hero);
+      color: #fff;
+    }
+
+    .btn-plan-primary:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .btn-plan-outline {
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+
+    .btn-plan-outline:hover {
+      border-color: var(--blue);
+      color: var(--blue-light);
+    }
+
+    /* ==================== TESTIMONIALS ==================== */
+    #testimonials { background: var(--bg-2); }
+
+    .testimonials-header {
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto 56px;
+    }
+
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+
+    .testimonial-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px;
+      transition: border-color 0.2s ease;
+    }
+
+    .testimonial-card:hover { border-color: rgba(59,130,246,0.25); }
+
+    .stars {
+      color: #f59e0b;
+      font-size: 1rem;
+      margin-bottom: 16px;
+      letter-spacing: 2px;
+    }
+
+    .testimonial-text {
+      font-size: 1rem;
+      color: var(--text);
+      line-height: 1.7;
+      margin-bottom: 24px;
+      font-style: italic;
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .author-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .av-blue { background: linear-gradient(135deg, #3b82f6, #6366f1); }
+    .av-green { background: linear-gradient(135deg, #10b981, #3b82f6); }
+    .av-purple { background: linear-gradient(135deg, #6366f1, #ec4899); }
+
+    .author-name {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .author-role {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    /* ==================== CTA SECTION ==================== */
+    #cta { }
+
+    .cta-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 80px 48px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-box::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(59,130,246,0.12) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .cta-box h2 { margin-bottom: 16px; }
+    .cta-box p { font-size: 1.1rem; max-width: 520px; margin: 0 auto 40px; }
+
+    .cta-note {
+      margin-top: 20px;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+    }
+
+    /* ==================== FOOTER ==================== */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 0;
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      text-decoration: none;
+      font-size: 0.875rem;
+      color: var(--text-dim);
+      transition: color 0.2s ease;
+    }
+
+    .footer-links a:hover { color: var(--text-muted); }
+
+    .footer-copy {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    /* ==================== RESPONSIVE ==================== */
+    @media (max-width: 768px) {
+      section { padding: 72px 0; }
+      .hero-stats { gap: 32px; }
+      .steps::before { display: none; }
+      .cta-box { padding: 48px 24px; }
+      .footer-inner { flex-direction: column; align-items: flex-start; }
+    }
+
+    @media (max-width: 480px) {
+      .hero-ctas { flex-direction: column; align-items: center; }
+      .btn-large { width: 100%; text-align: center; justify-content: center; }
+    }
+
+    /* ==================== MISC ==================== */
+    .text-center { text-align: center; }
+
+    .divider {
+      width: 48px;
+      height: 3px;
+      background: var(--gradient-hero);
+      border-radius: 2px;
+      margin: 20px auto 0;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ==================== NAVBAR ==================== -->
+<nav>
+  <div class="container">
+    <div class="nav-inner">
+      <a href="#" class="logo">
+        <div class="logo-icon">⚡</div>
+        <span class="logo-text">Motion <span>Elevation</span></span>
+      </a>
+      <a href="#cta" class="btn btn-outline" style="padding: 10px 22px; font-size: 0.9rem;">Kontakt</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ==================== HERO ==================== -->
+<section id="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-glow-2"></div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="dot"></span>
+        Verfügbar im DACH-Raum · Einrichtung in 48 Stunden
+      </div>
+      <h1>
+        Dein Unternehmen.<br>
+        <span class="gradient-text">Automatisiert.</span>
+      </h1>
+      <p class="hero-sub">
+        Wir bauen KI-Automatisierungen, die für dich arbeiten —<br>
+        24/7, fehlerfrei, skalierbar.
+      </p>
+      <div class="hero-ctas">
+        <a href="#cta" class="btn btn-primary btn-large">
+          Kostenloses Erstgespräch buchen →
+        </a>
+        <a href="#how-it-works" class="btn btn-outline btn-large">
+          Wie es funktioniert
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <div class="stat-number">48h</div>
+          <div class="stat-label">Einrichtungszeit</div>
+        </div>
+        <div class="stat">
+          <div class="stat-number">24/7</div>
+          <div class="stat-label">Läuft automatisch</div>
+        </div>
+        <div class="stat">
+          <div class="stat-number">€0</div>
+          <div class="stat-label">Erstgespräch</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== PROBLEM ==================== -->
+<section id="problem">
+  <div class="container">
+    <div class="text-center" style="max-width: 600px; margin: 0 auto 56px;">
+      <span class="section-label">Das Problem</span>
+      <h2>Du verlierst täglich Zeit und Geld —<br>ohne es zu merken.</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <span class="problem-emoji">⏰</span>
+        <h3>Zu viel Zeit mit manuellen Aufgaben</h3>
+        <p>Termine eintragen, Kunden per Hand erinnern, Rechnungen nachverfolgen — das frisst deine wertvollste Ressource: Zeit.</p>
+      </div>
+      <div class="problem-card">
+        <span class="problem-emoji">💸</span>
+        <h3>Umsatzverluste durch langsame Prozesse</h3>
+        <p>Jede Stunde ohne automatisches Follow-up ist eine verpasste Chance. Kunden kaufen beim Schnellsten — nicht beim Besten.</p>
+      </div>
+      <div class="problem-card">
+        <span class="problem-emoji">😤</span>
+        <h3>Kein System, das für dich skaliert</h3>
+        <p>Was bei 10 Kunden funktioniert, kollabiert bei 50. Ohne Automatisierung wächst dein Aufwand mit jedem neuen Kunden.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SOLUTION ==================== -->
+<section id="solution">
+  <div class="container">
+    <div class="solution-header">
+      <span class="section-label">Die Lösung</span>
+      <h2>Wir automatisieren deinen Workflow —<br><span class="gradient-text">in 48 Stunden.</span></h2>
+      <p style="margin-top: 16px;">Kein Tool-Dschungel. Kein IT-Aufwand. Einfach ein System, das läuft.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon icon-blue">🤖</div>
+        <h3>Customer Support Automation</h3>
+        <p>Automatische Antworten auf häufige Kundenanfragen — rund um die Uhr, auf allen Kanälen. Dein Kunde bekommt sofort eine Antwort. Du schläfst durch.</p>
+        <span class="feature-tag">→ Terminbuchung · Anfragen · FAQ</span>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon icon-green">📣</div>
+        <h3>Marketing Automation</h3>
+        <p>Lead-Magneten, E-Mail-Sequenzen, Social-Media-Posts — alles läuft automatisch. Vom ersten Kontakt bis zum kaufbereiten Kunden, ohne deinen Eingriff.</p>
+        <span class="feature-tag">→ E-Mail Flows · Lead Nurturing · Content</span>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon icon-purple">💼</div>
+        <h3>Sales Automation</h3>
+        <p>Automatisches Follow-up, Angebotsprozesse, Kunden-Onboarding — dein Vertrieb läuft im Hintergrund weiter, auch wenn du nicht am Laptop sitzt.</p>
+        <span class="feature-tag">→ CRM · Follow-up · Onboarding</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== HOW IT WORKS ==================== -->
+<section id="how-it-works">
+  <div class="container">
+    <div class="how-header">
+      <span class="section-label">So funktioniert's</span>
+      <h2>Drei Schritte bis zum laufenden System</h2>
+      <p style="margin-top: 16px;">Kein Aufwand auf deiner Seite. Wir bauen, du profitierst.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-number">1</div>
+        <h3>Kostenloses Gespräch</h3>
+        <p>Wir analysieren deine aktuellen Prozesse und identifizieren, wo Automatisierung dir am meisten bringt.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">2</div>
+        <h3>Wir bauen</h3>
+        <p>Unser Team baut deinen individuellen Workflow in 48 Stunden. Du bekommst ein fertiges, getestetes System.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <h3>Du wächst</h3>
+        <p>Dein System läuft 24/7. Wir überwachen und optimieren es monatlich. Du fokussierst dich aufs Wesentliche.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== PRICING ==================== -->
+<section id="pricing">
+  <div class="container">
+    <div class="pricing-header">
+      <span class="section-label">Preise</span>
+      <h2>Transparent. Fair. Skalierbar.</h2>
+      <p style="margin-top: 16px;">Keine versteckten Kosten. Keine langen Verträge. Kündbar monatlich.</p>
+    </div>
+    <div class="pricing-grid">
+
+      <!-- Starter -->
+      <div class="pricing-card">
+        <div class="plan-name">Starter</div>
+        <div class="plan-price">
+          <span class="amount">€297</span>
+          <span class="period">/Monat</span>
+        </div>
+        <p class="plan-desc">Perfekt für Solopreneure und kleine Betriebe, die mit Automatisierung starten wollen.</p>
+        <ul class="plan-features">
+          <li>1 maßgeschneiderter Automation-Workflow</li>
+          <li>Setup & Integration (48h Turnaround)</li>
+          <li>Monatliches Check-in & Monitoring</li>
+          <li>E-Mail Support</li>
+          <li>Kostenloser Onboarding-Call</li>
+        </ul>
+        <a href="#cta" class="btn-plan btn-plan-outline">Jetzt starten →</a>
+      </div>
+
+      <!-- Growth -->
+      <div class="pricing-card featured">
+        <div class="pricing-badge">⭐ Beliebteste Wahl</div>
+        <div class="plan-name">Growth</div>
+        <div class="plan-price">
+          <span class="amount">€697</span>
+          <span class="period">/Monat</span>
+        </div>
+        <p class="plan-desc">Für wachsende Unternehmen, die mehrere Prozesse automatisieren und skalieren wollen.</p>
+        <ul class="plan-features">
+          <li>3 maßgeschneiderte Automation-Workflows</li>
+          <li>Priority Setup (24h Turnaround)</li>
+          <li>Monatliche Optimierung & Reports</li>
+          <li>Priority E-Mail + Chat Support</li>
+          <li>Quartalsstrategie-Call</li>
+          <li>Integration mit deinen bestehenden Tools</li>
+        </ul>
+        <a href="#cta" class="btn-plan btn-plan-primary">Jetzt starten →</a>
+      </div>
+
+      <!-- Scale -->
+      <div class="pricing-card">
+        <div class="plan-name">Scale</div>
+        <div class="plan-price">
+          <span class="amount">€1.497</span>
+          <span class="period">/Monat</span>
+        </div>
+        <p class="plan-desc">Für ambitionierte Unternehmen, die ihr gesamtes Business automatisieren wollen.</p>
+        <ul class="plan-features">
+          <li>Vollständiges Automation-Stack Setup</li>
+          <li>Unbegrenzte Workflows</li>
+          <li>Dedizierter Account Manager</li>
+          <li>24/7 Support & Monitoring</li>
+          <li>Custom API-Integrationen</li>
+          <li>Monatliche Strategy Sessions</li>
+        </ul>
+        <a href="#cta" class="btn-plan btn-plan-outline">Jetzt starten →</a>
+      </div>
+
+    </div>
+    <p style="text-align: center; margin-top: 32px; font-size: 0.85rem; color: var(--text-dim);">
+      Alle Pläne monatlich kündbar · Kostenloser Ersttermin · Kein Risiko
+    </p>
+  </div>
+</section>
+
+<!-- ==================== TESTIMONIALS ==================== -->
+<section id="testimonials">
+  <div class="container">
+    <div class="testimonials-header">
+      <span class="section-label">Kundenstimmen</span>
+      <h2>Was unsere Kunden sagen</h2>
+    </div>
+    <div class="testimonials-grid">
+
+      <div class="testimonial-card">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">
+          "Ich habe wöchentlich ca. 8 Stunden mit manuellem Kunden-Onboarding verbracht. Seit Motion Elevation das automatisiert hat, läuft alles von selbst — und ich habe endlich Zeit für die Arbeit, für die Kunden mich eigentlich bezahlen."
+        </p>
+        <div class="testimonial-author">
+          <div class="author-avatar av-blue">MK</div>
+          <div>
+            <div class="author-name">Markus Kellner</div>
+            <div class="author-role">Business Coach, München</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">
+          "Unser Onlineshop hat im ersten Monat nach der Einrichtung 12% mehr Umsatz gemacht — rein durch den Abandoned Cart Flow und die Post-Purchase Sequence. Das hat sich nach 3 Wochen amortisiert."
+        </p>
+        <div class="testimonial-author">
+          <div class="author-avatar av-green">SB</div>
+          <div>
+            <div class="author-name">Sarah Berger</div>
+            <div class="author-role">E-Commerce Gründerin, Wien</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">
+          "Als Friseursalon haben wir das No-Show-Problem seit Jahren. Jetzt bekommen Kunden automatisch Erinnerungen — die No-Show-Rate ist um 80% gesunken. Unglaublich, dass wir das nicht früher gemacht haben."
+        </p>
+        <div class="testimonial-author">
+          <div class="author-avatar av-purple">TH</div>
+          <div>
+            <div class="author-name">Thomas Huber</div>
+            <div class="author-role">Salon-Inhaber, Zürich</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ==================== CTA ==================== -->
+<section id="cta">
+  <div class="container">
+    <div class="cta-box">
+      <span class="section-label">Bereit loszulegen?</span>
+      <h2 style="margin-top: 16px;">Dein erster Workflow<br><span class="gradient-text">in 48 Stunden.</span></h2>
+      <p>Kostenloses Erstgespräch — kein Pitch, kein Druck. Wir schauen uns an, was bei dir automatisiert werden kann und ob wir passen.</p>
+      <a href="mailto:hello@motion-elevation.com" class="btn btn-primary btn-large">
+        Kostenloses Erstgespräch buchen →
+      </a>
+      <p class="cta-note">⚡ Durchschnittliche Antwortzeit: unter 2 Stunden</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== FOOTER ==================== -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <a href="#" class="logo">
+        <div class="logo-icon" style="width: 28px; height: 28px; font-size: 14px;">⚡</div>
+        <span class="logo-text" style="font-size: 0.95rem;">Motion <span>Elevation</span></span>
+      </a>
+      <div class="footer-links">
+        <a href="#solution">Leistungen</a>
+        <a href="#pricing">Preise</a>
+        <a href="#cta">Kontakt</a>
+        <a href="#">Impressum</a>
+        <a href="#">Datenschutz</a>
+      </div>
+      <p class="footer-copy">© 2025 Motion Elevation. Alle Rechte vorbehalten.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ==================== SMOOTH SCROLL + NAV SHADOW ==================== -->
+<script>
+  // Add shadow to nav on scroll
+  const nav = document.querySelector('nav');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 50) {
+      nav.style.background = 'rgba(10, 11, 15, 0.95)';
+      nav.style.borderBottomColor = 'rgba(255,255,255,0.08)';
+    } else {
+      nav.style.background = 'rgba(10, 11, 15, 0.8)';
+      nav.style.borderBottomColor = 'rgba(255,255,255,0.04)';
+    }
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,683 @@
+{
+  "name": "ME-11 | Appointment Reminder + No-Show Recovery",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 * * * *"
+            }
+          ]
+        }
+      },
+      "id": "a1b2c3d4-1101-1101-1101-110000000001",
+      "name": "Schedule: Every Hour",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300],
+      "notes": "Runs every hour to check for upcoming appointments and no-shows. Reduce to every 30min for higher volume."
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Appointments",
+          "mode": "name"
+        },
+        "filters": {},
+        "options": {}
+      },
+      "id": "a1b2c3d4-1102-1102-1102-110000000002",
+      "name": "Read Appointments Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [460, 300],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets - Motion Elevation"
+        }
+      },
+      "notes": "SETUP: Create sheet tab 'Appointments' with columns: Name | Email | Phone | Date | Time | Status | Reminder_24h_Sent | Reminder_2h_Sent | Survey_Sent | Notes"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Classify each appointment based on timing and status\nconst items = $input.all();\nconst now = new Date();\n\nconst results = {\n  send_24h_reminder: [],\n  send_2h_reminder: [],\n  check_noshow: [],\n  send_survey: []\n};\n\nfor (const item of items) {\n  const row = item.json;\n  const status = (row.Status || '').trim().toLowerCase();\n  \n  // Skip cancelled or already-processed\n  if (['cancelled', 'canceled', 'no-show processed'].includes(status)) continue;\n  \n  // Parse appointment datetime\n  let apptDateTime;\n  try {\n    // Try combining Date + Time columns\n    const dateStr = row.Date || '';\n    const timeStr = row.Time || '09:00';\n    apptDateTime = new Date(`${dateStr} ${timeStr}`);\n    if (isNaN(apptDateTime)) throw new Error('Invalid date');\n  } catch {\n    continue; // Skip rows with invalid dates\n  }\n  \n  const msUntilAppt = apptDateTime - now;\n  const hoursUntilAppt = msUntilAppt / (1000 * 60 * 60);\n  const msSinceAppt = now - apptDateTime;\n  const minutesSinceAppt = msSinceAppt / (1000 * 60);\n  \n  const common = {\n    name: row.Name,\n    email: row.Email,\n    phone: row.Phone,\n    date: row.Date,\n    time: row.Time,\n    status: row.Status,\n    reminder_24h_sent: row.Reminder_24h_Sent,\n    reminder_2h_sent: row.Reminder_2h_Sent,\n    survey_sent: row.Survey_Sent,\n    _appt_datetime: apptDateTime.toISOString()\n  };\n  \n  // 24h reminder: 23-25 hours before, not yet sent\n  if (hoursUntilAppt >= 23 && hoursUntilAppt <= 25 && row.Reminder_24h_Sent !== 'Yes') {\n    results.send_24h_reminder.push({ json: common });\n  }\n  \n  // 2h reminder: 1.75-2.25 hours before, not yet sent\n  if (hoursUntilAppt >= 1.75 && hoursUntilAppt <= 2.25 && row.Reminder_2h_Sent !== 'Yes') {\n    results.send_2h_reminder.push({ json: common });\n  }\n  \n  // No-show check: 30-90 minutes after appointment, status still not 'Attended'\n  if (minutesSinceAppt >= 30 && minutesSinceAppt <= 90 && \n      status !== 'attended' && row.Reminder_24h_Sent === 'Yes') {\n    results.check_noshow.push({ json: common });\n  }\n  \n  // Survey: 2-3 hours after appointment, status is 'Attended', survey not sent\n  if (minutesSinceAppt >= 120 && minutesSinceAppt <= 180 && \n      status === 'attended' && row.Survey_Sent !== 'Yes') {\n    results.send_survey.push({ json: common });\n  }\n}\n\n// Return all appointments that need action, tagged with action type\nconst allActions = [\n  ...results.send_24h_reminder.map(i => ({ json: { ...i.json, _action: '24h_reminder' } })),\n  ...results.send_2h_reminder.map(i => ({ json: { ...i.json, _action: '2h_reminder' } })),\n  ...results.check_noshow.map(i => ({ json: { ...i.json, _action: 'noshow' } })),\n  ...results.send_survey.map(i => ({ json: { ...i.json, _action: 'survey' } }))\n];\n\nconsole.log(`Actions needed: 24h=${results.send_24h_reminder.length}, 2h=${results.send_2h_reminder.length}, noshow=${results.check_noshow.length}, survey=${results.send_survey.length}`);\n\nreturn allActions.length > 0 ? allActions : [{ json: { _action: 'none', message: 'No appointments need action right now.' } }];"
+      },
+      "id": "a1b2c3d4-1103-1103-1103-110000000003",
+      "name": "Classify Appointments",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "outputKey": "24h_reminder",
+              "conditions": {
+                "options": {
+                  "caseSensitive": false
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json._action }}",
+                    "rightValue": "24h_reminder",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "outputKey": "2h_reminder",
+              "conditions": {
+                "options": {
+                  "caseSensitive": false
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json._action }}",
+                    "rightValue": "2h_reminder",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "outputKey": "noshow",
+              "conditions": {
+                "options": {
+                  "caseSensitive": false
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json._action }}",
+                    "rightValue": "noshow",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "outputKey": "survey",
+              "conditions": {
+                "options": {
+                  "caseSensitive": false
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json._action }}",
+                    "rightValue": "survey",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ],
+          "fallbackOutput": "none"
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-1104-1104-1104-110000000004",
+      "name": "Route by Action",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_SENDER_EMAIL",
+        "toEmail": "={{ $json.email }}",
+        "subject": "=📅 Reminder: Your appointment tomorrow at {{ $json.time }}",
+        "emailType": "html",
+        "message": "=<html><body style=\"font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px;\">\n<div style=\"background: white; padding: 30px; border-radius: 12px; border-top: 4px solid #3b82f6;\">\n  <h2 style=\"color: #1a1a2e;\">📅 Appointment Reminder</h2>\n  <p>Hi {{ $json.name }}, just a friendly reminder about your upcoming appointment:</p>\n  <div style=\"background: #f0f4ff; padding: 20px; border-radius: 8px; margin: 20px 0;\">\n    <p style=\"margin: 0;\"><strong>📅 Date:</strong> {{ $json.date }}</p>\n    <p style=\"margin: 8px 0 0;\"><strong>🕐 Time:</strong> {{ $json.time }}</p>\n    <p style=\"margin: 8px 0 0;\"><strong>📍 Location:</strong> REPLACE_WITH_LOCATION_OR_LINK</p>\n  </div>\n  <p>Need to reschedule? Please let us know at least 4 hours in advance.</p>\n  <p style=\"text-align: center; margin: 25px 0;\">\n    <a href=\"REPLACE_WITH_RESCHEDULE_URL\" style=\"background: #3b82f6; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none;\">Reschedule</a>\n    &nbsp;&nbsp;\n    <a href=\"REPLACE_WITH_CANCEL_URL\" style=\"background: #ef4444; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none;\">Cancel</a>\n  </p>\n  <p style=\"color: #999; font-size: 12px;\">REPLACE_WITH_BUSINESS_NAME</p>\n</div>\n</body></html>",
+        "options": {}
+      },
+      "id": "a1b2c3d4-1105-1105-1105-110000000005",
+      "name": "Send 24h Reminder Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1160, 100],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID",
+          "name": "SMTP - Motion Elevation"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "accountSid": "REPLACE_WITH_TWILIO_ACCOUNT_SID",
+        "from": "REPLACE_WITH_TWILIO_PHONE_NUMBER",
+        "to": "={{ $json.phone }}",
+        "message": "=Hi {{ $json.name }}! Reminder: Your appointment is TODAY at {{ $json.time }}. Location: REPLACE_WITH_LOCATION. To reschedule: REPLACE_WITH_RESCHEDULE_URL — REPLACE_WITH_BUSINESS_NAME"
+      },
+      "id": "a1b2c3d4-1106-1106-1106-110000000006",
+      "name": "Send 2h SMS Reminder",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [1160, 280],
+      "credentials": {
+        "twilioApi": {
+          "id": "REPLACE_WITH_TWILIO_CREDENTIAL_ID",
+          "name": "Twilio - Motion Elevation"
+        }
+      },
+      "notes": "SETUP:\n1. Sign up at twilio.com → get Account SID and Auth Token\n2. Buy a phone number (from ~$1/month)\n3. In n8n: Settings → Credentials → New → Twilio API\n4. Replace REPLACE_WITH_TWILIO_ACCOUNT_SID and REPLACE_WITH_TWILIO_PHONE_NUMBER\n5. SMS cost: ~$0.0075 per message"
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_SENDER_EMAIL",
+        "toEmail": "={{ $json.email }}",
+        "subject": "=😔 We missed you — let's reschedule",
+        "emailType": "html",
+        "message": "=<html><body style=\"font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px;\">\n<div style=\"background: white; padding: 30px; border-radius: 12px;\">\n  <h2 style=\"color: #1a1a2e;\">😔 We missed you, {{ $json.name }}</h2>\n  <p>It looks like you weren't able to make your appointment today at {{ $json.time }}. No worries — life happens!</p>\n  <p>We'd love to find another time that works for you. Grab a slot below:</p>\n  <p style=\"text-align: center; margin: 25px 0;\">\n    <a href=\"REPLACE_WITH_RESCHEDULE_URL\" style=\"background: #10b981; color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block;\">Pick a New Time →</a>\n  </p>\n  <p style=\"color: #666;\">Or simply reply to this email and we'll sort it out together.</p>\n  <p style=\"color: #999; font-size: 12px;\">REPLACE_WITH_BUSINESS_NAME</p>\n</div>\n</body></html>",
+        "options": {}
+      },
+      "id": "a1b2c3d4-1107-1107-1107-110000000007",
+      "name": "No-Show: Reschedule Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1160, 460],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID",
+          "name": "SMTP - Motion Elevation"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_SENDER_EMAIL",
+        "toEmail": "={{ $json.email }}",
+        "subject": "=⭐ How was your appointment? (1 min survey)",
+        "emailType": "html",
+        "message": "=<html><body style=\"font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px;\">\n<div style=\"background: white; padding: 30px; border-radius: 12px;\">\n  <h2 style=\"color: #1a1a2e;\">⭐ How did it go, {{ $json.name }}?</h2>\n  <p>We hope your appointment today went smoothly! We'd love to hear your feedback — it takes less than 60 seconds.</p>\n  <p style=\"text-align: center; margin: 25px 0;\">\n    <a href=\"REPLACE_WITH_SURVEY_URL?name={{ $json.name }}&email={{ $json.email }}\" style=\"background: #f59e0b; color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block;\">Take the 60-Second Survey →</a>\n  </p>\n  <p>Your feedback helps us improve for every client. Thank you! 🙏</p>\n  <p style=\"color: #999; font-size: 12px;\">REPLACE_WITH_BUSINESS_NAME</p>\n</div>\n</body></html>",
+        "options": {}
+      },
+      "id": "a1b2c3d4-1108-1108-1108-110000000008",
+      "name": "Send Satisfaction Survey",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1160, 640],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID",
+          "name": "SMTP - Motion Elevation"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Appointments",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Reminder_24h_Sent": "Yes"
+          }
+        },
+        "where": {
+          "values": [
+            {
+              "lookupColumn": "Email",
+              "lookupValue": "={{ $json.email }}"
+            },
+            {
+              "lookupColumn": "Date",
+              "lookupValue": "={{ $json.date }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-1109-1109-1109-110000000009",
+      "name": "Update: 24h Reminder Sent",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [1400, 100],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets - Motion Elevation"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Appointments",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Reminder_2h_Sent": "Yes"
+          }
+        },
+        "where": {
+          "values": [
+            {
+              "lookupColumn": "Email",
+              "lookupValue": "={{ $json.email }}"
+            },
+            {
+              "lookupColumn": "Date",
+              "lookupValue": "={{ $json.date }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-1110-1110-1110-110000000010",
+      "name": "Update: 2h Reminder Sent",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [1400, 280],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets - Motion Elevation"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Appointments",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Status": "No-Show"
+          }
+        },
+        "where": {
+          "values": [
+            {
+              "lookupColumn": "Email",
+              "lookupValue": "={{ $json.email }}"
+            },
+            {
+              "lookupColumn": "Date",
+              "lookupValue": "={{ $json.date }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-1111-1111-1111-110000000011",
+      "name": "Update: Mark No-Show",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [1400, 460],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets - Motion Elevation"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Appointments",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Survey_Sent": "Yes"
+          }
+        },
+        "where": {
+          "values": [
+            {
+              "lookupColumn": "Email",
+              "lookupValue": "={{ $json.email }}"
+            },
+            {
+              "lookupColumn": "Date",
+              "lookupValue": "={{ $json.date }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-1112-1112-1112-110000000012",
+      "name": "Update: Survey Sent",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [1400, 640],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets - Motion Elevation"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 23 * * *"
+            }
+          ]
+        }
+      },
+      "id": "a1b2c3d4-1113-1113-1113-110000000013",
+      "name": "Schedule: Daily No-Show Stats 11pm",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 800],
+      "notes": "Runs every night at 11pm to calculate daily no-show rate."
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Appointments",
+          "mode": "name"
+        },
+        "filters": {},
+        "options": {}
+      },
+      "id": "a1b2c3d4-1114-1114-1114-110000000014",
+      "name": "Read Appointments for Stats",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [460, 800],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets - Motion Elevation"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Calculate no-show rate and write to stats sheet\nconst items = $input.all();\nconst today = new Date().toDateString();\n\nconst todayAppts = items.filter(i => {\n  try { return new Date(i.json.Date).toDateString() === today; } catch { return false; }\n});\n\nconst attended = todayAppts.filter(i => (i.json.Status || '').toLowerCase() === 'attended').length;\nconst noShow = todayAppts.filter(i => (i.json.Status || '').toLowerCase() === 'no-show').length;\nconst total = todayAppts.length;\nconst noShowRate = total > 0 ? ((noShow / total) * 100).toFixed(1) : '0.0';\n\nreturn [{\n  json: {\n    date: new Date().toISOString().split('T')[0],\n    total_appointments: total,\n    attended: attended,\n    no_shows: noShow,\n    no_show_rate_pct: parseFloat(noShowRate),\n    recorded_at: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "a1b2c3d4-1115-1115-1115-110000000015",
+      "name": "Calculate No-Show Rate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 800]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "No_Show_Stats",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $json.date }}",
+            "Total_Appointments": "={{ $json.total_appointments }}",
+            "Attended": "={{ $json.attended }}",
+            "No_Shows": "={{ $json.no_shows }}",
+            "No_Show_Rate_Pct": "={{ $json.no_show_rate_pct }}",
+            "Recorded_At": "={{ $json.recorded_at }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-1116-1116-1116-110000000016",
+      "name": "Log No-Show Stats",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [900, 800],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets - Motion Elevation"
+        }
+      },
+      "notes": "SETUP: Create sheet tab 'No_Show_Stats' with columns: Date | Total_Appointments | Attended | No_Shows | No_Show_Rate_Pct | Recorded_At"
+    },
+    {
+      "parameters": {
+        "jsCode": "const error = $input.first().json;\nconsole.error('ME-11 Error:', JSON.stringify(error));\nreturn [{ json: { error: true, message: error.message || 'Reminder system error', timestamp: new Date().toISOString() } }];"
+      },
+      "id": "a1b2c3d4-1117-1117-1117-110000000017",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 460],
+      "notes": "Catches errors from any node. Connect error outputs here."
+    }
+  ],
+  "connections": {
+    "Schedule: Every Hour": {
+      "main": [
+        [
+          {
+            "node": "Read Appointments Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Appointments Sheet": {
+      "main": [
+        [
+          {
+            "node": "Classify Appointments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Appointments": {
+      "main": [
+        [
+          {
+            "node": "Route by Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Action": {
+      "main": [
+        [
+          {
+            "node": "Send 24h Reminder Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send 2h SMS Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No-Show: Reschedule Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Satisfaction Survey",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send 24h Reminder Email": {
+      "main": [
+        [
+          {
+            "node": "Update: 24h Reminder Sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send 2h SMS Reminder": {
+      "main": [
+        [
+          {
+            "node": "Update: 2h Reminder Sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "No-Show: Reschedule Email": {
+      "main": [
+        [
+          {
+            "node": "Update: Mark No-Show",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Satisfaction Survey": {
+      "main": [
+        [
+          {
+            "node": "Update: Survey Sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule: Daily No-Show Stats 11pm": {
+      "main": [
+        [
+          {
+            "node": "Read Appointments for Stats",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Appointments for Stats": {
+      "main": [
+        [
+          {
+            "node": "Calculate No-Show Rate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate No-Show Rate": {
+      "main": [
+        [
+          {
+            "node": "Log No-Show Stats",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "tags": ["motion-elevation", "appointments", "reminders", "sms", "twilio", "no-show"],
+  "meta": {
+    "motionElevation": {
+      "version": "1.0.0",
+      "category": "Operations Automation",
+      "deployTime": "~60 minutes",
+      "credentialsNeeded": ["SMTP", "Twilio API", "Google Sheets OAuth2"],
+      "description": "SETUP README:\n\nTHIS WORKFLOW HAS 2 FLOWS:\n\nFLOW A — Appointment Reminders + No-Show Recovery (runs hourly):\n  24h before → Email reminder\n  2h before  → SMS reminder (Twilio)\n  30min after (if not 'Attended') → No-show reschedule email\n  2h after   (if 'Attended') → Satisfaction survey email\n\nFLOW B — Daily No-Show Stats (runs at 11pm):\n  Calculates daily no-show rate → logs to 'No_Show_Stats' tab\n\nGOOGLE SHEETS SETUP:\n  Tab 'Appointments':\n    Name | Email | Phone | Date | Time | Status | Reminder_24h_Sent | Reminder_2h_Sent | Survey_Sent | Notes\n  \n  - Date format: YYYY-MM-DD (e.g. 2024-03-20)\n  - Time format: HH:MM (e.g. 14:30)\n  - Status values:\n    * 'Scheduled' — appointment is upcoming\n    * 'Attended'  — mark this after the appointment happens (manually or via other webhook)\n    * 'No-Show'   — auto-set by this workflow\n    * 'Cancelled' — to exclude from reminders\n  - Reminder_24h_Sent, Reminder_2h_Sent, Survey_Sent: auto-filled by workflow\n\n  Tab 'No_Show_Stats':\n    Date | Total_Appointments | Attended | No_Shows | No_Show_Rate_Pct | Recorded_At\n\nTWILIO SETUP:\n  1. Create account at twilio.com (free trial includes $15 credit)\n  2. Buy a phone number from the console (~$1/month)\n  3. In n8n: Settings → Credentials → New → Twilio API\n  4. Replace REPLACE_WITH_TWILIO_ACCOUNT_SID with your Account SID\n  5. Replace REPLACE_WITH_TWILIO_PHONE_NUMBER with your Twilio number (+1234567890 format)\n  SMS cost: ~€0.007 per message\n\nCUSTOMIZE:\n  - REPLACE_WITH_SENDER_EMAIL — your sending email\n  - REPLACE_WITH_LOCATION_OR_LINK — physical address or video call link\n  - REPLACE_WITH_RESCHEDULE_URL — Calendly or booking link\n  - REPLACE_WITH_CANCEL_URL — cancellation page or mailto: link\n  - REPLACE_WITH_SURVEY_URL — Google Forms, Typeform, or Tally survey link\n  - REPLACE_WITH_BUSINESS_NAME — your business name\n\nTIP: Create a simple Typeform/Tally survey asking:\n  1. How would you rate your experience? (1-5)\n  2. What could we improve?\n  3. Would you recommend us? (Yes/No)"
+    }
+  }
+}

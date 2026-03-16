@@ -176,4 +176,42 @@
 
 ---
 
-*Total files: 30+ | 13 automation categories | Europe-first | Ready to launch: Yes*
+---
+
+## 📦 Production n8n Workflows (Automations Folder)
+
+### Workflows 01–11 (Core Library)
+
+| # | Name | File | Category |
+|---|------|------|----------|
+| 01 | Email Triage + Auto-Reply | `01-email-triage-autoreply.json` | Email Automation |
+| 02 | Lead Capture → CRM | `02-lead-capture-crm.json` | Sales Automation |
+| 03 | Invoice Reminder | `03-invoice-reminder.json` | Finance |
+| 04 | Customer Support Chatbot | `04-customer-support-chatbot.json` | Support |
+| 05 | Meeting Booking Confirmation | `05-meeting-booking-confirmation.json` | Operations |
+| 06 | Funnel Analytics Tracker | `06-funnel-analytics-tracker.json` | Analytics |
+| 07 | Social Media Scheduler | `07-social-media-scheduler.json` | Marketing |
+| 08 | E-Commerce Order Flow | `08-ecommerce-order-flow.json` | E-Commerce |
+| 09 | Client Onboarding Drip | `09-client-onboarding-drip.json` | Onboarding |
+| 10 | WhatsApp/Telegram Alerts | `10-whatsapp-telegram-alerts.json` | Notifications |
+| 11 | Appointment Reminder + No-Show | `11-appointment-reminder-noshow.json` | Operations |
+
+### Workflows 12–19 (Niche Edition — High-Converting)
+
+| # | Name | File | Niche | Setup Fee | Monthly |
+|---|------|------|-------|-----------|---------|
+| 12 | Dental Patient Follow-Up + Review | `12-dental-followup-review.json` | Healthcare | €597 | €97/mo |
+| 13 | Fitness Class Reminder + Churn Prevention | `13-fitness-class-reminder-churn.json` | Wellness | €497 | €97/mo |
+| 14 | Restaurant Reservation + No-Show Follow-Up | `14-restaurant-reservation-noshow.json` | Hospitality | €797 | €127/mo |
+| 15 | Real Estate Open House Follow-Up | `15-real-estate-open-house-followup.json` | Property | €997 | €147/mo |
+| 16 | Freelancer Project Update + Invoice | `16-freelancer-project-invoice.json` | Freelancers | €397 | €67/mo |
+| 17 | Coach Session Prep + Follow-Up Drip | `17-coach-session-prep-followup.json` | Coaching | €497 | €97/mo |
+| 18 | E-Commerce Review + Upsell Sequence | `18-ecommerce-review-upsell.json` | E-Commerce | €697 | €127/mo |
+| 19 | Legal Intake → CRM → Onboarding | `19-legal-intake-crm-onboarding.json` | Legal | €1,197 | €197/mo |
+
+All workflow JSON files are in: `automations/`  
+Full setup docs: `automations/README.md`
+
+---
+
+*Total files: 40+ | 13 automation categories | 19 production workflows | Europe-first | Ready to launch: Yes*

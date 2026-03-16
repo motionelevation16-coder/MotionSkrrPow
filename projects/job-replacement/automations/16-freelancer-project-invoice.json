@@ -1,0 +1,233 @@
+{
+  "name": "ME-16 | Freelancer — Project Updates + Invoice Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            { "field": "cronExpression", "expression": "0 9 * * 1,3,5" }
+          ]
+        }
+      },
+      "id": "me16-0001-0001-0001-000000000001",
+      "name": "Schedule: Mon/Wed/Fri 9am",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300],
+      "notes": "Runs Mon, Wed, Fri to send project updates and check for overdue invoices."
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "documentId": { "__rl": true, "value": "REPLACE_WITH_GOOGLE_SHEET_ID", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Projects", "mode": "name" },
+        "filters": {},
+        "options": {}
+      },
+      "id": "me16-0002-0002-0002-000000000002",
+      "name": "Read Projects Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [460, 300],
+      "credentials": { "googleSheetsOAuth2Api": { "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID", "name": "Google Sheets - Motion Elevation" } },
+      "notes": "Sheet tab: Projects. Columns: Client_Name | Client_Email | Project_Name | Status | Progress_Pct | Deadline | Last_Update_Sent | Invoice_Amount | Invoice_Due_Date | Invoice_Status | Invoice_Reminder_Count | Notes"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst now = new Date();\nnow.setHours(0,0,0,0);\n\nconst actions = [];\n\nfor (const item of items) {\n  const row = item.json;\n  if (!row.Client_Email) continue;\n\n  const status = (row.Status || '').toLowerCase();\n  if (['completed', 'cancelled', 'on-hold'].includes(status)) continue;\n\n  const base = {\n    client_name: row.Client_Name || 'Client',\n    client_email: row.Client_Email,\n    project_name: row.Project_Name || 'Your Project',\n    status: row.Status || 'In Progress',\n    progress_pct: row.Progress_Pct || '0',\n    deadline: row.Deadline || '',\n    last_update_sent: row.Last_Update_Sent || '',\n    invoice_amount: row.Invoice_Amount || '',\n    invoice_due_date: row.Invoice_Due_Date || '',\n    invoice_status: (row.Invoice_Status || 'pending').toLowerCase(),\n    invoice_reminder_count: parseInt(row.Invoice_Reminder_Count || '0'),\n    notes: row.Notes || ''\n  };\n\n  // Project update: send every 48h for active projects\n  let shouldSendUpdate = false;\n  if (base.last_update_sent) {\n    const lastSent = new Date(base.last_update_sent);\n    const hoursSinceUpdate = (now - lastSent) / (1000 * 60 * 60);\n    if (hoursSinceUpdate >= 48) shouldSendUpdate = true;\n  } else {\n    shouldSendUpdate = true; // never sent\n  }\n\n  if (shouldSendUpdate && status === 'in progress') {\n    actions.push({ json: { ...base, _action: 'project_update' } });\n  }\n\n  // Invoice overdue check\n  if (base.invoice_amount && base.invoice_due_date && base.invoice_status === 'unpaid') {\n    let dueDate;\n    try {\n      dueDate = new Date(base.invoice_due_date);\n      dueDate.setHours(0,0,0,0);\n    } catch { dueDate = null; }\n\n    if (dueDate) {\n      const daysOverdue = Math.round((now - dueDate) / (1000 * 60 * 60 * 24));\n      if (daysOverdue >= 1 && base.invoice_reminder_count < 3) {\n        actions.push({ json: { ...base, _action: 'invoice_reminder', days_overdue: daysOverdue } });\n      }\n    }\n  }\n}\n\nconsole.log(`Freelancer actions: ${actions.length}`);\nreturn actions.length > 0 ? actions : [{ json: { _action: 'none' } }];"
+      },
+      "id": "me16-0003-0003-0003-000000000003",
+      "name": "Classify Project Actions",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "outputKey": "project_update",
+              "conditions": {
+                "conditions": [{ "leftValue": "={{ $json._action }}", "rightValue": "project_update", "operator": { "type": "string", "operation": "equals" } }],
+                "combinator": "and"
+              }
+            },
+            {
+              "outputKey": "invoice_reminder",
+              "conditions": {
+                "conditions": [{ "leftValue": "={{ $json._action }}", "rightValue": "invoice_reminder", "operator": { "type": "string", "operation": "equals" } }],
+                "combinator": "and"
+              }
+            }
+          ],
+          "fallbackOutput": "none"
+        },
+        "options": {}
+      },
+      "id": "me16-0004-0004-0004-000000000004",
+      "name": "Route by Action",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_YOUR_EMAIL",
+        "toEmail": "={{ $json.client_email }}",
+        "subject": "=📊 {{ $json.project_name }} — Progress Update ({{ $json.progress_pct }}% complete)",
+        "emailType": "html",
+        "message": "=<html><body style=\"font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; background: #f8fafc;\">\n<div style=\"background: white; padding: 32px; border-radius: 12px; border-top: 4px solid #7c3aed;\">\n  <h2 style=\"color: #0f172a;\">Project Update: {{ $json.project_name }} 📊</h2>\n  <p>Hi {{ $json.client_name }}, here's your latest progress report:</p>\n\n  <div style=\"background: #faf5ff; padding: 20px; border-radius: 8px; margin: 20px 0;\">\n    <p style=\"margin: 0 0 12px;\"><strong>📈 Progress: {{ $json.progress_pct }}%</strong></p>\n    <div style=\"background: #e9d5ff; border-radius: 99px; height: 12px;\">\n      <div style=\"background: #7c3aed; border-radius: 99px; height: 12px; width: {{ $json.progress_pct }}%;\"></div>\n    </div>\n    <p style=\"margin: 12px 0 0; color: #6b7280;\"><strong>Status:</strong> {{ $json.status }}</p>\n    <p style=\"margin: 6px 0 0; color: #6b7280;\"><strong>Deadline:</strong> {{ $json.deadline }}</p>\n  </div>\n\n  <h3 style=\"color: #7c3aed;\">✅ What's been done:</h3>\n  <p style=\"color: #374151;\">REPLACE_WITH_COMPLETED_TASKS_OR_USE_NOTES_FIELD</p>\n  <p style=\"color: #374151; white-space: pre-line;\">{{ $json.notes }}</p>\n\n  <h3 style=\"color: #7c3aed;\">🔜 What's next:</h3>\n  <p style=\"color: #374151;\">REPLACE_WITH_NEXT_STEPS</p>\n\n  <p>Have feedback or questions? Hit reply — I'm always happy to chat!</p>\n  <p style=\"color: #94a3b8; font-size: 12px;\">— REPLACE_WITH_YOUR_NAME | REPLACE_WITH_YOUR_WEBSITE</p>\n</div>\n</body></html>",
+        "options": {}
+      },
+      "id": "me16-0005-0005-0005-000000000005",
+      "name": "Send Project Update Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1160, 180],
+      "credentials": { "smtp": { "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID", "name": "SMTP - Motion Elevation" } }
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_YOUR_EMAIL",
+        "toEmail": "={{ $json.client_email }}",
+        "subject": "=💰 Invoice reminder — {{ $json.project_name }} ({{ $json.days_overdue }} days overdue)",
+        "emailType": "html",
+        "message": "=<html><body style=\"font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; background: #f8fafc;\">\n<div style=\"background: white; padding: 32px; border-radius: 12px; border-top: 4px solid {{ $json.invoice_reminder_count >= 2 ? '#dc2626' : '#f59e0b' }};\">\n  <h2 style=\"color: #0f172a;\">{{ $json.invoice_reminder_count >= 2 ? '🚨 Final Invoice Notice' : '💰 Payment Reminder' }}</h2>\n  <p>Hi {{ $json.client_name }},</p>\n  <p>{{ $json.invoice_reminder_count === 0 ? 'Just a friendly reminder that payment for' : $json.invoice_reminder_count === 1 ? 'I wanted to follow up again regarding the outstanding invoice for' : 'This is my final notice regarding the overdue invoice for' }} <strong>{{ $json.project_name }}</strong> is due.</p>\n  <div style=\"background: #fffbeb; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #fcd34d;\">\n    <p style=\"margin: 0;\"><strong>💰 Amount due:</strong> {{ $json.invoice_amount }}</p>\n    <p style=\"margin: 8px 0 0;\"><strong>📅 Due date:</strong> {{ $json.invoice_due_date }}</p>\n    <p style=\"margin: 8px 0 0; color: #dc2626;\"><strong>⚠️ Days overdue:</strong> {{ $json.days_overdue }}</p>\n  </div>\n  <p style=\"text-align: center; margin: 28px 0;\">\n    <a href=\"REPLACE_WITH_PAYMENT_LINK\" style=\"background: #7c3aed; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px;\">Pay Now →</a>\n  </p>\n  <p style=\"color: #64748b; font-size: 14px;\">Payment methods accepted: REPLACE_WITH_PAYMENT_METHODS. If you have any questions about this invoice, please reply to this email.</p>\n  {{ $json.invoice_reminder_count >= 2 ? '<p style=\"color: #dc2626; font-size: 13px;\">Please note: If payment is not received within 7 days, I may need to pause work on any current or future projects.</p>' : '' }}\n  <p style=\"color: #94a3b8; font-size: 12px;\">— REPLACE_WITH_YOUR_NAME | REPLACE_WITH_YOUR_EMAIL</p>\n</div>\n</body></html>",
+        "options": {}
+      },
+      "id": "me16-0006-0006-0006-000000000006",
+      "name": "Send Invoice Reminder",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1160, 400],
+      "credentials": { "smtp": { "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID", "name": "SMTP - Motion Elevation" } }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": { "__rl": true, "value": "REPLACE_WITH_GOOGLE_SHEET_ID", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Projects", "mode": "name" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": { "Last_Update_Sent": "={{ $now.toISO() }}" }
+        },
+        "where": { "values": [{ "lookupColumn": "Client_Email", "lookupValue": "={{ $json.client_email }}" }, { "lookupColumn": "Project_Name", "lookupValue": "={{ $json.project_name }}" }] },
+        "options": {}
+      },
+      "id": "me16-0007-0007-0007-000000000007",
+      "name": "Update Last Update Sent",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [1400, 180],
+      "credentials": { "googleSheetsOAuth2Api": { "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID", "name": "Google Sheets - Motion Elevation" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Increment invoice reminder count\nconst item = $input.first().json;\nreturn [{ json: { ...item, new_reminder_count: item.invoice_reminder_count + 1 } }];"
+      },
+      "id": "me16-0008-0008-0008-000000000008",
+      "name": "Increment Reminder Count",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1400, 400]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": { "__rl": true, "value": "REPLACE_WITH_GOOGLE_SHEET_ID", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Projects", "mode": "name" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": { "Invoice_Reminder_Count": "={{ $json.new_reminder_count }}" }
+        },
+        "where": { "values": [{ "lookupColumn": "Client_Email", "lookupValue": "={{ $json.client_email }}" }, { "lookupColumn": "Project_Name", "lookupValue": "={{ $json.project_name }}" }] },
+        "options": {}
+      },
+      "id": "me16-0009-0009-0009-000000000009",
+      "name": "Update Invoice Reminder Count",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [1620, 400],
+      "credentials": { "googleSheetsOAuth2Api": { "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID", "name": "Google Sheets - Motion Elevation" } }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "project-complete",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "me16-0010-0010-0010-000000000010",
+      "name": "Webhook: Project Completed",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 700],
+      "webhookId": "project-complete-me16",
+      "notes": "Trigger this webhook manually or from your project tool when a project is marked complete. Fields: client_email, project_name, client_name"
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_YOUR_EMAIL",
+        "toEmail": "={{ ($input.first().json.body || $input.first().json).client_email }}",
+        "subject": "=🎉 {{ ($input.first().json.body || $input.first().json).project_name }} is complete!",
+        "emailType": "html",
+        "message": "=<html><body style=\"font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; background: #f8fafc;\">\n<div style=\"background: white; padding: 32px; border-radius: 12px; border-top: 4px solid #10b981;\">\n  <h2 style=\"color: #0f172a;\">Project Complete! 🎉</h2>\n  <p>Hi {{ ($input.first().json.body || $input.first().json).client_name }}, great news — <strong>{{ ($input.first().json.body || $input.first().json).project_name }}</strong> is officially wrapped up!</p>\n  <h3 style=\"color: #10b981;\">🗂️ What's being delivered:</h3>\n  <p style=\"color: #374151;\">REPLACE_WITH_DELIVERABLES_LIST</p>\n  <p style=\"text-align: center; margin: 28px 0;\">\n    <a href=\"REPLACE_WITH_DELIVERABLES_LINK\" style=\"background: #10b981; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: bold;\">Access Your Files →</a>\n  </p>\n  <p>It's been a pleasure working with you. If you have any feedback or need any tweaks in the next 7 days, just hit reply.</p>\n  <p>And if you loved the work — a quick testimonial or referral would mean the world! 🙏</p>\n  <p style=\"text-align: center; margin: 24px 0;\">\n    <a href=\"REPLACE_WITH_TESTIMONIAL_FORM_URL\" style=\"background: #7c3aed; color: white; padding: 10px 24px; border-radius: 6px; text-decoration: none;\">Leave a Testimonial</a>\n  </p>\n  <p style=\"color: #94a3b8; font-size: 12px;\">— REPLACE_WITH_YOUR_NAME</p>\n</div>\n</body></html>",
+        "options": {}
+      },
+      "id": "me16-0011-0011-0011-000000000011",
+      "name": "Send Project Completion Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [500, 700],
+      "credentials": { "smtp": { "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID", "name": "SMTP - Motion Elevation" } }
+    }
+  ],
+  "connections": {
+    "Schedule: Mon/Wed/Fri 9am": {
+      "main": [[{ "node": "Read Projects Sheet", "type": "main", "index": 0 }]]
+    },
+    "Read Projects Sheet": {
+      "main": [[{ "node": "Classify Project Actions", "type": "main", "index": 0 }]]
+    },
+    "Classify Project Actions": {
+      "main": [[{ "node": "Route by Action", "type": "main", "index": 0 }]]
+    },
+    "Route by Action": {
+      "main": [
+        [{ "node": "Send Project Update Email", "type": "main", "index": 0 }],
+        [{ "node": "Send Invoice Reminder", "type": "main", "index": 0 }]
+      ]
+    },
+    "Send Project Update Email": {
+      "main": [[{ "node": "Update Last Update Sent", "type": "main", "index": 0 }]]
+    },
+    "Send Invoice Reminder": {
+      "main": [[{ "node": "Increment Reminder Count", "type": "main", "index": 0 }]]
+    },
+    "Increment Reminder Count": {
+      "main": [[{ "node": "Update Invoice Reminder Count", "type": "main", "index": 0 }]]
+    },
+    "Webhook: Project Completed": {
+      "main": [[{ "node": "Send Project Completion Email", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "tags": ["motion-elevation", "freelancer", "invoicing", "project-management", "client-communication"],
+  "meta": {
+    "motionElevation": {
+      "version": "1.0.0",
+      "category": "Freelancer Automation",
+      "deployTime": "~45 minutes",
+      "credentialsNeeded": ["SMTP", "Google Sheets OAuth2"],
+      "suggestedPrice": "€397 setup + €67/month",
+      "description": "Mon/Wed/Fri: sends project progress emails and escalating invoice reminders (max 3). Separate webhook for project completion + delivery email."
+    }
+  }
+}

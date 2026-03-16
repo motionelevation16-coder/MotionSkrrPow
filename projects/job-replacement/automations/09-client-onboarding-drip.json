@@ -1,0 +1,438 @@
+{
+  "name": "ME-09 | Client Onboarding Drip",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "new-client-onboarding",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "e9f0a1b2-0901-0901-0901-090000000001",
+      "name": "Webhook: New Client Signup",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "notes": "SETUP: Fire this webhook from your payment processor (Stripe, PayPal, Gumroad) after payment confirmation. Or fire from your signup form. POST JSON with: name, email, company (optional), plan (optional)."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse and normalize incoming client data\nconst body = $input.first().json.body || $input.first().json;\n\nconst clientName = body.name || body.customer_name || body.full_name || 'Valued Client';\nconst firstName = clientName.split(' ')[0];\nconst clientEmail = body.email || body.customer_email;\nconst company = body.company || body.company_name || '';\nconst plan = body.plan || body.product || 'Starter';\nconst clientId = 'CL_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6).toUpperCase();\n\nif (!clientEmail) throw new Error('Missing required field: email');\n\nconst now = new Date();\nconst day1 = new Date(now); day1.setDate(now.getDate() + 1);\nconst day3 = new Date(now); day3.setDate(now.getDate() + 3);\nconst day7 = new Date(now); day7.setDate(now.getDate() + 7);\nconst day14 = new Date(now); day14.setDate(now.getDate() + 14);\n\nreturn [{\n  json: {\n    client_id: clientId,\n    client_name: clientName,\n    first_name: firstName,\n    client_email: clientEmail,\n    company: company,\n    plan: plan,\n    signup_date: now.toISOString(),\n    day1_date: day1.toISOString(),\n    day3_date: day3.toISOString(),\n    day7_date: day7.toISOString(),\n    day14_date: day14.toISOString(),\n    dashboard_url: `REPLACE_WITH_DASHBOARD_URL`,\n    calendly_url: `REPLACE_WITH_CALENDLY_URL`\n  }\n}];"
+      },
+      "id": "e9f0a1b2-0902-0902-0902-090000000002",
+      "name": "Parse Client Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Drip_Tracker",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Client_ID": "={{ $json.client_id }}",
+            "Name": "={{ $json.client_name }}",
+            "Email": "={{ $json.client_email }}",
+            "Company": "={{ $json.company }}",
+            "Plan": "={{ $json.plan }}",
+            "Signup_Date": "={{ $json.signup_date }}",
+            "Day0_Sent": "Yes",
+            "Day1_Sent": "Pending",
+            "Day3_Sent": "Pending",
+            "Day7_Sent": "Pending",
+            "Day14_Sent": "Pending",
+            "Status": "Active"
+          }
+        },
+        "options": {}
+      },
+      "id": "e9f0a1b2-0903-0903-0903-090000000003",
+      "name": "Add to Drip Tracker Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [680, 300],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets - Motion Elevation"
+        }
+      },
+      "notes": "SETUP: Create sheet tab 'Drip_Tracker' with columns: Client_ID | Name | Email | Company | Plan | Signup_Date | Day0_Sent | Day1_Sent | Day3_Sent | Day7_Sent | Day14_Sent | Status"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"status\": \"onboarding_started\", \"client_id\": \"{{ $('Parse Client Data').first().json.client_id }}\" }"
+      },
+      "id": "e9f0a1b2-0904-0904-0904-090000000004",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [680, 480]
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_SENDER_EMAIL",
+        "toEmail": "={{ $('Parse Client Data').first().json.client_email }}",
+        "subject": "=🎉 Welcome to REPLACE_WITH_COMPANY_NAME, {{ $('Parse Client Data').first().json.first_name }}!",
+        "emailType": "html",
+        "message": "=<html><body style=\"font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px;\">\n<div style=\"background: white; padding: 30px; border-radius: 12px; border-top: 4px solid #1a1a2e;\">\n  <h1 style=\"color: #1a1a2e;\">🎉 Welcome aboard, {{ $('Parse Client Data').first().json.first_name }}!</h1>\n  <p>We're thrilled to have you as a client. Your automations are being set up and we'll have everything running smoothly for you.</p>\n  <h3>Your Next Step: Access Your Dashboard</h3>\n  <p style=\"text-align: center; margin: 25px 0;\">\n    <a href=\"{{ $('Parse Client Data').first().json.dashboard_url }}\" style=\"background: #1a1a2e; color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block;\">Open My Dashboard →</a>\n  </p>\n  <h3>What happens next:</h3>\n  <ul>\n    <li>✅ <strong>Today:</strong> Dashboard access activated</li>\n    <li>📧 <strong>Tomorrow:</strong> Tips email — getting the most from your automations</li>\n    <li>📞 <strong>Day 3:</strong> Optional setup call offer</li>\n    <li>📊 <strong>Day 7:</strong> First week performance summary</li>\n  </ul>\n  <hr/>\n  <p>Questions? Just reply to this email — we respond within 24 hours.</p>\n  <p style=\"color: #999; font-size: 12px;\">REPLACE_WITH_COMPANY_NAME | Client ID: {{ $('Parse Client Data').first().json.client_id }}</p>\n</div>\n</body></html>",
+        "options": {}
+      },
+      "id": "e9f0a1b2-0905-0905-0905-090000000005",
+      "name": "Day 0: Welcome Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [900, 300],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID",
+          "name": "SMTP - Motion Elevation"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 1,
+        "unit": "days"
+      },
+      "id": "e9f0a1b2-0906-0906-0906-090000000006",
+      "name": "Wait 1 Day",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_SENDER_EMAIL",
+        "toEmail": "={{ $('Parse Client Data').first().json.client_email }}",
+        "subject": "=💡 5 ways to get the most from your automations",
+        "emailType": "html",
+        "message": "=<html><body style=\"font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px;\">\n<div style=\"background: white; padding: 30px; border-radius: 12px;\">\n  <h2 style=\"color: #1a1a2e;\">💡 Day 1: Quick wins for {{ $('Parse Client Data').first().json.first_name }}</h2>\n  <p>Your automations are running. Here's how to squeeze every bit of value from them:</p>\n  <ol>\n    <li style=\"margin-bottom: 12px;\"><strong>✅ Test with a real submission</strong> — submit a test lead or send a test email to see the whole flow fire.</li>\n    <li style=\"margin-bottom: 12px;\"><strong>📊 Check your Google Sheet weekly</strong> — that's your live data hub. Review it every Monday morning.</li>\n    <li style=\"margin-bottom: 12px;\"><strong>✏️ Customize email templates</strong> — edit the text in your workflows to match your brand voice exactly.</li>\n    <li style=\"margin-bottom: 12px;\"><strong>🔗 Add the tracking snippet to your website</strong> — it'll start capturing funnel data you've never had access to before.</li>\n    <li style=\"margin-bottom: 12px;\"><strong>⚡ Share your webhook URLs</strong> — your forms, payment processor, and booking tools should all point to your n8n webhooks.</li>\n  </ol>\n  <hr/>\n  <p>Tomorrow we'll check in and offer a quick setup call if you'd like one.</p>\n  <p style=\"color: #999; font-size: 12px;\">REPLACE_WITH_COMPANY_NAME | <a href=\"REPLACE_WITH_UNSUBSCRIBE_URL\">Unsubscribe</a></p>\n</div>\n</body></html>",
+        "options": {}
+      },
+      "id": "e9f0a1b2-0907-0907-0907-090000000007",
+      "name": "Day 1: Tips Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1340, 300],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID",
+          "name": "SMTP - Motion Elevation"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 2,
+        "unit": "days"
+      },
+      "id": "e9f0a1b2-0908-0908-0908-090000000008",
+      "name": "Wait 2 Days",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [1560, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_SENDER_EMAIL",
+        "toEmail": "={{ $('Parse Client Data').first().json.client_email }}",
+        "subject": "=📞 How's everything going, {{ $('Parse Client Data').first().json.first_name }}?",
+        "emailType": "html",
+        "message": "=<html><body style=\"font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px;\">\n<div style=\"background: white; padding: 30px; border-radius: 12px;\">\n  <h2 style=\"color: #1a1a2e;\">📞 Day 3 Check-In</h2>\n  <p>Hey {{ $('Parse Client Data').first().json.first_name }}, your automations have been live for 3 days now.</p>\n  <p>How are things going? Any questions or anything you'd like to adjust?</p>\n  <p>If you'd like a quick 15-minute call to walk through everything together, grab a slot here:</p>\n  <p style=\"text-align: center; margin: 25px 0;\">\n    <a href=\"{{ $('Parse Client Data').first().json.calendly_url }}\" style=\"background: #10b981; color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block;\">Book a Free Setup Call →</a>\n  </p>\n  <p>No obligation — only if it'd be useful for you.</p>\n  <p>Otherwise, your first week summary is on its way in 4 days. 🚀</p>\n  <p style=\"color: #999; font-size: 12px;\">REPLACE_WITH_COMPANY_NAME | <a href=\"REPLACE_WITH_UNSUBSCRIBE_URL\">Unsubscribe</a></p>\n</div>\n</body></html>",
+        "options": {}
+      },
+      "id": "e9f0a1b2-0909-0909-0909-090000000009",
+      "name": "Day 3: Check-In + Calendly",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1780, 300],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID",
+          "name": "SMTP - Motion Elevation"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 4,
+        "unit": "days"
+      },
+      "id": "e9f0a1b2-0910-0910-0910-090000000010",
+      "name": "Wait 4 Days",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [2000, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_SENDER_EMAIL",
+        "toEmail": "={{ $('Parse Client Data').first().json.client_email }}",
+        "subject": "=📊 Your first week with REPLACE_WITH_COMPANY_NAME",
+        "emailType": "html",
+        "message": "=<html><body style=\"font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px;\">\n<div style=\"background: white; padding: 30px; border-radius: 12px;\">\n  <h2 style=\"color: #1a1a2e;\">📊 Week 1 Summary</h2>\n  <p>Hey {{ $('Parse Client Data').first().json.first_name }}, it's been one week since you joined REPLACE_WITH_COMPANY_NAME!</p>\n  <p>Here's what your automations have been doing behind the scenes:</p>\n  <div style=\"background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;\">\n    <h3 style=\"margin-top: 0;\">✅ Active Workflows</h3>\n    <ul>\n      <li>📧 Email auto-responder: Handling enquiries 24/7</li>\n      <li>📋 Lead capture: Logging every lead to your sheet</li>\n      <li>🔔 Notifications: Alerting you to important events</li>\n      <li>📊 Analytics: Tracking your funnel performance</li>\n    </ul>\n  </div>\n  <p>Log in to your dashboard to see your live stats:</p>\n  <p style=\"text-align: center;\">\n    <a href=\"{{ $('Parse Client Data').first().json.dashboard_url }}\" style=\"background: #1a1a2e; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none;\">Open Dashboard →</a>\n  </p>\n  <hr/>\n  <p>Next email in 7 days — we'll have a special offer for you. 👀</p>\n  <p style=\"color: #999; font-size: 12px;\">REPLACE_WITH_COMPANY_NAME | <a href=\"REPLACE_WITH_UNSUBSCRIBE_URL\">Unsubscribe</a></p>\n</div>\n</body></html>",
+        "options": {}
+      },
+      "id": "e9f0a1b2-0911-0911-0911-090000000011",
+      "name": "Day 7: Week Summary",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [2220, 300],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID",
+          "name": "SMTP - Motion Elevation"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 7,
+        "unit": "days"
+      },
+      "id": "e9f0a1b2-0912-0912-0912-090000000012",
+      "name": "Wait 7 Days",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [2440, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_SENDER_EMAIL",
+        "toEmail": "={{ $('Parse Client Data').first().json.client_email }}",
+        "subject": "=🚀 Ready to 2x your automation stack? (special offer inside)",
+        "emailType": "html",
+        "message": "=<html><body style=\"font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px;\">\n<div style=\"background: white; padding: 30px; border-radius: 12px; border: 2px solid #6366f1;\">\n  <h2 style=\"color: #1a1a2e;\">🚀 Day 14: You're on a roll, {{ $('Parse Client Data').first().json.first_name }}</h2>\n  <p>Two weeks in and your automations are running like clockwork. Our clients who add a second automation in the first month see an average <strong>3x increase in time saved</strong>.</p>\n  <h3>Most popular add-ons:</h3>\n  <ul>\n    <li>📱 <strong>Social Media Scheduler</strong> — post to Instagram, LinkedIn, Twitter daily on autopilot</li>\n    <li>📞 <strong>Appointment Reminder + No-Show Recovery</strong> — cut no-shows by up to 40%</li>\n    <li>🛒 <strong>Abandoned Cart Recovery</strong> — recover 15-25% of abandoned checkouts</li>\n  </ul>\n  <div style=\"background: #f0f4ff; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;\">\n    <p style=\"margin: 0; font-size: 18px;\"><strong>Add any automation for just €50/month</strong></p>\n    <p style=\"margin: 5px 0 0; color: #666; font-size: 14px;\">Exclusive loyalty rate — normal price €97-€247/month</p>\n  </div>\n  <p style=\"text-align: center; margin: 25px 0;\">\n    <a href=\"REPLACE_WITH_UPSELL_URL\" style=\"background: #6366f1; color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block;\">Claim My Loyalty Rate →</a>\n  </p>\n  <p style=\"color: #666; font-size: 13px;\">Offer valid for existing clients only. Reply to this email if you'd like to chat first.</p>\n  <p style=\"color: #999; font-size: 12px;\">REPLACE_WITH_COMPANY_NAME | <a href=\"REPLACE_WITH_UNSUBSCRIBE_URL\">Unsubscribe</a></p>\n</div>\n</body></html>",
+        "options": {}
+      },
+      "id": "e9f0a1b2-0913-0913-0913-090000000013",
+      "name": "Day 14: Upsell Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [2660, 300],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID",
+          "name": "SMTP - Motion Elevation"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Drip_Tracker",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Day14_Sent": "Yes",
+            "Status": "Sequence Complete"
+          }
+        },
+        "where": {
+          "values": [
+            {
+              "lookupColumn": "Client_ID",
+              "lookupValue": "={{ $('Parse Client Data').first().json.client_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e9f0a1b2-0914-0914-0914-090000000014",
+      "name": "Mark Sequence Complete",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [2880, 300],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets - Motion Elevation"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const error = $input.first().json;\nconsole.error('ME-09 Error:', JSON.stringify(error));\nreturn [{ json: { error: true, message: error.message || 'Drip sequence error', timestamp: new Date().toISOString() } }];"
+      },
+      "id": "e9f0a1b2-0915-0915-0915-090000000015",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 540],
+      "notes": "Catches errors from any node in the sequence."
+    }
+  ],
+  "connections": {
+    "Webhook: New Client Signup": {
+      "main": [
+        [
+          {
+            "node": "Parse Client Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Client Data": {
+      "main": [
+        [
+          {
+            "node": "Add to Drip Tracker Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add to Drip Tracker Sheet": {
+      "main": [
+        [
+          {
+            "node": "Day 0: Welcome Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Day 0: Welcome Email": {
+      "main": [
+        [
+          {
+            "node": "Wait 1 Day",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 1 Day": {
+      "main": [
+        [
+          {
+            "node": "Day 1: Tips Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Day 1: Tips Email": {
+      "main": [
+        [
+          {
+            "node": "Wait 2 Days",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 2 Days": {
+      "main": [
+        [
+          {
+            "node": "Day 3: Check-In + Calendly",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Day 3: Check-In + Calendly": {
+      "main": [
+        [
+          {
+            "node": "Wait 4 Days",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 4 Days": {
+      "main": [
+        [
+          {
+            "node": "Day 7: Week Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Day 7: Week Summary": {
+      "main": [
+        [
+          {
+            "node": "Wait 7 Days",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 7 Days": {
+      "main": [
+        [
+          {
+            "node": "Day 14: Upsell Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Day 14: Upsell Email": {
+      "main": [
+        [
+          {
+            "node": "Mark Sequence Complete",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "tags": ["motion-elevation", "onboarding", "drip", "email-sequence", "client"],
+  "meta": {
+    "motionElevation": {
+      "version": "1.0.0",
+      "category": "Client Retention Automation",
+      "deployTime": "~45 minutes",
+      "credentialsNeeded": ["SMTP", "Google Sheets OAuth2"],
+      "description": "SETUP README:\n\nDRIP SEQUENCE SCHEDULE:\n  Day 0:  Welcome email + dashboard access\n  Day 1:  5 tips to get the most from automations\n  Day 3:  Check-in + optional Calendly setup call\n  Day 7:  First week summary\n  Day 14: Upsell email (add automation for €50/month)\n\nINTEGRATION:\n  Fire the webhook when a new client pays. Integrate with:\n  - Stripe: Use Stripe webhooks → filter for payment_intent.succeeded\n  - PayPal: IPN webhooks on payment_completed\n  - Gumroad: Ping URL on sale\n  - Typeform/Webflow form: Fire on submission after manual review\n  POST body should include: { \"name\": \"...\", \"email\": \"...\", \"plan\": \"...\" }\n\nREPLACE THESE VALUES:\n  - REPLACE_WITH_COMPANY_NAME: Your agency name\n  - REPLACE_WITH_SENDER_EMAIL: Your sending email address\n  - REPLACE_WITH_DASHBOARD_URL: URL of client dashboard or portal\n  - REPLACE_WITH_CALENDLY_URL: Your Calendly booking link\n  - REPLACE_WITH_UPSELL_URL: Landing page or Stripe payment link for upsell\n  - REPLACE_WITH_UNSUBSCRIBE_URL: Unsubscribe/preference management page\n  - REPLACE_WITH_GOOGLE_SHEET_ID: Your tracking spreadsheet ID\n\nGOOGLE SHEETS TAB 'Drip_Tracker':\n  Client_ID | Name | Email | Company | Plan | Signup_Date | Day0_Sent | Day1_Sent | Day3_Sent | Day7_Sent | Day14_Sent | Status\n\nNOTE: n8n persists waiting executions in the database. If n8n restarts, waiting executions resume from where they left off."
+    }
+  }
+}

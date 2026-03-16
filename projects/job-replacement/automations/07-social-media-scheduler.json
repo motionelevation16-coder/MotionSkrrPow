@@ -1,0 +1,343 @@
+{
+  "name": "ME-07 | Social Media Content Scheduler",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * *"
+            }
+          ]
+        }
+      },
+      "id": "c7d8e9f0-0701-0701-0701-070000000001",
+      "name": "Schedule: Daily 9am",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300],
+      "notes": "Fires every day at 9:00 AM. Adjust timezone in n8n Settings → General → Timezone."
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Content_Calendar",
+          "mode": "name"
+        },
+        "filters": {},
+        "options": {}
+      },
+      "id": "c7d8e9f0-0702-0702-0702-070000000002",
+      "name": "Read Content Calendar",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [460, 300],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets - Motion Elevation"
+        }
+      },
+      "notes": "SETUP: Create sheet tab 'Content_Calendar' with columns: Date | Platform | Caption | Image_URL | Status | Posted_At | Row_Number"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filter posts scheduled for today with Status='Ready'\nconst items = $input.all();\nconst today = new Date();\nconst todayStr = today.toISOString().split('T')[0]; // YYYY-MM-DD\n\n// Also match common date formats\nconst todayFormatted = today.toLocaleDateString('en-GB'); // DD/MM/YYYY\nconst todayUS = today.toLocaleDateString('en-US'); // M/D/YYYY\n\nconst todayPosts = items.filter((item, index) => {\n  const date = (item.json.Date || '').trim();\n  const status = (item.json.Status || '').trim().toLowerCase();\n  \n  const isToday = date === todayStr || \n                  date === todayFormatted || \n                  date === todayUS ||\n                  date === today.toLocaleDateString('de-DE'); // DD.MM.YYYY\n  \n  return isToday && status === 'ready';\n}).map((item, index) => ({\n  json: {\n    ...item.json,\n    _rowIndex: index + 2 // For sheet update (1-indexed, +1 for header)\n  }\n}));\n\nconsole.log(`Found ${todayPosts.length} posts ready for today (${todayStr})`);\nreturn todayPosts;"
+      },
+      "id": "c7d8e9f0-0703-0703-0703-070000000003",
+      "name": "Filter Today's Ready Posts",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json['Caption'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "c7d8e9f0-0704-0704-0704-070000000004",
+      "name": "Has Content?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build Buffer API payload for each post\n// Supports: instagram, linkedin, twitter, tiktok\nconst item = $input.first().json;\n\nconst platformMap = {\n  'instagram': 'instagram',\n  'ig': 'instagram',\n  'linkedin': 'linkedin',\n  'twitter': 'twitter',\n  'x': 'twitter',\n  'tiktok': 'tiktok'\n};\n\nconst platform = platformMap[(item.Platform || '').toLowerCase().trim()] || 'instagram';\n\n// Build media array if image URL provided\nconst media = item.Image_URL && item.Image_URL.trim() ? \n  [{ url: item.Image_URL.trim(), thumbnail: item.Image_URL.trim() }] : [];\n\nconst bufferPayload = {\n  profile_ids: [`REPLACE_WITH_BUFFER_PROFILE_ID_${platform.toUpperCase()}`],\n  text: item.Caption || '',\n  now: true, // Post immediately\n  media: media.length > 0 ? { photo: item.Image_URL.trim() } : undefined,\n  _originalData: item // Keep for sheet update\n};\n\nreturn [{ json: bufferPayload }];"
+      },
+      "id": "c7d8e9f0-0705-0705-0705-070000000005",
+      "name": "Build Buffer Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 200],
+      "notes": "SETUP: Replace REPLACE_WITH_BUFFER_PROFILE_ID_INSTAGRAM etc. with your Buffer profile IDs. Find them at https://api.bufferapp.com/1/profiles.json"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.bufferapp.com/1/updates/create.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "profile_ids[]",
+              "value": "={{ $json.profile_ids[0] }}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $json.text }}"
+            },
+            {
+              "name": "now",
+              "value": "=true"
+            },
+            {
+              "name": "media[photo]",
+              "value": "={{ $json.media?.photo || '' }}"
+            },
+            {
+              "name": "access_token",
+              "value": "REPLACE_WITH_BUFFER_ACCESS_TOKEN"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "c7d8e9f0-0706-0706-0706-070000000006",
+      "name": "Post via Buffer API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1340, 200],
+      "notes": "SETUP: Get your Buffer access token from https://buffer.com/developers/api — replace REPLACE_WITH_BUFFER_ACCESS_TOKEN"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Content_Calendar",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Status": "Posted",
+            "Posted_At": "={{ new Date().toISOString() }}"
+          }
+        },
+        "where": {
+          "values": [
+            {
+              "lookupColumn": "Caption",
+              "lookupValue": "={{ $('Build Buffer Payload').first().json._originalData.Caption }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c7d8e9f0-0707-0707-0707-070000000007",
+      "name": "Update Status to Posted",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [1560, 200],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets - Motion Elevation"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Count how many posts were successfully published today\nconst items = $input.all();\nconst count = items.length;\nconst platforms = [...new Set(items.map(i => i.json._originalData?.Platform || 'Unknown'))];\n\nreturn [{\n  json: {\n    published_count: count,\n    platforms: platforms.join(', '),\n    summary: count > 0\n      ? `✅ ${count} post${count !== 1 ? 's' : ''} published today on: ${platforms.join(', ')}`\n      : '📭 No posts were scheduled for today.',\n    date: new Date().toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })\n  }\n}];"
+      },
+      "id": "c7d8e9f0-0708-0708-0708-070000000008",
+      "name": "Build Daily Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1780, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_SENDER_EMAIL",
+        "toEmail": "REPLACE_WITH_OWNER_EMAIL",
+        "subject": "=📱 Daily Social Media Summary — {{ $json.date }}",
+        "emailType": "html",
+        "message": "=<html><body style=\"font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px;\">\n<h2 style=\"color: #1a1a2e;\">📱 Daily Social Media Summary</h2>\n<p style=\"font-size: 18px;\">{{ $json.summary }}</p>\n<hr/>\n<p><strong>Date:</strong> {{ $json.date }}</p>\n<p><strong>Platforms:</strong> {{ $json.platforms || 'N/A' }}</p>\n<p><strong>Posts Published:</strong> {{ $json.published_count }}</p>\n<hr/>\n<p style=\"color: #666;\">To schedule more posts, update your <a href=\"https://docs.google.com/spreadsheets/d/REPLACE_WITH_GOOGLE_SHEET_ID\">Content Calendar sheet</a> and set Status to 'Ready'.</p>\n<p style=\"color: #999; font-size: 12px;\">Sent by Motion Elevation Automation</p>\n</body></html>",
+        "options": {}
+      },
+      "id": "c7d8e9f0-0709-0709-0709-070000000009",
+      "name": "Email Daily Summary",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [2000, 300],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID",
+          "name": "SMTP - Motion Elevation"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const error = $input.first().json;\nconsole.error('ME-07 Error:', JSON.stringify(error));\nreturn [{ json: { error: true, message: error.message || 'Posting failed', timestamp: new Date().toISOString() } }];"
+      },
+      "id": "c7d8e9f0-0710-0710-0710-070000000010",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1340, 460],
+      "notes": "Catches errors from Buffer API or Sheets. Connect error outputs here."
+    }
+  ],
+  "connections": {
+    "Schedule: Daily 9am": {
+      "main": [
+        [
+          {
+            "node": "Read Content Calendar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Content Calendar": {
+      "main": [
+        [
+          {
+            "node": "Filter Today's Ready Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Today's Ready Posts": {
+      "main": [
+        [
+          {
+            "node": "Has Content?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Content?": {
+      "main": [
+        [
+          {
+            "node": "Build Buffer Payload",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build Daily Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Buffer Payload": {
+      "main": [
+        [
+          {
+            "node": "Post via Buffer API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post via Buffer API": {
+      "main": [
+        [
+          {
+            "node": "Update Status to Posted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Status to Posted": {
+      "main": [
+        [
+          {
+            "node": "Build Daily Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Daily Summary": {
+      "main": [
+        [
+          {
+            "node": "Email Daily Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "tags": ["motion-elevation", "social-media", "buffer", "google-sheets", "scheduler"],
+  "meta": {
+    "motionElevation": {
+      "version": "1.0.0",
+      "category": "Social Media Automation",
+      "deployTime": "~45 minutes",
+      "credentialsNeeded": ["Google Sheets OAuth2", "SMTP", "Buffer API Token"],
+      "description": "SETUP README:\n\n1. GOOGLE SHEETS SETUP:\n   Create a sheet named 'Content_Calendar' with these columns:\n   Date | Platform | Caption | Image_URL | Status | Posted_At\n   \n   - Date: Use YYYY-MM-DD format (e.g. 2024-03-15) or DD/MM/YYYY\n   - Platform: instagram / linkedin / twitter / tiktok\n   - Caption: Your post text\n   - Image_URL: Direct link to image (optional, leave blank for text-only)\n   - Status: Set to 'Ready' when post should go out. 'Draft' = skip.\n   - Posted_At: Auto-filled by workflow\n\n2. BUFFER SETUP:\n   - Sign up at buffer.com and connect your social accounts\n   - Get your Access Token: buffer.com/developers/api → OAuth\n   - Get Profile IDs: GET https://api.bufferapp.com/1/profiles.json?access_token=YOUR_TOKEN\n   - Replace REPLACE_WITH_BUFFER_ACCESS_TOKEN in 'Post via Buffer API' node\n   - Replace REPLACE_WITH_BUFFER_PROFILE_ID_INSTAGRAM etc. in 'Build Buffer Payload' node\n\n3. CREDENTIALS:\n   - Google Sheets OAuth2: n8n Settings → Credentials\n   - SMTP: n8n Settings → Credentials\n\n4. TIMEZONE:\n   - Set your n8n instance timezone to match your posting schedule\n   - n8n Settings → General → Timezone\n\nSUPPORTED PLATFORMS: Instagram, LinkedIn, Twitter/X, TikTok (via Buffer)"
+    }
+  }
+}

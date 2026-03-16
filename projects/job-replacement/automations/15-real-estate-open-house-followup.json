@@ -1,0 +1,313 @@
+{
+  "name": "ME-15 | Real Estate — Open House Follow-Up Sequence",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "open-house-signup",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "me15-0001-0001-0001-000000000001",
+      "name": "Webhook: Open House Sign-In",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "open-house-me15",
+      "notes": "Receives visitor sign-in data from iPad form at open house. Fields: name, email, phone, property_address, visit_date, interest_level, preapproved, notes"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body || $input.first().json;\n\nconst name = body.name || body.Name || 'Friend';\nconst email = body.email || body.Email || '';\nconst phone = body.phone || body.Phone || '';\nconst propertyAddress = body.property_address || body.property || 'the property';\nconst visitDate = body.visit_date || new Date().toISOString().split('T')[0];\nconst interestLevel = (body.interest_level || body.interest || 'medium').toLowerCase();\nconst preapproved = (body.preapproved || body.pre_approved || 'no').toLowerCase();\nconst notes = body.notes || '';\n\nif (!email) throw new Error('No email in sign-in form');\n\n// Score the lead\nlet score = 50;\nif (interestLevel === 'high') score += 30;\nif (interestLevel === 'medium') score += 10;\nif (preapproved === 'yes' || preapproved === 'true') score += 20;\nif (phone) score += 10;\n\nreturn [{\n  json: {\n    name, email, phone, property_address: propertyAddress,\n    visit_date: visitDate, interest_level: interestLevel,\n    preapproved, notes, lead_score: score,\n    sequence_step: 0,\n    created_at: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "me15-0002-0002-0002-000000000002",
+      "name": "Parse & Score Lead",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": { "__rl": true, "value": "REPLACE_WITH_GOOGLE_SHEET_ID", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Open_House_Leads", "mode": "name" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.name }}",
+            "Email": "={{ $json.email }}",
+            "Phone": "={{ $json.phone }}",
+            "Property": "={{ $json.property_address }}",
+            "Visit_Date": "={{ $json.visit_date }}",
+            "Interest": "={{ $json.interest_level }}",
+            "Preapproved": "={{ $json.preapproved }}",
+            "Notes": "={{ $json.notes }}",
+            "Lead_Score": "={{ $json.lead_score }}",
+            "Email1_Sent": "No",
+            "Email2_Sent": "No",
+            "Email3_Sent": "No",
+            "Status": "New",
+            "Created_At": "={{ $json.created_at }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "me15-0003-0003-0003-000000000003",
+      "name": "Log Lead to Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [680, 300],
+      "credentials": { "googleSheetsOAuth2Api": { "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID", "name": "Google Sheets - Motion Elevation" } }
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_AGENT_EMAIL",
+        "toEmail": "={{ $json.email }}",
+        "subject": "=Great meeting you at {{ $json.property_address }} today!",
+        "emailType": "html",
+        "message": "=<html><body style=\"font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; background: #f8fafc;\">\n<div style=\"background: white; padding: 32px; border-radius: 12px; border-top: 4px solid #1e40af;\">\n  <h2 style=\"color: #0f172a;\">Great to meet you, {{ $json.name }}! 🏡</h2>\n  <p>Thank you for stopping by our open house at <strong>{{ $json.property_address }}</strong> today. It was a pleasure showing you around!</p>\n  <p>As promised, here are the key details about the property:</p>\n  <ul style=\"line-height: 2; color: #374151;\">\n    <li>📐 <strong>Size:</strong> REPLACE_WITH_SQM m²</li>\n    <li>🛏️ <strong>Bedrooms:</strong> REPLACE_WITH_BEDROOMS</li>\n    <li>🚿 <strong>Bathrooms:</strong> REPLACE_WITH_BATHROOMS</li>\n    <li>💰 <strong>Asking price:</strong> REPLACE_WITH_PRICE</li>\n    <li>📅 <strong>Available:</strong> REPLACE_WITH_AVAILABILITY</li>\n  </ul>\n  <p style=\"text-align: center; margin: 28px 0;\">\n    <a href=\"REPLACE_WITH_PROPERTY_LISTING_URL\" style=\"background: #1e40af; color: white; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: bold;\">View Full Listing →</a>\n  </p>\n  <p>Have questions? I'm just a call or text away: <strong>REPLACE_WITH_AGENT_PHONE</strong></p>\n  <p style=\"color: #94a3b8; font-size: 12px;\">— REPLACE_WITH_AGENT_NAME | REPLACE_WITH_AGENCY_NAME<br>REPLACE_WITH_AGENT_LICENSE</p>\n</div>\n</body></html>",
+        "options": {}
+      },
+      "id": "me15-0004-0004-0004-000000000004",
+      "name": "Send Email 1: Thank You + Info",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [900, 200],
+      "credentials": { "smtp": { "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID", "name": "SMTP - Motion Elevation" } }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"success\": true, \"message\": \"Thank you! Check your email for property details.\" }",
+        "options": {}
+      },
+      "id": "me15-0005-0005-0005-000000000005",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [900, 380]
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_AGENT_EMAIL",
+        "toEmail": "REPLACE_WITH_AGENT_EMAIL",
+        "subject": "=🏡 HOT LEAD: {{ $json.name }} (Score: {{ $json.lead_score }}) — {{ $json.property_address }}",
+        "emailType": "html",
+        "message": "=<html><body style=\"font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px;\">\n<div style=\"background: white; padding: 24px; border-radius: 12px; border-top: 4px solid #dc2626;\">\n  <h2>🔥 New Open House Lead</h2>\n  <table style=\"width: 100%; border-collapse: collapse;\">\n    <tr><td style=\"padding: 6px 0; color: #64748b;\">Name</td><td style=\"padding: 6px 0; font-weight: bold;\">{{ $json.name }}</td></tr>\n    <tr><td style=\"padding: 6px 0; color: #64748b;\">Email</td><td style=\"padding: 6px 0;\">{{ $json.email }}</td></tr>\n    <tr><td style=\"padding: 6px 0; color: #64748b;\">Phone</td><td style=\"padding: 6px 0;\">{{ $json.phone }}</td></tr>\n    <tr><td style=\"padding: 6px 0; color: #64748b;\">Property</td><td style=\"padding: 6px 0;\">{{ $json.property_address }}</td></tr>\n    <tr><td style=\"padding: 6px 0; color: #64748b;\">Interest</td><td style=\"padding: 6px 0;\">{{ $json.interest_level }}</td></tr>\n    <tr><td style=\"padding: 6px 0; color: #64748b;\">Pre-approved</td><td style=\"padding: 6px 0;\">{{ $json.preapproved }}</td></tr>\n    <tr><td style=\"padding: 6px 0; color: #64748b;\">Lead Score</td><td style=\"padding: 6px 0; font-size: 18px; color: #dc2626;\"><strong>{{ $json.lead_score }}/100</strong></td></tr>\n    <tr><td style=\"padding: 6px 0; color: #64748b;\">Notes</td><td style=\"padding: 6px 0;\">{{ $json.notes }}</td></tr>\n  </table>\n  {{ $json.lead_score >= 70 ? '<p style=\"background: #fef2f2; padding: 12px; border-radius: 6px; color: #dc2626; font-weight: bold;\">⚡ HIGH PRIORITY — Call within 2 hours!</p>' : '<p style=\"color: #64748b;\">Standard follow-up sequence initiated.</p>' }}\n</div>\n</body></html>",
+        "options": {}
+      },
+      "id": "me15-0006-0006-0006-000000000006",
+      "name": "Alert Agent of New Lead",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [900, 560],
+      "credentials": { "smtp": { "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID", "name": "SMTP - Motion Elevation" } }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            { "field": "cronExpression", "expression": "0 9 * * *" }
+          ]
+        }
+      },
+      "id": "me15-0007-0007-0007-000000000007",
+      "name": "Schedule: Daily 9am Follow-Up",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 800],
+      "notes": "Second flow: sends Day 3 and Day 7 follow-up emails to open house leads."
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "documentId": { "__rl": true, "value": "REPLACE_WITH_GOOGLE_SHEET_ID", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Open_House_Leads", "mode": "name" },
+        "filters": {},
+        "options": {}
+      },
+      "id": "me15-0008-0008-0008-000000000008",
+      "name": "Read Open House Leads",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [460, 800],
+      "credentials": { "googleSheetsOAuth2Api": { "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID", "name": "Google Sheets - Motion Elevation" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst now = new Date();\nnow.setHours(0,0,0,0);\n\nconst actions = [];\n\nfor (const item of items) {\n  const row = item.json;\n  if (!row.Email || row.Status === 'Closed' || row.Status === 'Unsubscribed') continue;\n\n  let visitDate;\n  try {\n    visitDate = new Date(row.Visit_Date);\n    visitDate.setHours(0,0,0,0);\n    if (isNaN(visitDate)) continue;\n  } catch { continue; }\n\n  const daysSinceVisit = Math.round((now - visitDate) / (1000 * 60 * 60 * 24));\n\n  const base = {\n    name: row.Name || 'Friend',\n    email: row.Email,\n    phone: row.Phone || '',\n    property_address: row.Property || 'the property',\n    visit_date: row.Visit_Date,\n    interest: row.Interest || 'medium',\n    lead_score: parseInt(row.Lead_Score || '50'),\n    email1_sent: row.Email1_Sent || 'No',\n    email2_sent: row.Email2_Sent || 'No',\n    email3_sent: row.Email3_Sent || 'No'\n  };\n\n  // Day 3: neighbourhood insights + similar properties\n  if (daysSinceVisit === 3 && base.email2_sent === 'No') {\n    actions.push({ json: { ...base, _action: 'email2_day3' } });\n  }\n\n  // Day 7: urgency + schedule a call\n  if (daysSinceVisit === 7 && base.email3_sent === 'No') {\n    actions.push({ json: { ...base, _action: 'email3_day7' } });\n  }\n}\n\nconsole.log(`RE follow-up actions: ${actions.length}`);\nreturn actions.length > 0 ? actions : [{ json: { _action: 'none' } }];"
+      },
+      "id": "me15-0009-0009-0009-000000000009",
+      "name": "Find Leads Needing Follow-Up",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 800]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "outputKey": "email2",
+              "conditions": {
+                "conditions": [{ "leftValue": "={{ $json._action }}", "rightValue": "email2_day3", "operator": { "type": "string", "operation": "equals" } }],
+                "combinator": "and"
+              }
+            },
+            {
+              "outputKey": "email3",
+              "conditions": {
+                "conditions": [{ "leftValue": "={{ $json._action }}", "rightValue": "email3_day7", "operator": { "type": "string", "operation": "equals" } }],
+                "combinator": "and"
+              }
+            }
+          ],
+          "fallbackOutput": "none"
+        },
+        "options": {}
+      },
+      "id": "me15-0010-0010-0010-000000000010",
+      "name": "Route Follow-Up Type",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [900, 800]
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_AGENT_EMAIL",
+        "toEmail": "={{ $json.email }}",
+        "subject": "=A few things you should know about the {{ $json.property_address }} neighbourhood",
+        "emailType": "html",
+        "message": "=<html><body style=\"font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; background: #f8fafc;\">\n<div style=\"background: white; padding: 32px; border-radius: 12px; border-top: 4px solid #1e40af;\">\n  <h2 style=\"color: #0f172a;\">Hi {{ $json.name }}, a quick update! 🏡</h2>\n  <p>It's been a few days since you visited <strong>{{ $json.property_address }}</strong>. I wanted to share some info that might help you decide:</p>\n  <h3 style=\"color: #1e40af;\">📍 About the Neighbourhood</h3>\n  <ul style=\"line-height: 1.9; color: #374151;\">\n    <li>⭐ Average Google rating of local schools: REPLACE_WITH_SCHOOL_RATING</li>\n    <li>🚇 Public transport: REPLACE_WITH_TRANSPORT_INFO</li>\n    <li>🛒 Shopping & amenities: REPLACE_WITH_AMENITIES_INFO</li>\n    <li>📈 Property value trend: REPLACE_WITH_MARKET_TREND</li>\n  </ul>\n  <h3 style=\"color: #1e40af;\">🏠 Similar Properties You Might Like</h3>\n  <p>I've pulled together a few comparable listings in the area:<br>\n  <a href=\"REPLACE_WITH_SIMILAR_LISTING_1_URL\">Option A — REPLACE_WITH_SIMILAR_1_DESC</a><br>\n  <a href=\"REPLACE_WITH_SIMILAR_LISTING_2_URL\">Option B — REPLACE_WITH_SIMILAR_2_DESC</a></p>\n  <p>Want to arrange a private viewing? I can often get you access before listings go live.</p>\n  <p style=\"text-align: center; margin: 28px 0;\">\n    <a href=\"REPLACE_WITH_CALENDLY_URL\" style=\"background: #1e40af; color: white; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: bold;\">Schedule a Call →</a>\n  </p>\n  <p style=\"color: #94a3b8; font-size: 12px;\">— REPLACE_WITH_AGENT_NAME | REPLACE_WITH_AGENT_PHONE</p>\n</div>\n</body></html>",
+        "options": {}
+      },
+      "id": "me15-0011-0011-0011-000000000011",
+      "name": "Send Email 2: Neighbourhood Insights",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1160, 700],
+      "credentials": { "smtp": { "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID", "name": "SMTP - Motion Elevation" } }
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_AGENT_EMAIL",
+        "toEmail": "={{ $json.email }}",
+        "subject": "={{ $json.name }}, one week on — still thinking about {{ $json.property_address }}?",
+        "emailType": "html",
+        "message": "=<html><body style=\"font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; background: #f8fafc;\">\n<div style=\"background: white; padding: 32px; border-radius: 12px; border-top: 4px solid #dc2626;\">\n  <h2 style=\"color: #0f172a;\">Still on the fence, {{ $json.name }}? 🤔</h2>\n  <p>It's been a week since you visited <strong>{{ $json.property_address }}</strong>. The seller has been receiving increased interest this week.</p>\n  <div style=\"background: #fef2f2; padding: 16px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #dc2626;\">\n    <p style=\"margin: 0; color: #991b1b;\"><strong>⚡ Market update:</strong> Properties in this area are averaging REPLACE_WITH_AVG_DAYS_ON_MARKET days on the market. Don't miss out!</p>\n  </div>\n  <p>I'd love to jump on a quick 15-minute call to answer any remaining questions and help you move forward with confidence:</p>\n  <p style=\"text-align: center; margin: 28px 0;\">\n    <a href=\"REPLACE_WITH_CALENDLY_URL\" style=\"background: #dc2626; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px;\">📞 Book a 15-Min Call</a>\n  </p>\n  <p style=\"color: #64748b;\">Not the right fit? No problem — I work with buyers every day and would love to help you find your perfect home. Just hit reply and let me know what you're really looking for.</p>\n  <p style=\"color: #94a3b8; font-size: 12px;\">— REPLACE_WITH_AGENT_NAME | REPLACE_WITH_AGENT_PHONE | REPLACE_WITH_AGENCY_NAME</p>\n</div>\n</body></html>",
+        "options": {}
+      },
+      "id": "me15-0012-0012-0012-000000000012",
+      "name": "Send Email 3: Urgency + CTA",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1160, 900],
+      "credentials": { "smtp": { "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID", "name": "SMTP - Motion Elevation" } }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": { "__rl": true, "value": "REPLACE_WITH_GOOGLE_SHEET_ID", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Open_House_Leads", "mode": "name" },
+        "columns": { "mappingMode": "defineBelow", "value": { "Email1_Sent": "Yes" } },
+        "where": { "values": [{ "lookupColumn": "Email", "lookupValue": "={{ $json.email }}" }] },
+        "options": {}
+      },
+      "id": "me15-0013-0013-0013-000000000013",
+      "name": "Mark Email 1 Sent",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [1120, 500],
+      "credentials": { "googleSheetsOAuth2Api": { "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID", "name": "Google Sheets - Motion Elevation" } }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": { "__rl": true, "value": "REPLACE_WITH_GOOGLE_SHEET_ID", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Open_House_Leads", "mode": "name" },
+        "columns": { "mappingMode": "defineBelow", "value": { "Email2_Sent": "Yes" } },
+        "where": { "values": [{ "lookupColumn": "Email", "lookupValue": "={{ $json.email }}" }] },
+        "options": {}
+      },
+      "id": "me15-0014-0014-0014-000000000014",
+      "name": "Mark Email 2 Sent",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [1400, 700],
+      "credentials": { "googleSheetsOAuth2Api": { "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID", "name": "Google Sheets - Motion Elevation" } }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": { "__rl": true, "value": "REPLACE_WITH_GOOGLE_SHEET_ID", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Open_House_Leads", "mode": "name" },
+        "columns": { "mappingMode": "defineBelow", "value": { "Email3_Sent": "Yes" } },
+        "where": { "values": [{ "lookupColumn": "Email", "lookupValue": "={{ $json.email }}" }] },
+        "options": {}
+      },
+      "id": "me15-0015-0015-0015-000000000015",
+      "name": "Mark Email 3 Sent",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [1400, 900],
+      "credentials": { "googleSheetsOAuth2Api": { "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID", "name": "Google Sheets - Motion Elevation" } }
+    }
+  ],
+  "connections": {
+    "Webhook: Open House Sign-In": {
+      "main": [[{ "node": "Parse & Score Lead", "type": "main", "index": 0 }]]
+    },
+    "Parse & Score Lead": {
+      "main": [[{ "node": "Log Lead to Sheet", "type": "main", "index": 0 }]]
+    },
+    "Log Lead to Sheet": {
+      "main": [
+        [{ "node": "Send Email 1: Thank You + Info", "type": "main", "index": 0 }],
+        [{ "node": "Respond to Webhook", "type": "main", "index": 0 }],
+        [{ "node": "Alert Agent of New Lead", "type": "main", "index": 0 }]
+      ]
+    },
+    "Send Email 1: Thank You + Info": {
+      "main": [[{ "node": "Mark Email 1 Sent", "type": "main", "index": 0 }]]
+    },
+    "Schedule: Daily 9am Follow-Up": {
+      "main": [[{ "node": "Read Open House Leads", "type": "main", "index": 0 }]]
+    },
+    "Read Open House Leads": {
+      "main": [[{ "node": "Find Leads Needing Follow-Up", "type": "main", "index": 0 }]]
+    },
+    "Find Leads Needing Follow-Up": {
+      "main": [[{ "node": "Route Follow-Up Type", "type": "main", "index": 0 }]]
+    },
+    "Route Follow-Up Type": {
+      "main": [
+        [{ "node": "Send Email 2: Neighbourhood Insights", "type": "main", "index": 0 }],
+        [{ "node": "Send Email 3: Urgency + CTA", "type": "main", "index": 0 }]
+      ]
+    },
+    "Send Email 2: Neighbourhood Insights": {
+      "main": [[{ "node": "Mark Email 2 Sent", "type": "main", "index": 0 }]]
+    },
+    "Send Email 3: Urgency + CTA": {
+      "main": [[{ "node": "Mark Email 3 Sent", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "tags": ["motion-elevation", "real-estate", "open-house", "lead-nurture", "follow-up", "property"],
+  "meta": {
+    "motionElevation": {
+      "version": "1.0.0",
+      "category": "Real Estate Automation",
+      "deployTime": "~60 minutes",
+      "credentialsNeeded": ["SMTP", "Google Sheets OAuth2"],
+      "suggestedPrice": "€997 setup + €147/month",
+      "description": "iPad sign-in form → instant thank you email → Day 3 neighbourhood insights → Day 7 urgency close. Agent gets hot lead alert for score 70+."
+    }
+  }
+}

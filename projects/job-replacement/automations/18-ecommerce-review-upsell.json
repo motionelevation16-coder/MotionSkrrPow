@@ -1,0 +1,273 @@
+{
+  "name": "ME-18 | E-Commerce — Review Request + Upsell Sequence",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "order-shipped",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "me18-0001-0001-0001-000000000001",
+      "name": "Webhook: Order Shipped",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "order-shipped-me18",
+      "notes": "Connect your Shopify/WooCommerce order shipped webhook here. Fields: customer_name, customer_email, order_id, order_total, product_name, product_category, tracking_url, shop_name"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body || $input.first().json;\n\nconst customerName = body.customer_name || body.name || 'Customer';\nconst customerEmail = body.customer_email || body.email || '';\nconst orderId = body.order_id || body.id || 'N/A';\nconst orderTotal = body.order_total || body.total || '0';\nconst productName = body.product_name || body.product || 'your order';\nconst productCategory = (body.product_category || body.category || 'general').toLowerCase();\nconst trackingUrl = body.tracking_url || body.tracking || '#';\nconst shopName = body.shop_name || 'REPLACE_WITH_SHOP_NAME';\n\nif (!customerEmail) throw new Error('No customer email in order webhook');\n\nreturn [{\n  json: {\n    customer_name: customerName,\n    customer_email: customerEmail,\n    order_id: orderId,\n    order_total: orderTotal,\n    product_name: productName,\n    product_category: productCategory,\n    tracking_url: trackingUrl,\n    shop_name: shopName,\n    shipped_at: new Date().toISOString(),\n    review_sent: 'No',\n    upsell_sent: 'No'\n  }\n}];"
+      },
+      "id": "me18-0002-0002-0002-000000000002",
+      "name": "Parse Order Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": { "__rl": true, "value": "REPLACE_WITH_GOOGLE_SHEET_ID", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Orders", "mode": "name" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Customer_Name": "={{ $json.customer_name }}",
+            "Customer_Email": "={{ $json.customer_email }}",
+            "Order_ID": "={{ $json.order_id }}",
+            "Order_Total": "={{ $json.order_total }}",
+            "Product_Name": "={{ $json.product_name }}",
+            "Product_Category": "={{ $json.product_category }}",
+            "Tracking_URL": "={{ $json.tracking_url }}",
+            "Shipped_At": "={{ $json.shipped_at }}",
+            "Review_Sent": "No",
+            "Upsell_Sent": "No"
+          }
+        },
+        "options": {}
+      },
+      "id": "me18-0003-0003-0003-000000000003",
+      "name": "Log Order to Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [680, 300],
+      "credentials": { "googleSheetsOAuth2Api": { "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID", "name": "Google Sheets - Motion Elevation" } }
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_STORE_EMAIL",
+        "toEmail": "={{ $json.customer_email }}",
+        "subject": "=📦 Your order is on its way, {{ $json.customer_name }}!",
+        "emailType": "html",
+        "message": "=<html><body style=\"font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; background: #f8fafc;\">\n<div style=\"background: white; padding: 32px; border-radius: 12px; border-top: 4px solid #0ea5e9;\">\n  <h2 style=\"color: #0f172a;\">It's on its way! 📦</h2>\n  <p>Hi {{ $json.customer_name }}, great news — your order has shipped!</p>\n  <div style=\"background: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0;\">\n    <p style=\"margin: 0;\"><strong>📋 Order:</strong> #{{ $json.order_id }}</p>\n    <p style=\"margin: 8px 0 0;\"><strong>📦 Item:</strong> {{ $json.product_name }}</p>\n    <p style=\"margin: 8px 0 0;\"><strong>💰 Total:</strong> {{ $json.order_total }}</p>\n  </div>\n  <p style=\"text-align: center; margin: 28px 0;\">\n    <a href=\"{{ $json.tracking_url }}\" style=\"background: #0ea5e9; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: bold;\">Track My Order →</a>\n  </p>\n  <p style=\"color: #64748b;\">Estimated delivery: REPLACE_WITH_DELIVERY_ESTIMATE. Questions? Reply to this email or visit REPLACE_WITH_SUPPORT_URL</p>\n  <p style=\"color: #94a3b8; font-size: 12px;\">— {{ $json.shop_name }}</p>\n</div>\n</body></html>",
+        "options": {}
+      },
+      "id": "me18-0004-0004-0004-000000000004",
+      "name": "Send Shipping Confirmation",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [900, 200],
+      "credentials": { "smtp": { "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID", "name": "SMTP - Motion Elevation" } }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"success\": true }",
+        "options": {}
+      },
+      "id": "me18-0005-0005-0005-000000000005",
+      "name": "Respond OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [900, 380]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            { "field": "cronExpression", "expression": "0 10 * * *" }
+          ]
+        }
+      },
+      "id": "me18-0006-0006-0006-000000000006",
+      "name": "Schedule: Daily 10am",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 700],
+      "notes": "Second flow: checks who needs a review request (5 days after ship) or upsell email (7 days after ship)."
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "documentId": { "__rl": true, "value": "REPLACE_WITH_GOOGLE_SHEET_ID", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Orders", "mode": "name" },
+        "filters": {},
+        "options": {}
+      },
+      "id": "me18-0007-0007-0007-000000000007",
+      "name": "Read Orders Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [460, 700],
+      "credentials": { "googleSheetsOAuth2Api": { "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID", "name": "Google Sheets - Motion Elevation" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst now = new Date();\nnow.setHours(0,0,0,0);\n\nconst actions = [];\n\nfor (const item of items) {\n  const row = item.json;\n  if (!row.Customer_Email) continue;\n\n  let shippedDate;\n  try {\n    shippedDate = new Date(row.Shipped_At);\n    shippedDate.setHours(0,0,0,0);\n    if (isNaN(shippedDate)) continue;\n  } catch { continue; }\n\n  const daysSinceShip = Math.round((now - shippedDate) / (1000 * 60 * 60 * 24));\n\n  const base = {\n    customer_name: row.Customer_Name || 'Customer',\n    customer_email: row.Customer_Email,\n    order_id: row.Order_ID || '',\n    order_total: row.Order_Total || '',\n    product_name: row.Product_Name || 'your order',\n    product_category: row.Product_Category || 'general',\n    shipped_at: row.Shipped_At,\n    review_sent: row.Review_Sent || 'No',\n    upsell_sent: row.Upsell_Sent || 'No',\n    days_since_ship: daysSinceShip\n  };\n\n  // Review request: 5 days after shipping\n  if (daysSinceShip === 5 && base.review_sent === 'No') {\n    actions.push({ json: { ...base, _action: 'review_request' } });\n  }\n\n  // Upsell: 7 days after shipping, review was sent\n  if (daysSinceShip === 7 && base.review_sent === 'Yes' && base.upsell_sent === 'No') {\n    actions.push({ json: { ...base, _action: 'upsell' } });\n  }\n}\n\nconsole.log(`Ecom actions: ${actions.length}`);\nreturn actions.length > 0 ? actions : [{ json: { _action: 'none' } }];"
+      },
+      "id": "me18-0008-0008-0008-000000000008",
+      "name": "Find Orders Needing Action",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 700]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "outputKey": "review_request",
+              "conditions": {
+                "conditions": [{ "leftValue": "={{ $json._action }}", "rightValue": "review_request", "operator": { "type": "string", "operation": "equals" } }],
+                "combinator": "and"
+              }
+            },
+            {
+              "outputKey": "upsell",
+              "conditions": {
+                "conditions": [{ "leftValue": "={{ $json._action }}", "rightValue": "upsell", "operator": { "type": "string", "operation": "equals" } }],
+                "combinator": "and"
+              }
+            }
+          ],
+          "fallbackOutput": "none"
+        },
+        "options": {}
+      },
+      "id": "me18-0009-0009-0009-000000000009",
+      "name": "Route by Action",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [900, 700]
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_STORE_EMAIL",
+        "toEmail": "={{ $json.customer_email }}",
+        "subject": "=⭐ How's your {{ $json.product_name }}? (30-second review)",
+        "emailType": "html",
+        "message": "=<html><body style=\"font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; background: #f8fafc;\">\n<div style=\"background: white; padding: 32px; border-radius: 12px; border-top: 4px solid #f59e0b;\">\n  <h2 style=\"color: #0f172a;\">Loving your {{ $json.product_name }}? ⭐</h2>\n  <p>Hi {{ $json.customer_name }}, your order (#{{ $json.order_id }}) should have arrived by now — we hope you're happy with it!</p>\n  <p>We're a small team and honest reviews make a huge difference for us. Would you mind leaving a quick one?</p>\n  <div style=\"text-align: center; margin: 32px 0;\">\n    <p style=\"margin: 0 0 8px; color: #64748b; font-size: 14px;\">How would you rate your experience?</p>\n    <p style=\"margin: 0;\">\n      <a href=\"REPLACE_WITH_REVIEW_URL?rating=5\" style=\"font-size: 28px; text-decoration: none;\">⭐</a>\n      <a href=\"REPLACE_WITH_REVIEW_URL?rating=5\" style=\"font-size: 28px; text-decoration: none;\">⭐</a>\n      <a href=\"REPLACE_WITH_REVIEW_URL?rating=5\" style=\"font-size: 28px; text-decoration: none;\">⭐</a>\n      <a href=\"REPLACE_WITH_REVIEW_URL?rating=5\" style=\"font-size: 28px; text-decoration: none;\">⭐</a>\n      <a href=\"REPLACE_WITH_REVIEW_URL?rating=5\" style=\"font-size: 28px; text-decoration: none;\">⭐</a>\n    </p>\n    <p style=\"margin: 16px 0 0;\">\n      <a href=\"REPLACE_WITH_REVIEW_URL\" style=\"background: #f59e0b; color: white; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: bold;\">Leave a Review →</a>\n    </p>\n  </div>\n  <p style=\"color: #64748b; font-size: 14px;\">Not 100% happy? Just reply to this email and we'll make it right. We stand behind every order. 💪</p>\n  <p style=\"color: #94a3b8; font-size: 12px;\">— REPLACE_WITH_SHOP_NAME team</p>\n</div>\n</body></html>",
+        "options": {}
+      },
+      "id": "me18-0010-0010-0010-000000000010",
+      "name": "Send Review Request",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1160, 580],
+      "credentials": { "smtp": { "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID", "name": "SMTP - Motion Elevation" } }
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_STORE_EMAIL",
+        "toEmail": "={{ $json.customer_email }}",
+        "subject": "={{ $json.customer_name }}, customers who bought {{ $json.product_name }} also love this...",
+        "emailType": "html",
+        "message": "=<html><body style=\"font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; background: #f8fafc;\">\n<div style=\"background: white; padding: 32px; border-radius: 12px; border-top: 4px solid #10b981;\">\n  <h2 style=\"color: #0f172a;\">Customers who love {{ $json.product_name }} also love...</h2>\n  <p>Hi {{ $json.customer_name }}, thanks again for your recent purchase. Based on what you bought, we think you'd love these:</p>\n\n  <div style=\"border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin: 16px 0;\">\n    <p style=\"margin: 0; font-weight: bold; color: #0f172a;\">REPLACE_WITH_UPSELL_PRODUCT_1_NAME</p>\n    <p style=\"margin: 4px 0; color: #64748b;\">REPLACE_WITH_UPSELL_PRODUCT_1_DESC</p>\n    <p style=\"margin: 8px 0 0;\">\n      <span style=\"font-size: 18px; font-weight: bold; color: #10b981;\">REPLACE_WITH_UPSELL_PRICE_1</span>\n      <a href=\"REPLACE_WITH_UPSELL_URL_1\" style=\"background: #10b981; color: white; padding: 8px 20px; border-radius: 6px; text-decoration: none; margin-left: 12px;\">Shop Now</a>\n    </p>\n  </div>\n\n  <div style=\"border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin: 16px 0;\">\n    <p style=\"margin: 0; font-weight: bold; color: #0f172a;\">REPLACE_WITH_UPSELL_PRODUCT_2_NAME</p>\n    <p style=\"margin: 4px 0; color: #64748b;\">REPLACE_WITH_UPSELL_PRODUCT_2_DESC</p>\n    <p style=\"margin: 8px 0 0;\">\n      <span style=\"font-size: 18px; font-weight: bold; color: #10b981;\">REPLACE_WITH_UPSELL_PRICE_2</span>\n      <a href=\"REPLACE_WITH_UPSELL_URL_2\" style=\"background: #10b981; color: white; padding: 8px 20px; border-radius: 6px; text-decoration: none; margin-left: 12px;\">Shop Now</a>\n    </p>\n  </div>\n\n  <div style=\"background: #f0fdf4; padding: 16px; border-radius: 8px; margin: 20px 0;\">\n    <p style=\"margin: 0; color: #166534;\">🎁 <strong>Loyalty discount:</strong> Use code <strong>THANKYOU10</strong> for 10% off your next order!</p>\n  </div>\n  <p style=\"color: #94a3b8; font-size: 12px;\">— REPLACE_WITH_SHOP_NAME | <a href=\"REPLACE_WITH_UNSUBSCRIBE_URL\" style=\"color: #94a3b8;\">Unsubscribe</a></p>\n</div>\n</body></html>",
+        "options": {}
+      },
+      "id": "me18-0011-0011-0011-000000000011",
+      "name": "Send Upsell Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1160, 800],
+      "credentials": { "smtp": { "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID", "name": "SMTP - Motion Elevation" } }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": { "__rl": true, "value": "REPLACE_WITH_GOOGLE_SHEET_ID", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Orders", "mode": "name" },
+        "columns": { "mappingMode": "defineBelow", "value": { "Review_Sent": "Yes" } },
+        "where": { "values": [{ "lookupColumn": "Order_ID", "lookupValue": "={{ $json.order_id }}" }] },
+        "options": {}
+      },
+      "id": "me18-0012-0012-0012-000000000012",
+      "name": "Mark Review Sent",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [1400, 580],
+      "credentials": { "googleSheetsOAuth2Api": { "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID", "name": "Google Sheets - Motion Elevation" } }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": { "__rl": true, "value": "REPLACE_WITH_GOOGLE_SHEET_ID", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Orders", "mode": "name" },
+        "columns": { "mappingMode": "defineBelow", "value": { "Upsell_Sent": "Yes" } },
+        "where": { "values": [{ "lookupColumn": "Order_ID", "lookupValue": "={{ $json.order_id }}" }] },
+        "options": {}
+      },
+      "id": "me18-0013-0013-0013-000000000013",
+      "name": "Mark Upsell Sent",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [1400, 800],
+      "credentials": { "googleSheetsOAuth2Api": { "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID", "name": "Google Sheets - Motion Elevation" } }
+    }
+  ],
+  "connections": {
+    "Webhook: Order Shipped": {
+      "main": [[{ "node": "Parse Order Data", "type": "main", "index": 0 }]]
+    },
+    "Parse Order Data": {
+      "main": [[{ "node": "Log Order to Sheet", "type": "main", "index": 0 }]]
+    },
+    "Log Order to Sheet": {
+      "main": [
+        [{ "node": "Send Shipping Confirmation", "type": "main", "index": 0 }],
+        [{ "node": "Respond OK", "type": "main", "index": 0 }]
+      ]
+    },
+    "Schedule: Daily 10am": {
+      "main": [[{ "node": "Read Orders Sheet", "type": "main", "index": 0 }]]
+    },
+    "Read Orders Sheet": {
+      "main": [[{ "node": "Find Orders Needing Action", "type": "main", "index": 0 }]]
+    },
+    "Find Orders Needing Action": {
+      "main": [[{ "node": "Route by Action", "type": "main", "index": 0 }]]
+    },
+    "Route by Action": {
+      "main": [
+        [{ "node": "Send Review Request", "type": "main", "index": 0 }],
+        [{ "node": "Send Upsell Email", "type": "main", "index": 0 }]
+      ]
+    },
+    "Send Review Request": {
+      "main": [[{ "node": "Mark Review Sent", "type": "main", "index": 0 }]]
+    },
+    "Send Upsell Email": {
+      "main": [[{ "node": "Mark Upsell Sent", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "tags": ["motion-elevation", "ecommerce", "review-request", "upsell", "shopify", "woocommerce", "post-purchase"],
+  "meta": {
+    "motionElevation": {
+      "version": "1.0.0",
+      "category": "E-Commerce Automation",
+      "deployTime": "~60 minutes",
+      "credentialsNeeded": ["SMTP", "Google Sheets OAuth2"],
+      "suggestedPrice": "€697 setup + €127/month",
+      "description": "Order shipped → shipping confirmation. Day 5: review request. Day 7: upsell with loyalty discount. Works with Shopify, WooCommerce, or any store that can fire webhooks."
+    }
+  }
+}

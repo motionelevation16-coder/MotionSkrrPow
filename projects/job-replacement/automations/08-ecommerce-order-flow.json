@@ -1,0 +1,439 @@
+{
+  "name": "ME-08 | E-Commerce Order Flow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "shopify-order-created",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "d8e9f0a1-0801-0801-0801-080000000001",
+      "name": "Webhook: Order Created",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 200],
+      "notes": "SETUP: In Shopify Admin → Settings → Notifications → Webhooks, add this URL for the 'Order creation' event. Format: JSON."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse Shopify order webhook payload\nconst order = $input.first().json;\n\nconst customer = order.customer || {};\nconst shippingAddress = order.shipping_address || order.billing_address || {};\nconst lineItems = order.line_items || [];\n\n// Build items list for email\nconst itemsList = lineItems.map(item => \n  `• ${item.name} × ${item.quantity} — €${parseFloat(item.price).toFixed(2)}`\n).join('\\n');\n\n// Calculate estimated delivery (5-7 business days from now)\nconst deliveryDate = new Date();\ndeliveryDate.setDate(deliveryDate.getDate() + 6);\nconst deliveryDateStr = deliveryDate.toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });\n\n// Review request date = delivery date + 3 days\nconst reviewDate = new Date(deliveryDate);\nreviewDate.setDate(reviewDate.getDate() + 3);\n\nreturn [{\n  json: {\n    order_id: order.id || order.order_number,\n    order_number: order.order_number || order.name,\n    customer_email: customer.email || order.email,\n    customer_name: `${customer.first_name || ''} ${customer.last_name || ''}`.trim() || 'Valued Customer',\n    customer_phone: shippingAddress.phone || customer.phone || '',\n    total_price: order.total_price || '0.00',\n    currency: order.currency || 'EUR',\n    items_list: itemsList,\n    items_count: lineItems.length,\n    shipping_address: `${shippingAddress.address1 || ''}, ${shippingAddress.city || ''}, ${shippingAddress.country || ''}`,\n    estimated_delivery: deliveryDateStr,\n    review_request_date: reviewDate.toISOString(),\n    order_status_url: order.order_status_url || `https://REPLACE_WITH_SHOP_DOMAIN/orders/${order.id}`,\n    created_at: order.created_at || new Date().toISOString(),\n    _raw_order_id: order.id\n  }\n}];"
+      },
+      "id": "d8e9f0a1-0802-0802-0802-080000000002",
+      "name": "Parse Order Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 200]
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_STORE_EMAIL",
+        "toEmail": "={{ $json.customer_email }}",
+        "subject": "=🛍️ Order Confirmed — #{{ $json.order_number }} | {{ $json['REPLACE_WITH_STORE_NAME'] || 'Your Store' }}",
+        "emailType": "html",
+        "message": "=<html><body style=\"font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; background: #f8f9fa;\">\n<div style=\"background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);\">\n  <h1 style=\"color: #1a1a2e; margin-bottom: 5px;\">✅ Order Confirmed!</h1>\n  <p style=\"color: #666;\">Thanks {{ $json.customer_name }}, your order is on its way!</p>\n  <hr/>\n  <h3>Order #{{ $json.order_number }}</h3>\n  <pre style=\"background: #f8f9fa; padding: 15px; border-radius: 8px; white-space: pre-wrap;\">{{ $json.items_list }}</pre>\n  <p><strong>Total:</strong> {{ $json.currency }} {{ $json.total_price }}</p>\n  <hr/>\n  <h3>📦 Shipping To</h3>\n  <p>{{ $json.shipping_address }}</p>\n  <p><strong>Estimated Delivery:</strong> {{ $json.estimated_delivery }}</p>\n  <hr/>\n  <p style=\"text-align: center;\">\n    <a href=\"{{ $json.order_status_url }}\" style=\"background: #1a1a2e; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; display: inline-block;\">Track Your Order</a>\n  </p>\n  <hr/>\n  <p style=\"color: #999; font-size: 12px; text-align: center;\">REPLACE_WITH_STORE_NAME | REPLACE_WITH_STORE_SUPPORT_EMAIL</p>\n</div>\n</body></html>",
+        "options": {}
+      },
+      "id": "d8e9f0a1-0803-0803-0803-080000000003",
+      "name": "Send Order Confirmation",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [680, 200],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID",
+          "name": "SMTP - Motion Elevation"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Orders",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Order_ID": "={{ $('Parse Order Data').first().json.order_id }}",
+            "Order_Number": "={{ $('Parse Order Data').first().json.order_number }}",
+            "Customer_Name": "={{ $('Parse Order Data').first().json.customer_name }}",
+            "Customer_Email": "={{ $('Parse Order Data').first().json.customer_email }}",
+            "Total": "={{ $('Parse Order Data').first().json.total_price }}",
+            "Currency": "={{ $('Parse Order Data').first().json.currency }}",
+            "Items_Count": "={{ $('Parse Order Data').first().json.items_count }}",
+            "Shipping_Address": "={{ $('Parse Order Data').first().json.shipping_address }}",
+            "Estimated_Delivery": "={{ $('Parse Order Data').first().json.estimated_delivery }}",
+            "Review_Request_Date": "={{ $('Parse Order Data').first().json.review_request_date }}",
+            "Status": "Confirmed",
+            "Created_At": "={{ $('Parse Order Data').first().json.created_at }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "d8e9f0a1-0804-0804-0804-080000000004",
+      "name": "Log Order to Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [900, 200],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets - Motion Elevation"
+        }
+      },
+      "notes": "SETUP: Create sheet tab 'Orders' with columns: Order_ID | Order_Number | Customer_Name | Customer_Email | Total | Currency | Items_Count | Shipping_Address | Estimated_Delivery | Review_Request_Date | Status | Created_At"
+    },
+    {
+      "parameters": {
+        "amount": 3,
+        "unit": "days"
+      },
+      "id": "d8e9f0a1-0805-0805-0805-080000000005",
+      "name": "Wait 3 Days (After Delivery)",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [1120, 200],
+      "notes": "Waits 3 days after delivery estimate before sending review request. Adjust timing as needed."
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_STORE_EMAIL",
+        "toEmail": "={{ $('Parse Order Data').first().json.customer_email }}",
+        "subject": "=⭐ How was your order? — #{{ $('Parse Order Data').first().json.order_number }}",
+        "emailType": "html",
+        "message": "=<html><body style=\"font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px;\">\n<div style=\"background: white; padding: 30px; border-radius: 12px;\">\n  <h2 style=\"color: #1a1a2e;\">⭐ How did we do, {{ $('Parse Order Data').first().json.customer_name }}?</h2>\n  <p>Your order #{{ $('Parse Order Data').first().json.order_number }} should have arrived by now. We'd love to hear what you think!</p>\n  <p>Leaving a review takes less than 60 seconds and helps other customers like you make great decisions.</p>\n  <p style=\"text-align: center; margin: 30px 0;\">\n    <a href=\"REPLACE_WITH_REVIEW_URL\" style=\"background: #f59e0b; color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block; font-size: 16px;\">Leave a Review ⭐</a>\n  </p>\n  <p style=\"color: #666;\">Have an issue with your order? Reply to this email — we make it right, guaranteed.</p>\n  <hr/>\n  <p style=\"color: #999; font-size: 12px;\">REPLACE_WITH_STORE_NAME | <a href=\"REPLACE_WITH_UNSUBSCRIBE_URL\">Unsubscribe</a></p>\n</div>\n</body></html>",
+        "options": {}
+      },
+      "id": "d8e9f0a1-0806-0806-0806-080000000006",
+      "name": "Send Review Request",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1340, 200],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID",
+          "name": "SMTP - Motion Elevation"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "shopify-cart-abandoned",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "d8e9f0a1-0807-0807-0807-080000000007",
+      "name": "Webhook: Abandoned Cart",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 540],
+      "notes": "SETUP: In Shopify, use a Klaviyo/Omnisend/custom app to fire a webhook on cart abandonment. Or use Shopify's 'Checkouts/create' webhook and filter by non-completion."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse abandoned cart data\nconst cart = $input.first().json;\nconst customer = cart.customer || {};\nconst lineItems = cart.line_items || cart.checkout?.line_items || [];\n\nconst itemsList = lineItems.map(item =>\n  `• ${item.title || item.name} × ${item.quantity}`\n).join('\\n');\n\nconst recoveryUrl = cart.abandoned_checkout_url || \n                    cart.checkout?.abandoned_checkout_url || \n                    `https://REPLACE_WITH_SHOP_DOMAIN/cart`;\n\nreturn [{\n  json: {\n    customer_email: customer.email || cart.email || cart.checkout?.email,\n    customer_name: `${customer.first_name || cart.checkout?.billing_address?.first_name || ''}`.trim() || 'there',\n    items_list: itemsList || 'Your saved items',\n    cart_total: cart.total_price || cart.checkout?.total_price || '0.00',\n    currency: cart.currency || cart.checkout?.currency || 'EUR',\n    recovery_url: recoveryUrl,\n    cart_id: cart.id || cart.checkout?.id,\n    created_at: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "d8e9f0a1-0808-0808-0808-080000000008",
+      "name": "Parse Abandoned Cart",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 540]
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_STORE_EMAIL",
+        "toEmail": "={{ $json.customer_email }}",
+        "subject": "=🛒 You left something behind, {{ $json.customer_name }}!",
+        "emailType": "html",
+        "message": "=<html><body style=\"font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px;\">\n<div style=\"background: white; padding: 30px; border-radius: 12px;\">\n  <h2 style=\"color: #1a1a2e;\">🛒 Forgot something?</h2>\n  <p>Hey {{ $json.customer_name }}, you left these in your cart:</p>\n  <pre style=\"background: #f8f9fa; padding: 15px; border-radius: 8px;\">{{ $json.items_list }}</pre>\n  <p style=\"text-align: center; margin: 25px 0;\">\n    <a href=\"{{ $json.recovery_url }}\" style=\"background: #1a1a2e; color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: bold;\">Complete My Order →</a>\n  </p>\n  <p style=\"color: #999; font-size: 12px;\">REPLACE_WITH_STORE_NAME | <a href=\"REPLACE_WITH_UNSUBSCRIBE_URL\">Unsubscribe</a></p>\n</div>\n</body></html>",
+        "options": {}
+      },
+      "id": "d8e9f0a1-0809-0809-0809-080000000009",
+      "name": "Abandoned Cart Email 1 (1h)",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [680, 540],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID",
+          "name": "SMTP - Motion Elevation"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 23,
+        "unit": "hours"
+      },
+      "id": "d8e9f0a1-0810-0810-0810-080000000010",
+      "name": "Wait 23h (Total: 24h)",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [900, 540]
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_STORE_EMAIL",
+        "toEmail": "={{ $('Parse Abandoned Cart').first().json.customer_email }}",
+        "subject": "=⏰ Your cart expires soon — save {{ $('Parse Abandoned Cart').first().json.currency }} {{ $('Parse Abandoned Cart').first().json.cart_total }}",
+        "emailType": "html",
+        "message": "=<html><body style=\"font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px;\">\n<div style=\"background: white; padding: 30px; border-radius: 12px;\">\n  <h2 style=\"color: #e74c3c;\">⏰ Your cart is about to expire</h2>\n  <p>Hey {{ $('Parse Abandoned Cart').first().json.customer_name }}, just a heads-up — your saved items won't be reserved much longer.</p>\n  <p><strong>Cart value: {{ $('Parse Abandoned Cart').first().json.currency }} {{ $('Parse Abandoned Cart').first().json.cart_total }}</strong></p>\n  <p style=\"text-align: center; margin: 25px 0;\">\n    <a href=\"{{ $('Parse Abandoned Cart').first().json.recovery_url }}\" style=\"background: #e74c3c; color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: bold;\">Save My Cart Now →</a>\n  </p>\n  <p style=\"color: #999; font-size: 12px;\">REPLACE_WITH_STORE_NAME | <a href=\"REPLACE_WITH_UNSUBSCRIBE_URL\">Unsubscribe</a></p>\n</div>\n</body></html>",
+        "options": {}
+      },
+      "id": "d8e9f0a1-0811-0811-0811-080000000011",
+      "name": "Abandoned Cart Email 2 (24h)",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1120, 540],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID",
+          "name": "SMTP - Motion Elevation"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 2,
+        "unit": "days"
+      },
+      "id": "d8e9f0a1-0812-0812-0812-080000000012",
+      "name": "Wait 2 Days (Total: 72h)",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [1340, 540]
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_STORE_EMAIL",
+        "toEmail": "={{ $('Parse Abandoned Cart').first().json.customer_email }}",
+        "subject": "=🎁 Last chance + a little something for you",
+        "emailType": "html",
+        "message": "=<html><body style=\"font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px;\">\n<div style=\"background: white; padding: 30px; border-radius: 12px; border: 2px solid #f59e0b;\">\n  <h2 style=\"color: #1a1a2e;\">🎁 We want you back</h2>\n  <p>Hey {{ $('Parse Abandoned Cart').first().json.customer_name }}, this is our final reminder about your cart.</p>\n  <p>Use code <strong style=\"background: #fef3c7; padding: 4px 8px; border-radius: 4px;\">REPLACE_WITH_DISCOUNT_CODE</strong> for REPLACE_WITH_DISCOUNT_PERCENT% off your order.</p>\n  <p style=\"text-align: center; margin: 25px 0;\">\n    <a href=\"{{ $('Parse Abandoned Cart').first().json.recovery_url }}\" style=\"background: #f59e0b; color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: bold;\">Claim My Discount →</a>\n  </p>\n  <p style=\"color: #666; font-size: 13px;\">Offer expires in 24 hours.</p>\n  <p style=\"color: #999; font-size: 12px;\">REPLACE_WITH_STORE_NAME | <a href=\"REPLACE_WITH_UNSUBSCRIBE_URL\">Unsubscribe</a></p>\n</div>\n</body></html>",
+        "options": {}
+      },
+      "id": "d8e9f0a1-0813-0813-0813-080000000013",
+      "name": "Abandoned Cart Email 3 (72h + Discount)",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1560, 540],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID",
+          "name": "SMTP - Motion Elevation"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Abandoned_Carts",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Cart_ID": "={{ $('Parse Abandoned Cart').first().json.cart_id }}",
+            "Customer_Email": "={{ $('Parse Abandoned Cart').first().json.customer_email }}",
+            "Customer_Name": "={{ $('Parse Abandoned Cart').first().json.customer_name }}",
+            "Cart_Total": "={{ $('Parse Abandoned Cart').first().json.cart_total }}",
+            "Currency": "={{ $('Parse Abandoned Cart').first().json.currency }}",
+            "Recovery_URL": "={{ $('Parse Abandoned Cart').first().json.recovery_url }}",
+            "Sequence_Complete": "Yes",
+            "Created_At": "={{ $('Parse Abandoned Cart').first().json.created_at }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "d8e9f0a1-0814-0814-0814-080000000014",
+      "name": "Log Abandoned Cart",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [1780, 540],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets - Motion Elevation"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const error = $input.first().json;\nconsole.error('ME-08 Error:', JSON.stringify(error));\nreturn [{ json: { error: true, message: error.message || 'Unknown error', timestamp: new Date().toISOString() } }];"
+      },
+      "id": "d8e9f0a1-0815-0815-0815-080000000015",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 760],
+      "notes": "Catches errors from any node. Connect error outputs here."
+    }
+  ],
+  "connections": {
+    "Webhook: Order Created": {
+      "main": [
+        [
+          {
+            "node": "Parse Order Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Order Data": {
+      "main": [
+        [
+          {
+            "node": "Send Order Confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Order Confirmation": {
+      "main": [
+        [
+          {
+            "node": "Log Order to Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Order to Sheets": {
+      "main": [
+        [
+          {
+            "node": "Wait 3 Days (After Delivery)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 3 Days (After Delivery)": {
+      "main": [
+        [
+          {
+            "node": "Send Review Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook: Abandoned Cart": {
+      "main": [
+        [
+          {
+            "node": "Parse Abandoned Cart",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Abandoned Cart": {
+      "main": [
+        [
+          {
+            "node": "Abandoned Cart Email 1 (1h)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Abandoned Cart Email 1 (1h)": {
+      "main": [
+        [
+          {
+            "node": "Wait 23h (Total: 24h)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 23h (Total: 24h)": {
+      "main": [
+        [
+          {
+            "node": "Abandoned Cart Email 2 (24h)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Abandoned Cart Email 2 (24h)": {
+      "main": [
+        [
+          {
+            "node": "Wait 2 Days (Total: 72h)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 2 Days (Total: 72h)": {
+      "main": [
+        [
+          {
+            "node": "Abandoned Cart Email 3 (72h + Discount)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Abandoned Cart Email 3 (72h + Discount)": {
+      "main": [
+        [
+          {
+            "node": "Log Abandoned Cart",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "tags": ["motion-elevation", "ecommerce", "shopify", "abandoned-cart", "email"],
+  "meta": {
+    "motionElevation": {
+      "version": "1.0.0",
+      "category": "E-Commerce Automation",
+      "deployTime": "~60 minutes",
+      "credentialsNeeded": ["SMTP", "Google Sheets OAuth2"],
+      "description": "SETUP README:\n\nTHIS WORKFLOW HAS 2 FLOWS:\n\nFLOW A — Order Confirmation + Review Request:\n1. In Shopify: Settings → Notifications → Webhooks → Add webhook\n   - Event: Order creation\n   - URL: Copy from 'Webhook: Order Created' node\n   - Format: JSON\n2. Replace REPLACE_WITH_STORE_EMAIL with your store's sending email\n3. Replace REPLACE_WITH_STORE_NAME in email templates\n4. Replace REPLACE_WITH_SHOP_DOMAIN with your myshopify.com domain\n5. Replace REPLACE_WITH_REVIEW_URL with your Google/Trustpilot review link\n\nFLOW B — Abandoned Cart (3-email sequence at 1h, 24h, 72h):\n1. Configure your abandoned cart trigger:\n   Option A: Use Shopify's 'Checkouts/create' webhook\n   Option B: Use a Shopify app (ReConvert, Klaviyo) to fire the webhook\n2. Replace REPLACE_WITH_DISCOUNT_CODE with a real Shopify discount code\n3. Replace REPLACE_WITH_DISCOUNT_PERCENT with the discount amount (e.g. 10)\n4. Replace REPLACE_WITH_UNSUBSCRIBE_URL with your unsubscribe page\n\nGOOGLE SHEETS SETUP:\n- Tab 'Orders': Order_ID | Order_Number | Customer_Name | Customer_Email | Total | Currency | Items_Count | Shipping_Address | Estimated_Delivery | Review_Request_Date | Status | Created_At\n- Tab 'Abandoned_Carts': Cart_ID | Customer_Email | Customer_Name | Cart_Total | Currency | Recovery_URL | Sequence_Complete | Created_At\n\nCOMPLIANCE NOTE: Include unsubscribe links in all marketing emails (GDPR / CAN-SPAM)."
+    }
+  }
+}

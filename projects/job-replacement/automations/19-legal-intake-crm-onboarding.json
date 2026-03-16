@@ -1,0 +1,232 @@
+{
+  "name": "ME-19 | Legal — Intake Form → CRM → Client Onboarding",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "legal-intake",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "me19-0001-0001-0001-000000000001",
+      "name": "Webhook: Legal Intake Form",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "legal-intake-me19",
+      "notes": "Connect your intake form (Typeform, Tally, Gravity Forms) to this webhook. Fields: full_name, email, phone, matter_type, description, urgency, preferred_contact, how_heard"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body || $input.first().json;\n\nconst fullName = body.full_name || body.name || '';\nconst email = body.email || body.Email || '';\nconst phone = body.phone || body.Phone || '';\nconst matterType = body.matter_type || body.matter || 'General';\nconst description = body.description || body.message || '';\nconst urgency = (body.urgency || 'normal').toLowerCase();\nconst preferredContact = body.preferred_contact || 'email';\nconst howHeard = body.how_heard || body.referral || '';\n\nif (!email && !phone) throw new Error('No contact info provided in legal intake');\n\n// Score and classify\nlet priority = 'standard';\nif (urgency === 'urgent' || urgency === 'high') priority = 'urgent';\nif (matterType.toLowerCase().includes('criminal') || matterType.toLowerCase().includes('custody')) priority = 'urgent';\n\n// Generate intake reference\nconst ref = 'INT-' + Date.now().toString(36).toUpperCase();\n\nreturn [{\n  json: {\n    full_name: fullName,\n    email, phone,\n    matter_type: matterType,\n    description,\n    urgency,\n    priority,\n    preferred_contact: preferredContact,\n    how_heard: howHeard,\n    intake_ref: ref,\n    status: 'New Inquiry',\n    created_at: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "me19-0002-0002-0002-000000000002",
+      "name": "Parse & Classify Intake",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": { "__rl": true, "value": "REPLACE_WITH_GOOGLE_SHEET_ID", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Intake_CRM", "mode": "name" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Intake_Ref": "={{ $json.intake_ref }}",
+            "Full_Name": "={{ $json.full_name }}",
+            "Email": "={{ $json.email }}",
+            "Phone": "={{ $json.phone }}",
+            "Matter_Type": "={{ $json.matter_type }}",
+            "Description": "={{ $json.description }}",
+            "Urgency": "={{ $json.urgency }}",
+            "Priority": "={{ $json.priority }}",
+            "Preferred_Contact": "={{ $json.preferred_contact }}",
+            "How_Heard": "={{ $json.how_heard }}",
+            "Status": "New Inquiry",
+            "Acknowledgment_Sent": "No",
+            "Consultation_Booked": "No",
+            "Onboarding_Sent": "No",
+            "Created_At": "={{ $json.created_at }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "me19-0003-0003-0003-000000000003",
+      "name": "Log to Intake CRM Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [680, 300],
+      "credentials": { "googleSheetsOAuth2Api": { "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID", "name": "Google Sheets - Motion Elevation" } }
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_FIRM_EMAIL",
+        "toEmail": "={{ $json.email }}",
+        "subject": "=We've received your inquiry — {{ $json.matter_type }} | Ref: {{ $json.intake_ref }}",
+        "emailType": "html",
+        "message": "=<html><body style=\"font-family: Georgia, serif; max-width: 620px; margin: auto; padding: 24px; background: #f9f9f7;\">\n<div style=\"background: white; padding: 36px; border-radius: 4px; border-top: 4px solid #1a3a5c;\">\n  <p style=\"color: #1a3a5c; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 16px;\">REPLACE_WITH_FIRM_NAME</p>\n  <h2 style=\"color: #1a1a1a; font-size: 22px; margin: 0 0 20px;\">Thank you for reaching out, {{ $json.full_name }}</h2>\n  <p style=\"color: #374151; line-height: 1.7;\">We have received your inquiry regarding <strong>{{ $json.matter_type }}</strong> and will review it promptly. Please keep your reference number for any correspondence:</p>\n  <div style=\"background: #f3f4f6; padding: 16px; border-radius: 4px; margin: 20px 0; text-align: center;\">\n    <p style=\"margin: 0; font-size: 20px; font-family: monospace; letter-spacing: 2px; color: #1a3a5c;\"><strong>{{ $json.intake_ref }}</strong></p>\n  </div>\n  <p style=\"color: #374151; line-height: 1.7;\">{{ $json.priority === 'urgent' ? '<strong>Given the urgency of your matter, a member of our team will contact you within 2 business hours.</strong>' : 'A member of our team will be in touch within 1–2 business days to discuss next steps and, if appropriate, schedule an initial consultation.' }}</p>\n  <p style=\"color: #374151; line-height: 1.7;\">In the meantime, please refrain from discussing the details of your matter with anyone other than our firm.</p>\n  <hr style=\"border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;\">\n  <p style=\"color: #6b7280; font-size: 13px; line-height: 1.6;\">REPLACE_WITH_FIRM_NAME<br>REPLACE_WITH_FIRM_ADDRESS<br>📞 REPLACE_WITH_FIRM_PHONE<br>✉️ REPLACE_WITH_FIRM_EMAIL</p>\n  <p style=\"color: #9ca3af; font-size: 11px; margin-top: 16px;\">This communication is confidential and subject to attorney-client privilege. If you received this in error, please delete it immediately.</p>\n</div>\n</body></html>",
+        "options": {}
+      },
+      "id": "me19-0004-0004-0004-000000000004",
+      "name": "Send Client Acknowledgment",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [900, 160],
+      "credentials": { "smtp": { "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID", "name": "SMTP - Motion Elevation" } }
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_FIRM_EMAIL",
+        "toEmail": "REPLACE_WITH_ATTORNEY_EMAIL",
+        "subject": "=🔔 {{ $json.priority === 'urgent' ? '🚨 URGENT' : 'New' }} Intake: {{ $json.full_name }} — {{ $json.matter_type }} [{{ $json.intake_ref }}]",
+        "emailType": "html",
+        "message": "=<html><body style=\"font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px;\">\n<div style=\"background: white; padding: 24px; border-radius: 8px; border-top: 4px solid {{ $json.priority === 'urgent' ? '#dc2626' : '#1a3a5c' }};\">\n  <h2>{{ $json.priority === 'urgent' ? '🚨 URGENT' : '📋 New' }} Client Intake</h2>\n  <table style=\"width: 100%; border-collapse: collapse; font-size: 14px;\">\n    <tr style=\"border-bottom: 1px solid #e5e7eb;\"><td style=\"padding: 8px 4px; color: #6b7280; width: 140px;\">Reference</td><td style=\"padding: 8px 4px; font-weight: bold;\">{{ $json.intake_ref }}</td></tr>\n    <tr style=\"border-bottom: 1px solid #e5e7eb;\"><td style=\"padding: 8px 4px; color: #6b7280;\">Client Name</td><td style=\"padding: 8px 4px;\">{{ $json.full_name }}</td></tr>\n    <tr style=\"border-bottom: 1px solid #e5e7eb;\"><td style=\"padding: 8px 4px; color: #6b7280;\">Email</td><td style=\"padding: 8px 4px;\">{{ $json.email }}</td></tr>\n    <tr style=\"border-bottom: 1px solid #e5e7eb;\"><td style=\"padding: 8px 4px; color: #6b7280;\">Phone</td><td style=\"padding: 8px 4px;\">{{ $json.phone }}</td></tr>\n    <tr style=\"border-bottom: 1px solid #e5e7eb;\"><td style=\"padding: 8px 4px; color: #6b7280;\">Matter Type</td><td style=\"padding: 8px 4px;\">{{ $json.matter_type }}</td></tr>\n    <tr style=\"border-bottom: 1px solid #e5e7eb;\"><td style=\"padding: 8px 4px; color: #6b7280;\">Priority</td><td style=\"padding: 8px 4px; color: {{ $json.priority === 'urgent' ? '#dc2626' : '#059669' }}; font-weight: bold;\">{{ $json.priority | upcase }}</td></tr>\n    <tr style=\"border-bottom: 1px solid #e5e7eb;\"><td style=\"padding: 8px 4px; color: #6b7280;\">Pref. Contact</td><td style=\"padding: 8px 4px;\">{{ $json.preferred_contact }}</td></tr>\n    <tr style=\"border-bottom: 1px solid #e5e7eb;\"><td style=\"padding: 8px 4px; color: #6b7280;\">How Heard</td><td style=\"padding: 8px 4px;\">{{ $json.how_heard }}</td></tr>\n    <tr><td style=\"padding: 8px 4px; color: #6b7280; vertical-align: top;\">Description</td><td style=\"padding: 8px 4px;\">{{ $json.description }}</td></tr>\n  </table>\n  {{ $json.priority === 'urgent' ? '<p style=\"background: #fef2f2; padding: 12px; border-radius: 6px; color: #dc2626; font-weight: bold; margin-top: 16px;\">⚡ ACTION REQUIRED: Contact within 2 business hours</p>' : '' }}\n</div>\n</body></html>",
+        "options": {}
+      },
+      "id": "me19-0005-0005-0005-000000000005",
+      "name": "Alert Attorney of New Intake",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [900, 360],
+      "credentials": { "smtp": { "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID", "name": "SMTP - Motion Elevation" } }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"success\": true, \"reference\": \"{{ $json.intake_ref }}\", \"message\": \"Thank you. We will be in touch shortly.\" }",
+        "options": {}
+      },
+      "id": "me19-0006-0006-0006-000000000006",
+      "name": "Respond to Form",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [900, 540]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "legal-client-accepted",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "me19-0007-0007-0007-000000000007",
+      "name": "Webhook: Client Accepted",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 800],
+      "webhookId": "legal-client-accepted-me19",
+      "notes": "Trigger this webhook when the attorney accepts a client (after consultation). Fields: intake_ref, full_name, email, matter_type, attorney_name, retainer_amount, next_step"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body || $input.first().json;\nreturn [{ json: body }];"
+      },
+      "id": "me19-0008-0008-0008-000000000008",
+      "name": "Parse Acceptance Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 800]
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_FIRM_EMAIL",
+        "toEmail": "={{ ($input.first().json.body || $input.first().json).email }}",
+        "subject": "=Welcome to REPLACE_WITH_FIRM_NAME — Client Onboarding",
+        "emailType": "html",
+        "message": "=<html><body style=\"font-family: Georgia, serif; max-width: 620px; margin: auto; padding: 24px; background: #f9f9f7;\">\n<div style=\"background: white; padding: 36px; border-radius: 4px; border-top: 4px solid #1a3a5c;\">\n  <p style=\"color: #1a3a5c; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 16px;\">REPLACE_WITH_FIRM_NAME — CONFIDENTIAL</p>\n  <h2 style=\"color: #1a1a1a; font-size: 22px; margin: 0 0 20px;\">Welcome, {{ ($input.first().json.body || $input.first().json).full_name }}</h2>\n  <p style=\"color: #374151; line-height: 1.7;\">We are pleased to confirm that <strong>REPLACE_WITH_FIRM_NAME</strong> will be representing you in your <strong>{{ ($input.first().json.body || $input.first().json).matter_type }}</strong> matter. Your lead attorney will be <strong>{{ ($input.first().json.body || $input.first().json).attorney_name || 'REPLACE_WITH_ATTORNEY_NAME' }}</strong>.</p>\n  <h3 style=\"color: #1a3a5c; font-size: 16px;\">📋 Your Next Steps:</h3>\n  <ol style=\"color: #374151; line-height: 2;\">\n    <li>Review and sign the <strong>Client Engagement Agreement</strong> (link below)</li>\n    <li>Arrange payment of the retainer: <strong>{{ ($input.first().json.body || $input.first().json).retainer_amount || 'REPLACE_WITH_RETAINER' }}</strong></li>\n    <li>Complete the <strong>Client Information Form</strong> (link below)</li>\n    <li>Gather any relevant documents (contracts, correspondence, evidence)</li>\n    <li>Await your initial strategy call: <strong>{{ ($input.first().json.body || $input.first().json).next_step || 'To be scheduled' }}</strong></li>\n  </ol>\n  <div style=\"text-align: center; margin: 28px 0;\">\n    <a href=\"REPLACE_WITH_ENGAGEMENT_AGREEMENT_URL\" style=\"background: #1a3a5c; color: white; padding: 12px 28px; border-radius: 4px; text-decoration: none; display: inline-block; margin: 6px;\">Sign Engagement Agreement</a>\n    <a href=\"REPLACE_WITH_CLIENT_INFO_FORM_URL\" style=\"background: #374151; color: white; padding: 12px 28px; border-radius: 4px; text-decoration: none; display: inline-block; margin: 6px;\">Complete Client Form</a>\n    <a href=\"REPLACE_WITH_PAYMENT_URL\" style=\"background: #059669; color: white; padding: 12px 28px; border-radius: 4px; text-decoration: none; display: inline-block; margin: 6px;\">Pay Retainer</a>\n  </div>\n  <h3 style=\"color: #1a3a5c; font-size: 16px;\">📁 Documents to Gather:</h3>\n  <ul style=\"color: #374151; line-height: 2;\">\n    <li>All correspondence related to your matter</li>\n    <li>Relevant contracts or agreements</li>\n    <li>Any formal notices or legal documents received</li>\n    <li>Financial records (if applicable)</li>\n  </ul>\n  <hr style=\"border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;\">\n  <p style=\"color: #374151; font-size: 14px;\">Your dedicated point of contact is <strong>REPLACE_WITH_PARALEGAL_NAME</strong> at <strong>REPLACE_WITH_PARALEGAL_EMAIL</strong>. For urgent matters, call <strong>REPLACE_WITH_FIRM_PHONE</strong>.</p>\n  <p style=\"color: #9ca3af; font-size: 11px; margin-top: 20px;\">This email and any attachments are strictly confidential and protected by attorney-client privilege. If you are not the intended recipient, please notify us immediately and destroy all copies.</p>\n</div>\n</body></html>",
+        "options": {}
+      },
+      "id": "me19-0009-0009-0009-000000000009",
+      "name": "Send Client Onboarding Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [680, 800],
+      "credentials": { "smtp": { "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID", "name": "SMTP - Motion Elevation" } }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": { "__rl": true, "value": "REPLACE_WITH_GOOGLE_SHEET_ID", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Intake_CRM", "mode": "name" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Status": "Active Client",
+            "Onboarding_Sent": "Yes"
+          }
+        },
+        "where": { "values": [{ "lookupColumn": "Intake_Ref", "lookupValue": "={{ ($input.first().json.body || $input.first().json).intake_ref }}" }] },
+        "options": {}
+      },
+      "id": "me19-0010-0010-0010-000000000010",
+      "name": "Update CRM: Active Client",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [900, 800],
+      "credentials": { "googleSheetsOAuth2Api": { "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID", "name": "Google Sheets - Motion Elevation" } }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": { "__rl": true, "value": "REPLACE_WITH_GOOGLE_SHEET_ID", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Intake_CRM", "mode": "name" },
+        "columns": { "mappingMode": "defineBelow", "value": { "Acknowledgment_Sent": "Yes" } },
+        "where": { "values": [{ "lookupColumn": "Intake_Ref", "lookupValue": "={{ $json.intake_ref }}" }] },
+        "options": {}
+      },
+      "id": "me19-0011-0011-0011-000000000011",
+      "name": "Mark Acknowledgment Sent",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [1120, 160],
+      "credentials": { "googleSheetsOAuth2Api": { "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID", "name": "Google Sheets - Motion Elevation" } }
+    }
+  ],
+  "connections": {
+    "Webhook: Legal Intake Form": {
+      "main": [[{ "node": "Parse & Classify Intake", "type": "main", "index": 0 }]]
+    },
+    "Parse & Classify Intake": {
+      "main": [[{ "node": "Log to Intake CRM Sheet", "type": "main", "index": 0 }]]
+    },
+    "Log to Intake CRM Sheet": {
+      "main": [
+        [{ "node": "Send Client Acknowledgment", "type": "main", "index": 0 }],
+        [{ "node": "Alert Attorney of New Intake", "type": "main", "index": 0 }],
+        [{ "node": "Respond to Form", "type": "main", "index": 0 }]
+      ]
+    },
+    "Send Client Acknowledgment": {
+      "main": [[{ "node": "Mark Acknowledgment Sent", "type": "main", "index": 0 }]]
+    },
+    "Webhook: Client Accepted": {
+      "main": [[{ "node": "Parse Acceptance Data", "type": "main", "index": 0 }]]
+    },
+    "Parse Acceptance Data": {
+      "main": [[{ "node": "Send Client Onboarding Email", "type": "main", "index": 0 }]]
+    },
+    "Send Client Onboarding Email": {
+      "main": [[{ "node": "Update CRM: Active Client", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "tags": ["motion-elevation", "legal", "intake", "onboarding", "crm", "law-firm", "attorney"],
+  "meta": {
+    "motionElevation": {
+      "version": "1.0.0",
+      "category": "Legal Automation",
+      "deployTime": "~60 minutes",
+      "credentialsNeeded": ["SMTP", "Google Sheets OAuth2"],
+      "suggestedPrice": "€1,197 setup + €197/month",
+      "description": "Intake form → CRM log → client acknowledgment email → attorney alert (urgent flag for criminal/custody matters). Second webhook for client acceptance → formal onboarding email with next steps."
+    }
+  }
+}

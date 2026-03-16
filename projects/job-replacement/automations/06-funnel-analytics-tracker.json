@@ -1,0 +1,312 @@
+{
+  "name": "ME-06 | Funnel Analytics Tracker",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "funnel-event",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "b6c7d8e9-0601-0601-0601-060000000001",
+      "name": "Webhook: Receive Funnel Event",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "notes": "SETUP: Copy this webhook URL and paste into 06-tracking-snippet.js as WEBHOOK_URL. Accepts POST with event data."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Normalize and enrich incoming funnel event\nconst body = $input.first().json.body || $input.first().json;\n\nconst normalized = {\n  timestamp: new Date().toISOString(),\n  session_id: body.sessionId || body.session_id || 'unknown',\n  page_url: body.pageUrl || body.page_url || '',\n  page_title: body.pageTitle || body.page_title || '',\n  event_type: body.eventType || body.event_type || '',\n  event_value: body.eventValue || body.event_value || '',\n  scroll_depth: body.scrollDepth || body.scroll_depth || 0,\n  time_on_page: body.timeOnPage || body.time_on_page || 0,\n  button_id: body.buttonId || body.button_id || '',\n  quiz_step: body.quizStep || body.quiz_step || '',\n  user_agent: body.userAgent || body.user_agent || '',\n  referrer: body.referrer || '',\n  utm_source: body.utmSource || body.utm_source || '',\n  utm_medium: body.utmMedium || body.utm_medium || '',\n  utm_campaign: body.utmCampaign || body.utm_campaign || ''\n};\n\nreturn [{ json: normalized }];"
+      },
+      "id": "b6c7d8e9-0602-0602-0602-060000000002",
+      "name": "Normalize Event Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300],
+      "notes": "Normalizes camelCase and snake_case field names from the tracking snippet."
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Events",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $json.timestamp }}",
+            "Session_ID": "={{ $json.session_id }}",
+            "Page_URL": "={{ $json.page_url }}",
+            "Page_Title": "={{ $json.page_title }}",
+            "Event_Type": "={{ $json.event_type }}",
+            "Event_Value": "={{ $json.event_value }}",
+            "Scroll_Depth": "={{ $json.scroll_depth }}",
+            "Time_On_Page": "={{ $json.time_on_page }}",
+            "Button_ID": "={{ $json.button_id }}",
+            "Quiz_Step": "={{ $json.quiz_step }}",
+            "UTM_Source": "={{ $json.utm_source }}",
+            "UTM_Medium": "={{ $json.utm_medium }}",
+            "UTM_Campaign": "={{ $json.utm_campaign }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "b6c7d8e9-0603-0603-0603-060000000003",
+      "name": "Log Event to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [680, 300],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets - Motion Elevation"
+        }
+      },
+      "notes": "SETUP: Create sheet tab 'Events' with columns: Timestamp, Session_ID, Page_URL, Page_Title, Event_Type, Event_Value, Scroll_Depth, Time_On_Page, Button_ID, Quiz_Step, UTM_Source, UTM_Medium, UTM_Campaign"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"status\": \"ok\", \"received\": true }"
+      },
+      "id": "b6c7d8e9-0604-0604-0604-060000000004",
+      "name": "Respond OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [1],
+              "triggerAtHour": 8,
+              "triggerAtMinute": 0
+            }
+          ]
+        }
+      },
+      "id": "b6c7d8e9-0605-0605-0605-060000000005",
+      "name": "Schedule: Every Monday 8am",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 560],
+      "notes": "Fires every Monday at 8am to generate the weekly analytics report."
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Events",
+          "mode": "name"
+        },
+        "filters": {},
+        "options": {}
+      },
+      "id": "b6c7d8e9-0606-0606-0606-060000000006",
+      "name": "Read All Events",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [460, 560],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_GSHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets - Motion Elevation"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Aggregate events from the past 7 days for OpenAI analysis\nconst items = $input.all();\nconst oneWeekAgo = new Date();\noneWeekAgo.setDate(oneWeekAgo.getDate() - 7);\n\nconst recentEvents = items.filter(item => {\n  const ts = new Date(item.json.Timestamp || item.json.timestamp);\n  return ts >= oneWeekAgo;\n});\n\n// Count event types\nconst eventCounts = {};\nconst pageCounts = {};\nconst buttonClicks = {};\nconst quizSteps = {};\nlet totalScrollDepth = 0;\nlet totalTimeOnPage = 0;\nlet scrollCount = 0;\nlet timeCount = 0;\n\nfor (const e of recentEvents) {\n  const type = e.json.Event_Type || e.json.event_type || 'unknown';\n  const page = e.json.Page_URL || e.json.page_url || 'unknown';\n  const btn = e.json.Button_ID || e.json.button_id || '';\n  const quiz = e.json.Quiz_Step || e.json.quiz_step || '';\n  const scroll = parseFloat(e.json.Scroll_Depth || 0);\n  const time = parseFloat(e.json.Time_On_Page || 0);\n\n  eventCounts[type] = (eventCounts[type] || 0) + 1;\n  pageCounts[page] = (pageCounts[page] || 0) + 1;\n  if (btn) buttonClicks[btn] = (buttonClicks[btn] || 0) + 1;\n  if (quiz) quizSteps[quiz] = (quizSteps[quiz] || 0) + 1;\n  if (scroll > 0) { totalScrollDepth += scroll; scrollCount++; }\n  if (time > 0) { totalTimeOnPage += time; timeCount++; }\n}\n\nconst summary = {\n  period: `${oneWeekAgo.toDateString()} - ${new Date().toDateString()}`,\n  total_events: recentEvents.length,\n  event_type_breakdown: eventCounts,\n  page_visit_counts: pageCounts,\n  button_clicks: buttonClicks,\n  quiz_step_completions: quizSteps,\n  avg_scroll_depth_pct: scrollCount > 0 ? (totalScrollDepth / scrollCount).toFixed(1) : 0,\n  avg_time_on_page_sec: timeCount > 0 ? (totalTimeOnPage / timeCount).toFixed(0) : 0\n};\n\nreturn [{ json: { summary, summaryText: JSON.stringify(summary, null, 2) } }];"
+      },
+      "id": "b6c7d8e9-0607-0607-0607-060000000007",
+      "name": "Aggregate Weekly Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 560]
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "operation": "create",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list"
+        },
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are a funnel analytics expert. Analyze website funnel data and write a clear, jargon-free weekly report for a business owner. Focus on: what's working, what's not, where users drop off, and 3 specific action recommendations. Keep it under 400 words. Use plain English."
+            },
+            {
+              "role": "user",
+              "content": "=Here is the funnel data for this week:\n\n{{ $json.summaryText }}\n\nPlease write a weekly funnel performance report."
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.7,
+          "maxTokens": 800
+        }
+      },
+      "id": "b6c7d8e9-0608-0608-0608-060000000008",
+      "name": "OpenAI: Analyze Funnel",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1.5,
+      "position": [900, 560],
+      "credentials": {
+        "openAiApi": {
+          "id": "REPLACE_WITH_OPENAI_CREDENTIAL_ID",
+          "name": "OpenAI - Motion Elevation"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_SENDER_EMAIL",
+        "toEmail": "REPLACE_WITH_OWNER_EMAIL",
+        "subject": "=📊 Weekly Funnel Report — {{ new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) }}",
+        "emailType": "html",
+        "message": "=<html><body style=\"font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px;\">\n<h2 style=\"color: #1a1a2e;\">📊 Weekly Funnel Report</h2>\n<p style=\"color: #666;\">{{ $('Aggregate Weekly Data').first().json.summary.period }}</p>\n<hr/>\n<h3>Key Numbers</h3>\n<ul>\n  <li><strong>Total Events:</strong> {{ $('Aggregate Weekly Data').first().json.summary.total_events }}</li>\n  <li><strong>Avg Scroll Depth:</strong> {{ $('Aggregate Weekly Data').first().json.summary.avg_scroll_depth_pct }}%</li>\n  <li><strong>Avg Time on Page:</strong> {{ $('Aggregate Weekly Data').first().json.summary.avg_time_on_page_sec }}s</li>\n</ul>\n<hr/>\n<h3>AI Analysis</h3>\n<div style=\"background: #f8f9fa; padding: 15px; border-radius: 8px; white-space: pre-wrap;\">{{ $json.message.content }}</div>\n<hr/>\n<p style=\"color: #999; font-size: 12px;\">Sent by Motion Elevation Automation | Reply to unsubscribe</p>\n</body></html>",
+        "options": {}
+      },
+      "id": "b6c7d8e9-0609-0609-0609-060000000009",
+      "name": "Email Weekly Report",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1120, 560],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID",
+          "name": "SMTP - Motion Elevation"
+        }
+      },
+      "notes": "SETUP: Replace REPLACE_WITH_SENDER_EMAIL and REPLACE_WITH_OWNER_EMAIL."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Error handler — log and surface the error\nconst error = $input.first().json;\nconsole.error('ME-06 Error:', JSON.stringify(error));\nreturn [{ json: { error: true, message: error.message || 'Unknown error', timestamp: new Date().toISOString() } }];"
+      },
+      "id": "b6c7d8e9-0610-0610-0610-060000000010",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 760],
+      "notes": "Catches errors from any node. Connect error outputs here."
+    }
+  ],
+  "connections": {
+    "Webhook: Receive Funnel Event": {
+      "main": [
+        [
+          {
+            "node": "Normalize Event Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Event Data": {
+      "main": [
+        [
+          {
+            "node": "Log Event to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Event to Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Respond OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule: Every Monday 8am": {
+      "main": [
+        [
+          {
+            "node": "Read All Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read All Events": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Weekly Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Weekly Data": {
+      "main": [
+        [
+          {
+            "node": "OpenAI: Analyze Funnel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI: Analyze Funnel": {
+      "main": [
+        [
+          {
+            "node": "Email Weekly Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "tags": ["motion-elevation", "analytics", "funnel", "google-sheets", "openai"],
+  "meta": {
+    "motionElevation": {
+      "version": "1.0.0",
+      "category": "Analytics Automation",
+      "deployTime": "~45 minutes",
+      "credentialsNeeded": ["Google Sheets OAuth2", "OpenAI API", "SMTP"],
+      "description": "SETUP README:\n\n1. WEBHOOK SETUP:\n   - Activate this workflow and copy the webhook URL from 'Webhook: Receive Funnel Event' node\n   - Paste the URL into 06-tracking-snippet.js as the WEBHOOK_URL constant\n   - Add the snippet to your website's <head> or just before </body>\n\n2. GOOGLE SHEETS SETUP:\n   - Create a new Google Sheet and note its ID (from the URL)\n   - Add a tab named 'Events' with these columns:\n     Timestamp | Session_ID | Page_URL | Page_Title | Event_Type | Event_Value | Scroll_Depth | Time_On_Page | Button_ID | Quiz_Step | UTM_Source | UTM_Medium | UTM_Campaign\n   - Replace REPLACE_WITH_GOOGLE_SHEET_ID in both Sheets nodes\n\n3. CREDENTIALS:\n   - Google Sheets OAuth2: n8n Settings → Credentials → Google Sheets OAuth2 API\n   - OpenAI API: n8n Settings → Credentials → OpenAI API\n   - SMTP: n8n Settings → Credentials → SMTP\n\n4. EMAIL CONFIG:\n   - Replace REPLACE_WITH_SENDER_EMAIL with your sending address\n   - Replace REPLACE_WITH_OWNER_EMAIL with where the report should go\n\n5. EVENTS TRACKED BY DEFAULT:\n   - page_view: On every page load\n   - scroll_depth: At 25%, 50%, 75%, 100%\n   - button_click: On any button with data-track attribute\n   - quiz_step: On quiz/form step progression\n   - time_milestone: At 30s, 60s, 120s on page\n\nCOST ESTIMATE: ~$0.002 per weekly report (GPT-4o-mini)\nRECOMMENDED PLAN: Send report to REPLACE_WITH_OWNER_EMAIL every Monday at 8am"
+    }
+  }
+}

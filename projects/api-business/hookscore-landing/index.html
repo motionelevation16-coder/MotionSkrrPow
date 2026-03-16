@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HookScore API — Score, Rewrite & A/B Test Your Content Hooks</title>
+  <meta name="description" content="HookScore scores, rewrites, and A/B tests your short-form content hooks via API. Built for content creators, agencies, and developers." />
+  <meta property="og:title" content="HookScore API — Stop Posting Hooks That Flop" />
+  <meta property="og:description" content="Score, rewrite, and A/B test your content hooks via API. 6 endpoints. Multi-platform." />
+  <meta property="og:type" content="website" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎣</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ============================
+     NAVIGATION
+============================= -->
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">🎣 Hook<span>Score</span></a>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#quickstart">Docs</a></li>
+      <li><a href="#features">Get Started</a></li>
+    </ul>
+    <a href="https://rapidapi.com/search/hookscore" target="_blank" rel="noopener" class="btn btn-primary btn-sm nav-cta">Start Free</a>
+    <button class="nav-hamburger" id="hamburger" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile Nav -->
+<div class="mobile-nav" id="mobileNav">
+  <a href="#features" onclick="closeMobileNav()">Features</a>
+  <a href="#pricing" onclick="closeMobileNav()">Pricing</a>
+  <a href="#quickstart" onclick="closeMobileNav()">Docs</a>
+  <a href="https://rapidapi.com/search/hookscore" target="_blank" rel="noopener" onclick="closeMobileNav()" style="color:var(--accent)">Start Free →</a>
+</div>
+
+<!-- ============================
+     HERO
+============================= -->
+<section class="hero" id="hero">
+  <div class="hero-inner">
+
+    <div class="hero-badge">
+      <span class="dot"></span>
+      Live on RapidAPI · 6 Endpoints Ready
+    </div>
+
+    <h1>Stop Posting Hooks<br><span class="accent">That Flop.</span></h1>
+
+    <p class="hero-sub">
+      HookScore scores, rewrites, and A/B tests your short-form content hooks via API.
+      Built for content creators, agencies, and developers.
+    </p>
+
+    <div class="hero-btns">
+      <a href="https://rapidapi.com/search/hookscore" target="_blank" rel="noopener" class="btn btn-primary">
+        ⚡ Try Free on RapidAPI
+      </a>
+      <a href="#quickstart" class="btn btn-outline">
+        View Docs →
+      </a>
+    </div>
+
+    <!-- Live Demo Widget -->
+    <div class="demo-widget">
+      <div class="demo-header">
+        <div class="demo-dots">
+          <span class="d1"></span>
+          <span class="d2"></span>
+          <span class="d3"></span>
+        </div>
+        <span class="demo-title">POST /score — Live Demo</span>
+      </div>
+      <div class="demo-body">
+        <div class="demo-input-row">
+          <input
+            type="text"
+            class="demo-input"
+            id="hookInput"
+            placeholder="Paste a hook here... e.g. &quot;5 habits that made me $10k this month&quot;"
+            value="5 habits that made me $10k this month"
+          />
+          <button class="score-btn" id="scoreBtn" onclick="runDemo()">Score It ⚡</button>
+        </div>
+
+        <!-- Analyzing -->
+        <div class="demo-analyzing" id="demoAnalyzing">
+          <div class="spinner"></div>
+          Analyzing hook across 12 scoring dimensions…
+        </div>
+
+        <!-- Output Panel -->
+        <div class="demo-output" id="demoOutput">
+          <div class="output-top">
+            <div class="output-score-block">
+              <div class="score-ring">
+                <div class="score-ring-inner">
+                  <div class="score-number">84</div>
+                  <div class="score-denom">/100</div>
+                </div>
+              </div>
+              <div class="score-meta">
+                <h3>Grade: A−</h3>
+                <p>Strong hook with high engagement potential</p>
+                <span class="platform-badge">🎵 TikTok · Optimized</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="output-lists">
+            <div class="output-list-box strengths">
+              <h4>✓ Strengths</h4>
+              <ul>
+                <li>Specific number creates curiosity</li>
+                <li>Income claim triggers desire</li>
+                <li>Implied transformation arc</li>
+              </ul>
+            </div>
+            <div class="output-list-box weaknesses">
+              <h4>✗ Weaknesses</h4>
+              <ul>
+                <li>Overused "$10k" framing — consider specificity</li>
+                <li>Missing urgency or time constraint</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================
+     SOCIAL PROOF BAR
+============================= -->
+<div class="proof-bar">
+  <div class="proof-bar-inner">
+    <p>Trusted by content creators, agencies, and developers worldwide</p>
+    <div class="proof-stats">
+      <div class="stat">
+        <div class="stat-number">6</div>
+        <div class="stat-label">Endpoints</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number">95%+</div>
+        <div class="stat-label">Margin for Builders</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number">5</div>
+        <div class="stat-label">Platforms Supported</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================
+     FEATURES
+============================= -->
+<section class="section" id="features">
+  <div class="container">
+    <div class="text-center">
+      <span class="section-label">Features</span>
+      <h2 class="section-title">Everything you need to dominate your niche</h2>
+      <p class="section-sub">6 powerful endpoints, one API key. From scoring to rewriting to batch analysis.</p>
+    </div>
+
+    <div class="features-grid">
+
+      <div class="feature-card">
+        <span class="feature-icon">🎯</span>
+        <h3>Hook Scorer</h3>
+        <p>Score any hook 0–100 across 12 dimensions including curiosity gap, specificity, emotional pull, and platform fit. Get actionable feedback instantly.</p>
+        <span class="feature-tag">POST /score</span>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-icon">✍️</span>
+        <h3>Rewrite Engine</h3>
+        <p>Get 5 improved versions of your hook in seconds — each with a different angle: curiosity, controversy, story, data, and FOMO. Stop staring at a blank screen.</p>
+        <span class="feature-tag">POST /rewrite</span>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-icon">⚡</span>
+        <h3>A/B Comparator</h3>
+        <p>Submit two hooks and get a clear winner with a side-by-side breakdown. Know which hook performs better before you post — not after.</p>
+        <span class="feature-tag">POST /compare</span>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-icon">🏷️</span>
+        <h3>Hook Classifier</h3>
+        <p>Identify your hook type (curiosity gap, how-to, controversy, social proof, etc.) and get tailored coaching on how to improve it for that specific format.</p>
+        <span class="feature-tag">POST /classify</span>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-icon">📦</span>
+        <h3>Batch Scorer</h3>
+        <p>Score up to 20 hooks in a single API call. Perfect for agencies running audits or creators testing a full content calendar at once. Results ranked automatically.</p>
+        <span class="feature-tag">POST /batch</span>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-icon">😊</span>
+        <h3>Emoji Impact Analyzer</h3>
+        <p>Know if your emojis help or hurt. Analyzes emoji placement, sentiment alignment, and platform-specific emoji performance so every character earns its place.</p>
+        <span class="feature-tag">POST /emoji</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================
+     PLATFORMS
+============================= -->
+<section class="platforms" id="platforms">
+  <div class="container text-center">
+    <span class="section-label">Platforms</span>
+    <h2 class="section-title">Works for every platform</h2>
+    <p class="section-sub" style="margin:0 auto 0">Scoring is calibrated per platform — what crushes on TikTok might flop on LinkedIn.</p>
+
+    <div class="platform-badges">
+      <div class="platform-badge-card"><span class="p-icon">🎵</span> TikTok</div>
+      <div class="platform-badge-card"><span class="p-icon">📸</span> Instagram</div>
+      <div class="platform-badge-card"><span class="p-icon">▶️</span> YouTube</div>
+      <div class="platform-badge-card"><span class="p-icon">𝕏</span> Twitter / X</div>
+      <div class="platform-badge-card"><span class="p-icon">💼</span> LinkedIn</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================
+     PRICING
+============================= -->
+<section class="section" id="pricing">
+  <div class="container">
+    <div class="text-center">
+      <span class="section-label">Pricing</span>
+      <h2 class="section-title">Start free. Scale as you grow.</h2>
+      <p class="section-sub">No credit card required for the free tier. Upgrade when you're ready.</p>
+    </div>
+
+    <div class="pricing-grid">
+
+      <!-- FREE -->
+      <div class="price-card">
+        <div>
+          <div class="price-tier">Free</div>
+          <div class="price-amount"><sup>$</sup>0<span class="per"> /mo</span></div>
+        </div>
+        <div class="price-calls">30 calls / month</div>
+        <ul class="price-features">
+          <li>/score endpoint</li>
+          <li>JSON response</li>
+          <li>Community support</li>
+        </ul>
+        <a href="https://rapidapi.com/search/hookscore" target="_blank" rel="noopener" class="price-btn price-btn-outline">Get Started</a>
+      </div>
+
+      <!-- STARTER -->
+      <div class="price-card">
+        <div>
+          <div class="price-tier">Starter</div>
+          <div class="price-amount"><sup>$</sup>3<span style="font-size:1.3rem">.99</span><span class="per"> /mo</span></div>
+        </div>
+        <div class="price-calls">500 calls / month</div>
+        <ul class="price-features">
+          <li>/score endpoint</li>
+          <li>/classify endpoint</li>
+          <li>Priority JSON responses</li>
+          <li>Email support</li>
+        </ul>
+        <a href="https://rapidapi.com/search/hookscore" target="_blank" rel="noopener" class="price-btn price-btn-outline">Get Started</a>
+      </div>
+
+      <!-- CREATOR -->
+      <div class="price-card">
+        <div>
+          <div class="price-tier">Creator</div>
+          <div class="price-amount"><sup>$</sup>7<span style="font-size:1.3rem">.99</span><span class="per"> /mo</span></div>
+        </div>
+        <div class="price-calls">2,000 calls / month</div>
+        <ul class="price-features">
+          <li>All endpoints</li>
+          <li>Except /batch</li>
+          <li>/rewrite + /compare + /emoji</li>
+          <li>Email support</li>
+        </ul>
+        <a href="https://rapidapi.com/search/hookscore" target="_blank" rel="noopener" class="price-btn price-btn-outline">Get Started</a>
+      </div>
+
+      <!-- PRO (Most Popular) -->
+      <div class="price-card popular">
+        <div class="popular-badge">⭐ Most Popular</div>
+        <div>
+          <div class="price-tier" style="color:var(--accent)">Pro</div>
+          <div class="price-amount"><sup>$</sup>14<span style="font-size:1.3rem">.99</span><span class="per"> /mo</span></div>
+        </div>
+        <div class="price-calls">8,000 calls / month</div>
+        <ul class="price-features">
+          <li>All 6 endpoints</li>
+          <li>Batch scoring (/batch)</li>
+          <li>Full emoji analysis</li>
+          <li>Priority support</li>
+          <li>Usage analytics</li>
+        </ul>
+        <a href="https://rapidapi.com/search/hookscore" target="_blank" rel="noopener" class="price-btn price-btn-accent">Get Started</a>
+      </div>
+
+      <!-- ULTRA -->
+      <div class="price-card">
+        <div>
+          <div class="price-tier">Ultra</div>
+          <div class="price-amount"><sup>$</sup>29<span style="font-size:1.3rem">.99</span><span class="per"> /mo</span></div>
+        </div>
+        <div class="price-calls">30,000 calls / month</div>
+        <ul class="price-features">
+          <li>All 6 endpoints</li>
+          <li>Priority processing</li>
+          <li>Dedicated support</li>
+          <li>Usage dashboard</li>
+          <li>White-label ready</li>
+        </ul>
+        <a href="https://rapidapi.com/search/hookscore" target="_blank" rel="noopener" class="price-btn price-btn-outline">Get Started</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================
+     USE CASES
+============================= -->
+<section class="section" id="usecases" style="background:var(--bg-2)">
+  <div class="container">
+    <div class="text-center">
+      <span class="section-label">Use Cases</span>
+      <h2 class="section-title">Built for the people who make content matter</h2>
+      <p class="section-sub">One API. Dozens of ways to use it.</p>
+    </div>
+
+    <div class="use-cases-grid">
+
+      <div class="use-case-card">
+        <div class="use-case-icon">🎬</div>
+        <h3>Content Creator</h3>
+        <p>Test 5 hook variations before posting, pick the winner. Stop guessing, start knowing. Your next viral video starts with a better hook.</p>
+      </div>
+
+      <div class="use-case-card">
+        <div class="use-case-icon">🏢</div>
+        <h3>Social Media Agency</h3>
+        <p>Batch score all client hooks, deliver reports in seconds. Add measurable hook quality scores to your client deliverables. Charge more, work smarter.</p>
+      </div>
+
+      <div class="use-case-card">
+        <div class="use-case-icon">🛠️</div>
+        <h3>SaaS Builder</h3>
+        <p>Embed hook scoring into your own product with 3 lines of code. Add real AI-powered content intelligence to your platform. Your users get smarter, you get stickier.</p>
+      </div>
+
+      <div class="use-case-card">
+        <div class="use-case-icon">⚙️</div>
+        <h3>n8n / Make Builder</h3>
+        <p>Add HookScore to your automation workflows. Score new content as it's created, trigger rewrites on low scores, or build a full content quality pipeline without writing a line of code.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================
+     QUICK START
+============================= -->
+<section class="section quickstart" id="quickstart">
+  <div class="container text-center">
+    <span class="section-label">Quick Start</span>
+    <h2 class="section-title">From zero to scoring in 60 seconds</h2>
+    <p class="section-sub">Grab your API key from RapidAPI and make your first call.</p>
+
+    <div class="code-container" style="margin-top:40px">
+      <div class="code-bar">
+        <div class="code-tabs" style="border-bottom:none;margin:0">
+          <button class="code-tab active" onclick="switchTab('python', this)">Python</button>
+          <button class="code-tab" onclick="switchTab('curl', this)">cURL</button>
+        </div>
+        <button class="copy-btn" id="copyBtn" onclick="copyCode()">Copy</button>
+      </div>
+
+      <!-- Python -->
+      <pre class="code-block active" id="code-python"><code><span class="c-keyword">import</span> requests
+
+<span class="c-var">url</span> = <span class="c-string">"https://hookscore.p.rapidapi.com/score"</span>
+
+<span class="c-var">payload</span> = {
+    <span class="c-string">"hook"</span>: <span class="c-string">"5 habits that made me $10k this month"</span>,
+    <span class="c-string">"platform"</span>: <span class="c-string">"tiktok"</span>
+}
+
+<span class="c-var">headers</span> = {
+    <span class="c-string">"x-rapidapi-key"</span>: <span class="c-string">"YOUR_API_KEY_HERE"</span>,
+    <span class="c-string">"x-rapidapi-host"</span>: <span class="c-string">"hookscore.p.rapidapi.com"</span>,
+    <span class="c-string">"Content-Type"</span>: <span class="c-string">"application/json"</span>
+}
+
+<span class="c-var">response</span> = requests.<span class="c-fn">post</span>(url, json=payload, headers=headers)
+<span class="c-var">data</span> = response.<span class="c-fn">json</span>()
+
+<span class="c-fn">print</span>(<span class="c-string">f"Score: <span class="c-prop">{data['score']}</span>/100"</span>)
+<span class="c-fn">print</span>(<span class="c-string">f"Grade: <span class="c-prop">{data['grade']}</span>"</span>)
+<span class="c-fn">print</span>(<span class="c-string">f"Feedback: <span class="c-prop">{data['feedback']}</span>"</span>)
+
+<span class="c-comment"># Output:</span>
+<span class="c-comment"># Score: 84/100</span>
+<span class="c-comment"># Grade: A-</span>
+<span class="c-comment"># Feedback: Strong specificity. Consider adding urgency...</span></code></pre>
+
+      <!-- cURL -->
+      <pre class="code-block" id="code-curl"><code><span class="c-fn">curl</span> <span class="c-flag">-X POST</span> <span class="c-url">https://hookscore.p.rapidapi.com/score</span> \
+  <span class="c-flag">-H</span> <span class="c-string">"x-rapidapi-key: YOUR_API_KEY_HERE"</span> \
+  <span class="c-flag">-H</span> <span class="c-string">"x-rapidapi-host: hookscore.p.rapidapi.com"</span> \
+  <span class="c-flag">-H</span> <span class="c-string">"Content-Type: application/json"</span> \
+  <span class="c-flag">-d</span> <span class="c-string">'{
+    "hook": "5 habits that made me $10k this month",
+    "platform": "tiktok"
+  }'</span>
+
+<span class="c-comment"># Response:</span>
+<span class="c-comment"># {</span>
+<span class="c-comment">#   "score": 84,</span>
+<span class="c-comment">#   "grade": "A-",</span>
+<span class="c-comment">#   "platform": "tiktok",</span>
+<span class="c-comment">#   "strengths": ["Specific number", "Income claim", "Implied story"],</span>
+<span class="c-comment">#   "weaknesses": ["Overused framing", "Missing urgency"],</span>
+<span class="c-comment">#   "feedback": "Strong hook. Tweak the income phrasing for originality."</span>
+<span class="c-comment"># }</span></code></pre>
+
+    </div>
+
+    <div style="margin-top:32px">
+      <a href="https://rapidapi.com/search/hookscore" target="_blank" rel="noopener" class="btn btn-primary">
+        Get Your Free API Key →
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================
+     FOOTER
+============================= -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <strong>🎣 HookScore API</strong> — Built for the creator economy
+    </div>
+    <ul class="footer-links">
+      <li><a href="https://rapidapi.com/search/hookscore" target="_blank" rel="noopener">RapidAPI</a></li>
+      <li><a href="#quickstart">Docs</a></li>
+      <li><a href="mailto:hello@hookscore.dev">Contact</a></li>
+    </ul>
+  </div>
+  <div class="container">
+    <div class="footer-copy">
+      © 2026 HookScore API. All rights reserved. Built with ❤️ for creators.
+    </div>
+  </div>
+</footer>
+
+<!-- ============================
+     JAVASCRIPT
+============================= -->
+<script>
+  /* ---- Mobile Nav ---- */
+  const hamburger = document.getElementById('hamburger');
+  const mobileNav = document.getElementById('mobileNav');
+
+  hamburger.addEventListener('click', () => {
+    mobileNav.classList.toggle('open');
+  });
+
+  function closeMobileNav() {
+    mobileNav.classList.remove('open');
+  }
+
+  /* ---- Nav scroll shadow ---- */
+  window.addEventListener('scroll', () => {
+    const nav = document.getElementById('nav');
+    if (window.scrollY > 20) {
+      nav.style.background = 'rgba(13,13,13,0.97)';
+    } else {
+      nav.style.background = 'rgba(13,13,13,0.85)';
+    }
+  });
+
+  /* ---- Demo Widget ---- */
+  let demoRan = false;
+
+  function runDemo() {
+    const btn = document.getElementById('scoreBtn');
+    const analyzing = document.getElementById('demoAnalyzing');
+    const output = document.getElementById('demoOutput');
+    const input = document.getElementById('hookInput');
+
+    if (!input.value.trim()) {
+      input.focus();
+      input.style.borderColor = 'var(--red)';
+      setTimeout(() => { input.style.borderColor = ''; }, 1200);
+      return;
+    }
+
+    // Hide previous output
+    output.classList.remove('visible');
+    analyzing.classList.remove('active');
+
+    // Disable button
+    btn.disabled = true;
+    btn.textContent = 'Analyzing…';
+    btn.style.opacity = '0.7';
+
+    // Show analyzing
+    setTimeout(() => {
+      analyzing.classList.add('active');
+    }, 100);
+
+    // Show output after delay
+    setTimeout(() => {
+      analyzing.classList.remove('active');
+      output.classList.add('visible');
+      btn.disabled = false;
+      btn.textContent = 'Score It ⚡';
+      btn.style.opacity = '1';
+      demoRan = true;
+    }, 1800);
+  }
+
+  // Allow pressing Enter in the input
+  document.getElementById('hookInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') runDemo();
+  });
+
+  // Auto-run demo after 2s so it catches the eye
+  setTimeout(() => {
+    if (!demoRan) runDemo();
+  }, 2000);
+
+  /* ---- Code Tabs ---- */
+  function switchTab(lang, el) {
+    // Deactivate all
+    document.querySelectorAll('.code-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.code-block').forEach(b => b.classList.remove('active'));
+
+    // Activate selected
+    el.classList.add('active');
+    document.getElementById('code-' + lang).classList.add('active');
+  }
+
+  /* ---- Copy Code ---- */
+  function copyCode() {
+    const activeBlock = document.querySelector('.code-block.active code');
+    const text = activeBlock ? activeBlock.innerText : '';
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = 'Copied!';
+      btn.style.color = 'var(--green)';
+      btn.style.borderColor = 'var(--green)';
+      setTimeout(() => {
+        btn.textContent = 'Copy';
+        btn.style.color = '';
+        btn.style.borderColor = '';
+      }, 2000);
+    });
+  }
+
+  /* ---- Smooth scroll for nav links ---- */
+  document.querySelectorAll('a[href^="#"]').forEach(link => {
+    link.addEventListener('click', e => {
+      const target = document.querySelector(link.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

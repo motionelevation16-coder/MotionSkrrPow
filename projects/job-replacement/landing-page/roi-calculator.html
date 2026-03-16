@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ROI Calculator — Motion Elevation</title>
+  <meta name="description" content="Find out exactly how much manual work is costing your business every month. Free ROI calculator by Motion Elevation." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background-color: #080c12;
+      color: #e2e8f0;
+      line-height: 1.6;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    :root {
+      --accent: #6366f1;
+      --accent-light: #818cf8;
+      --accent-glow: rgba(99, 102, 241, 0.15);
+      --accent-border: rgba(99, 102, 241, 0.35);
+      --surface: #0f1520;
+      --surface-2: #151d2e;
+      --surface-3: #1a2540;
+      --border: rgba(255,255,255,0.07);
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --green: #10b981;
+      --green-glow: rgba(16, 185, 129, 0.15);
+      --red: #ef4444;
+      --red-glow: rgba(239, 68, 68, 0.15);
+      --yellow: #f59e0b;
+      --radius: 12px;
+      --radius-lg: 20px;
+      --shadow: 0 4px 24px rgba(0,0,0,0.4);
+      --shadow-lg: 0 12px 60px rgba(0,0,0,0.5);
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(8, 12, 18, 0.9); backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border); padding: 16px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo {
+      font-size: 18px; font-weight: 800; letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #818cf8, #c084fc);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .nav-back {
+      display: flex; align-items: center; gap: 6px;
+      color: var(--text-muted); font-size: 14px; text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-back:hover { color: var(--accent-light); }
+
+    /* MAIN LAYOUT */
+    main {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 120px 24px 80px;
+    }
+
+    /* HEADER */
+    .hero {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--accent-glow); border: 1px solid var(--accent-border);
+      color: var(--accent-light); font-size: 11px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 6px 14px; border-radius: 100px;
+      margin-bottom: 20px;
+    }
+    .badge-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent-light); animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    h1 {
+      font-size: clamp(28px, 5vw, 52px); font-weight: 800;
+      line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 16px;
+    }
+    .hero-sub {
+      color: var(--text-muted); font-size: 18px; max-width: 540px; margin: 0 auto;
+    }
+
+    /* PROGRESS BAR */
+    .progress-wrap {
+      background: var(--surface); border-radius: 100px;
+      height: 6px; margin-bottom: 48px; overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%; border-radius: 100px;
+      background: linear-gradient(90deg, #6366f1, #8b5cf6);
+      transition: width 0.5s ease;
+    }
+    .progress-label {
+      text-align: center; font-size: 13px; color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    /* STEP CARD */
+    .step-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 40px;
+      transition: all 0.4s ease;
+    }
+
+    .step { display: none; }
+    .step.active { display: block; animation: fadeSlide 0.4s ease; }
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .step-number {
+      font-size: 12px; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--accent-light);
+      margin-bottom: 10px;
+    }
+    .step-question {
+      font-size: clamp(20px, 3vw, 28px); font-weight: 700;
+      line-height: 1.25; margin-bottom: 8px;
+    }
+    .step-hint {
+      color: var(--text-muted); font-size: 14px; margin-bottom: 32px;
+    }
+
+    /* INPUT STYLES */
+    .input-group {
+      position: relative; margin-bottom: 32px;
+    }
+    .input-prefix {
+      position: absolute; left: 18px; top: 50%; transform: translateY(-50%);
+      color: var(--text-muted); font-size: 20px; font-weight: 600; pointer-events: none;
+    }
+    .input-suffix {
+      position: absolute; right: 18px; top: 50%; transform: translateY(-50%);
+      color: var(--text-muted); font-size: 14px; pointer-events: none;
+    }
+    input[type="number"] {
+      width: 100%; background: var(--surface-2);
+      border: 2px solid var(--border); border-radius: var(--radius);
+      color: #e2e8f0; font-size: 28px; font-weight: 700;
+      padding: 20px 60px 20px 52px; outline: none;
+      transition: border-color 0.2s, background 0.2s;
+      -moz-appearance: textfield;
+    }
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+    input[type="number"]:focus {
+      border-color: var(--accent); background: var(--surface-3);
+    }
+
+    /* SLIDER OPTION BUTTONS */
+    .option-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 12px; margin-bottom: 32px;
+    }
+    .option-btn {
+      background: var(--surface-2); border: 2px solid var(--border);
+      border-radius: var(--radius); padding: 16px 12px; text-align: center;
+      cursor: pointer; transition: all 0.2s; color: #e2e8f0; font-size: 15px;
+      font-weight: 600;
+    }
+    .option-btn:hover { border-color: var(--accent-border); background: var(--accent-glow); }
+    .option-btn.selected { border-color: var(--accent); background: var(--accent-glow); color: var(--accent-light); }
+    .option-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; font-weight: 400; }
+
+    /* NAVIGATION BUTTONS */
+    .step-nav {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 16px 32px; border-radius: var(--radius); font-size: 15px; font-weight: 600;
+      cursor: pointer; border: none; transition: all 0.2s ease;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #fff; box-shadow: 0 4px 24px rgba(99,102,241,0.4);
+      flex: 1;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(99,102,241,0.55); }
+    .btn-ghost {
+      background: transparent; border: 1px solid var(--border);
+      color: var(--text-muted); padding: 16px 20px;
+    }
+    .btn-ghost:hover { border-color: var(--border); color: #e2e8f0; background: var(--surface-2); }
+    .btn-green {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff; box-shadow: 0 4px 24px rgba(16,185,129,0.4);
+      flex: 1; font-size: 16px; padding: 20px 32px;
+    }
+    .btn-green:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(16,185,129,0.55); }
+
+    /* LIVE PREVIEW (during steps) */
+    .live-preview {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 16px 20px;
+      margin-bottom: 32px; display: flex; align-items: center; gap: 12px;
+    }
+    .live-icon { font-size: 20px; }
+    .live-text { font-size: 13px; color: var(--text-muted); }
+    .live-value { font-size: 16px; font-weight: 700; color: var(--accent-light); }
+
+    /* ============ RESULTS SCREEN ============ */
+    #results { display: none; }
+    #results.show { display: block; animation: fadeSlide 0.5s ease; }
+
+    .results-header {
+      text-align: center; margin-bottom: 48px;
+    }
+    .results-header h2 {
+      font-size: clamp(24px, 4vw, 42px); font-weight: 800;
+      line-height: 1.1; margin-bottom: 12px;
+    }
+    .results-header p { color: var(--text-muted); font-size: 16px; }
+
+    .results-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 16px; margin-bottom: 24px;
+    }
+    @media (max-width: 600px) { .results-grid { grid-template-columns: 1fr; } }
+
+    .result-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 28px 24px;
+      position: relative; overflow: hidden;
+    }
+    .result-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    }
+    .result-card.loss::before { background: linear-gradient(90deg, #ef4444, #f97316); }
+    .result-card.revenue::before { background: linear-gradient(90deg, #f59e0b, #ef4444); }
+    .result-card.total::before { background: linear-gradient(90deg, #ef4444, #dc2626); }
+    .result-card.roi::before { background: linear-gradient(90deg, #6366f1, #8b5cf6); }
+
+    .result-label {
+      font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px;
+    }
+    .result-value {
+      font-size: clamp(28px, 4vw, 40px); font-weight: 800; line-height: 1;
+      margin-bottom: 6px;
+    }
+    .result-card.loss .result-value { color: #ef4444; }
+    .result-card.revenue .result-value { color: #f59e0b; }
+    .result-card.total .result-value { color: #ef4444; }
+    .result-card.roi .result-value { color: var(--accent-light); }
+
+    .result-sub { font-size: 13px; color: var(--text-muted); }
+
+    /* TOTAL COST CARD - full width */
+    .result-card.total-big {
+      background: linear-gradient(135deg, rgba(239,68,68,0.1), rgba(220,38,38,0.05));
+      border: 1px solid rgba(239,68,68,0.25);
+      grid-column: 1 / -1;
+      text-align: center; padding: 36px;
+    }
+    .result-card.total-big .result-value {
+      font-size: clamp(40px, 7vw, 72px); color: #ef4444;
+    }
+    .result-card.total-big .result-label { font-size: 14px; margin-bottom: 16px; }
+
+    /* ROI BANNER */
+    .roi-banner {
+      background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.1));
+      border: 1px solid var(--accent-border);
+      border-radius: var(--radius-lg); padding: 32px;
+      text-align: center; margin: 24px 0;
+    }
+    .roi-banner h3 {
+      font-size: 14px; color: var(--text-muted); text-transform: uppercase;
+      letter-spacing: 0.1em; margin-bottom: 8px;
+    }
+    .roi-multiplier {
+      font-size: clamp(48px, 8vw, 80px); font-weight: 800;
+      background: linear-gradient(135deg, #818cf8, #c084fc);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      line-height: 1;
+    }
+    .roi-payback {
+      font-size: 18px; color: var(--text-muted); margin-top: 8px;
+    }
+    .roi-payback span { color: var(--green); font-weight: 700; }
+
+    /* PRICE COMPARISON */
+    .price-compare {
+      display: flex; align-items: center; justify-content: center; gap: 20px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 24px; margin: 24px 0;
+      flex-wrap: wrap; gap: 12px;
+    }
+    .price-item { text-align: center; }
+    .price-item .label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+    .price-item .amount { font-size: 28px; font-weight: 800; }
+    .price-item.cost .amount { color: #ef4444; text-decoration: line-through; opacity: 0.8; }
+    .price-item.solution .amount { color: var(--green); }
+    .price-divider { font-size: 28px; color: var(--text-dim); }
+
+    /* CTA SECTION */
+    .cta-section {
+      background: linear-gradient(135deg, var(--surface-2), var(--surface-3));
+      border: 1px solid var(--accent-border);
+      border-radius: var(--radius-lg); padding: 40px; text-align: center;
+      margin-top: 32px;
+    }
+    .cta-section h3 {
+      font-size: clamp(20px, 3vw, 28px); font-weight: 800; margin-bottom: 12px;
+    }
+    .cta-section p { color: var(--text-muted); margin-bottom: 28px; font-size: 15px; }
+    .cta-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .cta-buttons .btn { min-width: 200px; }
+
+    /* SHARE CARD */
+    .share-section { margin-top: 32px; }
+    .share-section h4 { font-size: 14px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 16px; }
+    .share-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+    .share-btn {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 18px; border-radius: var(--radius); font-size: 14px;
+      font-weight: 600; cursor: pointer; border: 1px solid var(--border);
+      background: var(--surface-2); color: #e2e8f0; transition: all 0.2s;
+    }
+    .share-btn:hover { border-color: var(--accent-border); background: var(--accent-glow); color: var(--accent-light); }
+
+    /* SHARE MODAL */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75); z-index: 1000;
+      align-items: center; justify-content: center; padding: 24px;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 32px; max-width: 540px; width: 100%;
+      animation: fadeSlide 0.3s ease;
+    }
+    .modal h3 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+    .modal p { color: var(--text-muted); font-size: 14px; margin-bottom: 20px; }
+    .share-text-box {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 20px; font-family: monospace;
+      font-size: 13px; line-height: 1.6; color: #c7d2fe;
+      white-space: pre-wrap; margin-bottom: 20px; max-height: 200px; overflow-y: auto;
+    }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+    .btn-copy {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #fff; padding: 12px 24px; border-radius: var(--radius);
+      font-size: 14px; font-weight: 600; cursor: pointer; border: none;
+      transition: all 0.2s;
+    }
+    .btn-copy:hover { transform: translateY(-1px); }
+    .btn-close-modal {
+      background: var(--surface-2); border: 1px solid var(--border);
+      color: var(--text-muted); padding: 12px 20px; border-radius: var(--radius);
+      font-size: 14px; cursor: pointer; transition: all 0.2s;
+    }
+
+    /* TOAST */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px; z-index: 2000;
+      background: var(--green); color: #fff; padding: 14px 24px;
+      border-radius: var(--radius); font-size: 14px; font-weight: 600;
+      transform: translateY(80px); opacity: 0; transition: all 0.3s ease;
+      box-shadow: 0 8px 32px rgba(16,185,129,0.4);
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    /* FOOTER */
+    footer {
+      text-align: center; padding: 48px 24px 32px;
+      color: var(--text-dim); font-size: 13px;
+    }
+    footer a { color: var(--text-muted); text-decoration: underline; }
+
+    /* GLOW EFFECT */
+    .glow-orb {
+      position: fixed; width: 600px; height: 600px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(99,102,241,0.08) 0%, transparent 70%);
+      top: -200px; right: -200px; pointer-events: none; z-index: 0;
+    }
+  </style>
+</head>
+<body>
+
+<div class="glow-orb"></div>
+
+<nav>
+  <div class="nav-logo">Motion Elevation</div>
+  <a href="index.html" class="nav-back">
+    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    Back to site
+  </a>
+</nav>
+
+<main>
+
+  <!-- QUIZ -->
+  <div id="quiz">
+    <div class="hero">
+      <div class="badge"><span class="badge-dot"></span>Free ROI Calculator</div>
+      <h1>How much is manual work <span style="background: linear-gradient(135deg, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">costing you?</span></h1>
+      <p class="hero-sub">Answer 5 quick questions. We'll show you exactly what automation is worth for your business — in euros.</p>
+    </div>
+
+    <div class="progress-label" id="progress-label">Step 1 of 5</div>
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progress-bar" style="width: 20%"></div>
+    </div>
+
+    <div class="step-card">
+
+      <!-- STEP 1: Admin hours -->
+      <div class="step active" id="step-1">
+        <div class="step-number">Question 1 of 5</div>
+        <div class="step-question">⏱️ How many hours per week do you (or your team) spend on repetitive admin tasks?</div>
+        <div class="step-hint">Think: data entry, scheduling, copy-pasting, sending manual follow-ups, invoicing…</div>
+        <div class="option-grid" id="hours-options">
+          <div class="option-btn" data-value="2" onclick="selectOption('hours', 2, this)">
+            1–3h<div class="option-label">Light</div>
+          </div>
+          <div class="option-btn" data-value="6" onclick="selectOption('hours', 6, this)">
+            4–8h<div class="option-label">Moderate</div>
+          </div>
+          <div class="option-btn" data-value="12" onclick="selectOption('hours', 12, this)">
+            8–16h<div class="option-label">Heavy</div>
+          </div>
+          <div class="option-btn" data-value="20" onclick="selectOption('hours', 20, this)">
+            20h+<div class="option-label">Critical</div>
+          </div>
+        </div>
+        <div class="input-group">
+          <span class="input-suffix">hrs/week</span>
+          <input type="number" id="hours-input" placeholder="0" min="1" max="80" oninput="inputs.hours = +this.value; updateLive();">
+        </div>
+        <div class="step-nav">
+          <button class="btn btn-primary" onclick="nextStep(1)">Next →</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Hourly rate -->
+      <div class="step" id="step-2">
+        <div class="step-number">Question 2 of 5</div>
+        <div class="step-question">💶 What's the hourly cost of the people doing these tasks?</div>
+        <div class="step-hint">Your rate, or average hourly salary of your team members doing these tasks.</div>
+        <div class="option-grid">
+          <div class="option-btn" data-value="15" onclick="selectOption('rate', 15, this)">
+            €15<div class="option-label">Entry level</div>
+          </div>
+          <div class="option-btn" data-value="30" onclick="selectOption('rate', 30, this)">
+            €30<div class="option-label">Mid level</div>
+          </div>
+          <div class="option-btn" data-value="60" onclick="selectOption('rate', 60, this)">
+            €60<div class="option-label">Senior</div>
+          </div>
+          <div class="option-btn" data-value="100" onclick="selectOption('rate', 100, this)">
+            €100+<div class="option-label">Executive</div>
+          </div>
+        </div>
+        <div class="input-group">
+          <span class="input-prefix">€</span>
+          <span class="input-suffix">/hour</span>
+          <input type="number" id="rate-input" placeholder="0" min="1" oninput="inputs.rate = +this.value; updateLive();">
+        </div>
+        <div id="live-1" class="live-preview" style="display:none;">
+          <span class="live-icon">🔴</span>
+          <div>
+            <div class="live-text">Monthly cost of manual admin work</div>
+            <div class="live-value" id="live-1-value">—</div>
+          </div>
+        </div>
+        <div class="step-nav">
+          <button class="btn btn-ghost" onclick="prevStep(2)">←</button>
+          <button class="btn btn-primary" onclick="nextStep(2)">Next →</button>
+        </div>
+      </div>
+
+      <!-- STEP 3: Lost leads -->
+      <div class="step" id="step-3">
+        <div class="step-number">Question 3 of 5</div>
+        <div class="step-question">📉 How many leads go cold per week because of slow follow-up?</div>
+        <div class="step-hint">Leads who don't hear back within 5 minutes are 10x less likely to convert.</div>
+        <div class="option-grid">
+          <div class="option-btn" data-value="1" onclick="selectOption('leads', 1, this)">
+            0–1<div class="option-label">Rarely</div>
+          </div>
+          <div class="option-btn" data-value="3" onclick="selectOption('leads', 3, this)">
+            2–4<div class="option-label">Sometimes</div>
+          </div>
+          <div class="option-btn" data-value="7" onclick="selectOption('leads', 7, this)">
+            5–10<div class="option-label">Often</div>
+          </div>
+          <div class="option-btn" data-value="15" onclick="selectOption('leads', 15, this)">
+            10+<div class="option-label">Always</div>
+          </div>
+        </div>
+        <div class="input-group">
+          <span class="input-suffix">leads/week</span>
+          <input type="number" id="leads-input" placeholder="0" min="0" oninput="inputs.leads = +this.value; updateLive();">
+        </div>
+        <div class="step-nav">
+          <button class="btn btn-ghost" onclick="prevStep(3)">←</button>
+          <button class="btn btn-primary" onclick="nextStep(3)">Next →</button>
+        </div>
+      </div>
+
+      <!-- STEP 4: Deal value -->
+      <div class="step" id="step-4">
+        <div class="step-number">Question 4 of 5</div>
+        <div class="step-question">💰 What's your average deal value when you close a new client?</div>
+        <div class="step-hint">The average revenue per new customer or contract you close.</div>
+        <div class="option-grid">
+          <div class="option-btn" data-value="200" onclick="selectOption('deal', 200, this)">
+            €200<div class="option-label">Small ticket</div>
+          </div>
+          <div class="option-btn" data-value="750" onclick="selectOption('deal', 750, this)">
+            €750<div class="option-label">Mid ticket</div>
+          </div>
+          <div class="option-btn" data-value="2000" onclick="selectOption('deal', 2000, this)">
+            €2,000<div class="option-label">High ticket</div>
+          </div>
+          <div class="option-btn" data-value="5000" onclick="selectOption('deal', 5000, this)">
+            €5,000+<div class="option-label">Enterprise</div>
+          </div>
+        </div>
+        <div class="input-group">
+          <span class="input-prefix">€</span>
+          <span class="input-suffix">per deal</span>
+          <input type="number" id="deal-input" placeholder="0" min="0" oninput="inputs.deal = +this.value; updateLive();">
+        </div>
+        <div id="live-2" class="live-preview" style="display:none;">
+          <span class="live-icon">📉</span>
+          <div>
+            <div class="live-text">Revenue left on the table per month</div>
+            <div class="live-value" id="live-2-value">—</div>
+          </div>
+        </div>
+        <div class="step-nav">
+          <button class="btn btn-ghost" onclick="prevStep(4)">←</button>
+          <button class="btn btn-primary" onclick="nextStep(4)">Next →</button>
+        </div>
+      </div>
+
+      <!-- STEP 5: Team size -->
+      <div class="step" id="step-5">
+        <div class="step-number">Question 5 of 5</div>
+        <div class="step-question">👥 How many team members are involved in these manual tasks?</div>
+        <div class="step-hint">Include yourself. We'll multiply the time cost to get the real picture.</div>
+        <div class="option-grid">
+          <div class="option-btn" data-value="1" onclick="selectOption('team', 1, this)">
+            Just me<div class="option-label">Solo</div>
+          </div>
+          <div class="option-btn" data-value="2" onclick="selectOption('team', 2, this)">
+            2–3<div class="option-label">Small team</div>
+          </div>
+          <div class="option-btn" data-value="5" onclick="selectOption('team', 5, this)">
+            4–6<div class="option-label">Growing</div>
+          </div>
+          <div class="option-btn" data-value="10" onclick="selectOption('team', 10, this)">
+            7+<div class="option-label">Established</div>
+          </div>
+        </div>
+        <div class="input-group">
+          <span class="input-suffix">people</span>
+          <input type="number" id="team-input" placeholder="1" min="1" value="1" oninput="inputs.team = +this.value; updateLive();">
+        </div>
+        <div class="step-nav">
+          <button class="btn btn-ghost" onclick="prevStep(5)">←</button>
+          <button class="btn btn-green" onclick="showResults()">
+            🚀 Calculate My ROI
+          </button>
+        </div>
+      </div>
+
+    </div><!-- end step-card -->
+  </div><!-- end quiz -->
+
+  <!-- RESULTS -->
+  <div id="results">
+
+    <div class="results-header">
+      <div class="badge"><span class="badge-dot"></span>Your Results</div>
+      <h2>Here's what manual work is <span style="color:#ef4444;">costing you</span></h2>
+      <p id="results-sub">Based on your answers, here's the real financial picture.</p>
+    </div>
+
+    <div class="results-grid">
+      <div class="result-card loss">
+        <div class="result-label">🔴 Monthly cost of manual work</div>
+        <div class="result-value" id="r-admin">€0</div>
+        <div class="result-sub" id="r-admin-sub">hours wasted each month</div>
+      </div>
+      <div class="result-card revenue">
+        <div class="result-label">📉 Missed revenue (slow follow-up)</div>
+        <div class="result-value" id="r-leads">€0</div>
+        <div class="result-sub" id="r-leads-sub">leads lost to competitors each month</div>
+      </div>
+    </div>
+
+    <div class="result-card total-big">
+      <div class="result-label">💸 Total monthly cost of NOT automating</div>
+      <div class="result-value" id="r-total">€0</div>
+      <div class="result-sub">This is what you're losing every single month by staying manual</div>
+    </div>
+
+    <div class="price-compare">
+      <div class="price-item cost">
+        <div class="label">What you lose/month</div>
+        <div class="amount" id="pc-loss">€0</div>
+      </div>
+      <div class="price-divider">→</div>
+      <div class="price-item solution">
+        <div class="label">Motion Elevation costs</div>
+        <div class="amount">€150/mo</div>
+      </div>
+    </div>
+
+    <div class="roi-banner">
+      <h3>Your Return on Investment</h3>
+      <div class="roi-multiplier" id="r-roi">0x</div>
+      <div class="roi-payback">Payback period: <span id="r-payback">— days</span></div>
+    </div>
+
+    <div class="cta-section">
+      <h3>Ready to stop bleeding money? 🩸</h3>
+      <p>Book a free 30-minute call. We'll show you exactly which automations will deliver the biggest ROI for your business — no hard sell, just strategy.</p>
+      <div class="cta-buttons">
+        <a href="https://calendly.com/motion-elevation/strategy-call" target="_blank" class="btn btn-green" style="display:inline-flex; text-decoration:none;">
+          📅 Book Free Strategy Call
+        </a>
+        <button class="btn btn-ghost" onclick="restartQuiz()">↺ Recalculate</button>
+      </div>
+    </div>
+
+    <div class="share-section">
+      <h4>Share your results</h4>
+      <div class="share-buttons">
+        <button class="share-btn" onclick="shareResults('copy')">
+          📋 Copy summary
+        </button>
+        <button class="share-btn" onclick="shareResults('linkedin')">
+          💼 Share on LinkedIn
+        </button>
+        <button class="share-btn" onclick="shareResults('twitter')">
+          🐦 Share on X
+        </button>
+        <button class="share-btn" onclick="shareResults('whatsapp')">
+          💬 Send via WhatsApp
+        </button>
+      </div>
+    </div>
+
+  </div><!-- end results -->
+
+</main>
+
+<footer>
+  <p>Built by <a href="index.html">Motion Elevation</a> · AI-Powered Business Automation · <a href="index.html#contact">Contact us</a></p>
+</footer>
+
+<!-- SHARE MODAL -->
+<div class="modal-overlay" id="share-modal">
+  <div class="modal">
+    <h3>📊 Your ROI Summary</h3>
+    <p>Copy this text and share it anywhere:</p>
+    <div class="share-text-box" id="share-text"></div>
+    <div class="modal-actions">
+      <button class="btn-close-modal" onclick="closeModal()">Close</button>
+      <button class="btn-copy" onclick="copyToClipboard()">📋 Copy to clipboard</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">✅ Copied to clipboard!</div>
+
+<script>
+  // ============ STATE ============
+  const inputs = { hours: 0, rate: 0, leads: 0, deal: 0, team: 1 };
+  let currentStep = 1;
+  const totalSteps = 5;
+  let calculated = {};
+
+  // ============ NAVIGATION ============
+  function nextStep(from) {
+    const key = { 1:'hours', 2:'rate', 3:'leads', 4:'deal', 5:'team' }[from];
+    if (!inputs[key] || inputs[key] <= 0) {
+      // Try to get from input field
+      const el = document.getElementById(key + '-input');
+      if (el && +el.value > 0) {
+        inputs[key] = +el.value;
+      } else {
+        shakeCurrent();
+        return;
+      }
+    }
+    goToStep(from + 1);
+  }
+
+  function prevStep(from) {
+    goToStep(from - 1);
+  }
+
+  function goToStep(n) {
+    document.querySelector('.step.active').classList.remove('active');
+    document.getElementById('step-' + n).classList.add('active');
+    currentStep = n;
+    updateProgress();
+    updateLive();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function updateProgress() {
+    const pct = (currentStep / totalSteps) * 100;
+    document.getElementById('progress-bar').style.width = pct + '%';
+    document.getElementById('progress-label').textContent = `Step ${currentStep} of ${totalSteps}`;
+  }
+
+  function shakeCurrent() {
+    const card = document.querySelector('.step-card');
+    card.style.transform = 'translateX(-8px)';
+    setTimeout(() => { card.style.transform = 'translateX(8px)'; }, 100);
+    setTimeout(() => { card.style.transform = 'translateX(-6px)'; }, 200);
+    setTimeout(() => { card.style.transform = 'translateX(0)'; }, 300);
+  }
+
+  // ============ OPTION BUTTONS ============
+  function selectOption(field, value, el) {
+    // Deselect others in same group
+    el.closest('.option-grid').querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+    inputs[field] = value;
+    // Also set input field
+    const inputEl = document.getElementById(field + '-input');
+    if (inputEl) inputEl.value = value;
+    updateLive();
+  }
+
+  // ============ LIVE PREVIEW ============
+  function updateLive() {
+    const h = inputs.hours || 0;
+    const r = inputs.rate || 0;
+    const t = inputs.team || 1;
+    const adminMonthly = h * r * t * 4.33;
+
+    if (currentStep >= 2 && adminMonthly > 0) {
+      document.getElementById('live-1').style.display = 'flex';
+      document.getElementById('live-1-value').textContent = '€' + fmt(adminMonthly) + '/month';
+    }
+
+    const l = inputs.leads || 0;
+    const d = inputs.deal || 0;
+    const leadRevLost = l * d * 0.3 * 4.33; // ~30% close rate on contacted leads
+
+    if (currentStep >= 4 && leadRevLost > 0) {
+      document.getElementById('live-2').style.display = 'flex';
+      document.getElementById('live-2-value').textContent = '€' + fmt(leadRevLost) + '/month';
+    }
+  }
+
+  // ============ RESULTS ============
+  function showResults() {
+    // Get team value
+    const teamEl = document.getElementById('team-input');
+    if (teamEl && +teamEl.value > 0) inputs.team = +teamEl.value;
+    if (!inputs.team) inputs.team = 1;
+
+    // Calculate
+    const hoursPerMonth = inputs.hours * inputs.team * 4.33;
+    const adminCost = hoursPerMonth * inputs.rate;
+    const leadsPerMonth = inputs.leads * 4.33;
+    const revenueLost = leadsPerMonth * inputs.deal * 0.3;
+    const totalCost = adminCost + revenueLost;
+    const motionCost = 150;
+    const roi = totalCost / motionCost;
+    const paybackDays = Math.round(30 / roi);
+
+    calculated = { adminCost, revenueLost, totalCost, roi, paybackDays, hoursPerMonth, leadsPerMonth };
+
+    // Hide quiz, show results
+    document.getElementById('quiz').style.display = 'none';
+    const resultsEl = document.getElementById('results');
+    resultsEl.style.display = 'block';
+    resultsEl.classList.add('show');
+
+    // Animate counting up
+    animateValue('r-admin', 0, adminCost, '€', '/month');
+    animateValue('r-leads', 0, revenueLost, '€', '/month');
+    animateValue('r-total', 0, totalCost, '€', '/month', 800);
+    animateValue('pc-loss', 0, totalCost, '€', '/mo');
+
+    setTimeout(() => {
+      animateROI('r-roi', roi);
+    }, 600);
+
+    document.getElementById('r-admin-sub').textContent =
+      `${Math.round(hoursPerMonth)} hours wasted each month × ${inputs.team} team member${inputs.team > 1 ? 's' : ''}`;
+    document.getElementById('r-leads-sub').textContent =
+      `~${Math.round(leadsPerMonth)} leads going cold each month`;
+
+    if (paybackDays < 1) {
+      document.getElementById('r-payback').textContent = 'less than 1 day';
+    } else {
+      document.getElementById('r-payback').textContent = paybackDays + ' days';
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ============ ANIMATIONS ============
+  function animateValue(id, from, to, prefix, suffix, delay = 0) {
+    const el = document.getElementById(id);
+    const duration = 1800;
+    const start = Date.now() + delay;
+
+    function update() {
+      const now = Date.now();
+      if (now < start) { requestAnimationFrame(update); return; }
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const ease = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+      const current = from + (to - from) * ease;
+      el.textContent = prefix + fmt(current) + (suffix || '');
+      if (progress < 1) requestAnimationFrame(update);
+    }
+    requestAnimationFrame(update);
+  }
+
+  function animateROI(id, roi) {
+    const el = document.getElementById(id);
+    const duration = 1400;
+    const start = Date.now();
+    function update() {
+      const elapsed = Date.now() - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const ease = 1 - Math.pow(1 - progress, 3);
+      const current = roi * ease;
+      el.textContent = current.toFixed(1) + 'x';
+      if (progress < 1) requestAnimationFrame(update);
+    }
+    requestAnimationFrame(update);
+  }
+
+  function fmt(n) {
+    if (n >= 1000) {
+      return Math.round(n).toLocaleString('de-DE');
+    }
+    return Math.round(n).toString();
+  }
+
+  // ============ RESTART ============
+  function restartQuiz() {
+    inputs.hours = 0; inputs.rate = 0; inputs.leads = 0; inputs.deal = 0; inputs.team = 1;
+    // Clear inputs
+    ['hours','rate','leads','deal','team'].forEach(k => {
+      const el = document.getElementById(k + '-input');
+      if (el) el.value = '';
+    });
+    // Clear option selections
+    document.querySelectorAll('.option-btn.selected').forEach(b => b.classList.remove('selected'));
+    // Hide previews
+    document.getElementById('live-1').style.display = 'none';
+    document.getElementById('live-2').style.display = 'none';
+
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('results').classList.remove('show');
+    document.getElementById('quiz').style.display = 'block';
+    goToStep(1);
+  }
+
+  // ============ SHARING ============
+  function getShareText() {
+    const { adminCost, revenueLost, totalCost, roi, paybackDays } = calculated;
+    return `📊 I just calculated my automation ROI with Motion Elevation:
+
+🔴 Monthly cost of manual admin work: €${fmt(adminCost)}
+📉 Revenue lost to slow follow-up: €${fmt(revenueLost)}
+💸 Total monthly cost of NOT automating: €${fmt(totalCost)}
+
+💜 Motion Elevation costs just €150/month
+📈 My ROI would be: ${roi.toFixed(1)}x return
+⏱️ Payback period: ${paybackDays < 1 ? 'less than 1 day' : paybackDays + ' days'}
+
+Calculate yours free 👇
+https://motionele.com/roi-calculator`;
+  }
+
+  function shareResults(platform) {
+    const text = getShareText();
+    const url = 'https://motionele.com/roi-calculator';
+
+    if (platform === 'copy') {
+      document.getElementById('share-text').textContent = text;
+      document.getElementById('share-modal').classList.add('show');
+      return;
+    }
+    if (platform === 'twitter') {
+      const t = encodeURIComponent(text.slice(0, 280));
+      window.open(`https://twitter.com/intent/tweet?text=${t}`, '_blank');
+    }
+    if (platform === 'linkedin') {
+      const t = encodeURIComponent(text);
+      window.open(`https://www.linkedin.com/feed/?shareActive=true&text=${t}`, '_blank');
+    }
+    if (platform === 'whatsapp') {
+      const t = encodeURIComponent(text);
+      window.open(`https://wa.me/?text=${t}`, '_blank');
+    }
+  }
+
+  function closeModal() {
+    document.getElementById('share-modal').classList.remove('show');
+  }
+
+  function copyToClipboard() {
+    const text = document.getElementById('share-text').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      showToast('✅ Copied to clipboard!');
+      closeModal();
+    }).catch(() => {
+      // fallback
+      const el = document.getElementById('share-text');
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(range);
+      document.execCommand('copy');
+      showToast('✅ Copied!');
+      closeModal();
+    });
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  // Close modal on overlay click
+  document.getElementById('share-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  // Keyboard nav
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      const activeStep = document.querySelector('.step.active');
+      if (activeStep) {
+        const stepNum = parseInt(activeStep.id.split('-')[1]);
+        if (stepNum === 5) showResults();
+        else nextStep(stepNum);
+      }
+    }
+  });
+</script>
+
+</body>
+</html>
